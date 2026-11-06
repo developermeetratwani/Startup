@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:core/core.dart';
 
 class DriverEarningsSummary {
   final int todayEarnings; // paise
