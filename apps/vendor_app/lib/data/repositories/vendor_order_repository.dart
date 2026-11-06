@@ -67,7 +67,7 @@ class VendorOrderRepository {
       deliveryAddressId: data['deliveryAddressId'] ?? '',
       deliveryAddressSnapshot: Map<String, dynamic>.from(data['deliveryAddressSnapshot'] ?? {}),
       status: _parseOrderStatus(data['status']),
-      paymentMethod: data['paymentMethod'] == 'online' ? PaymentMethod.online : PaymentMethod.cod,
+      paymentMethod: data['paymentMethod'] == 'online' ? PaymentMethod.payOnline : PaymentMethod.cod,
       paymentStatus: _parsePaymentStatus(data['paymentStatus']),
       razorpayOrderId: data['razorpayOrderId'],
       razorpayPaymentId: data['razorpayPaymentId'],

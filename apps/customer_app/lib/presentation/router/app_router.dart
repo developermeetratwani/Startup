@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../providers/auth_provider.dart';
 import '../screens/auth/splash_screen.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/register_screen.dart';
@@ -13,6 +14,7 @@ import '../screens/cart/cart_screen.dart';
 import '../screens/checkout/checkout_screen.dart';
 import '../screens/orders/orders_list_screen.dart';
 import '../screens/orders/order_tracking_screen.dart';
+import '../screens/orders/order_exchange_screen.dart';
 import '../screens/address/address_list_screen.dart';
 import '../screens/address/add_address_screen.dart';
 import '../screens/search/search_screen.dart';
@@ -27,12 +29,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         user = FirebaseAuth.instance.currentUser;
       } catch (_) {}
 
+      final domainUser = ref.read(currentUserProvider);
+
       // Protected routes requiring authentication
       final requiresAuth = state.matchedLocation.startsWith('/orders') ||
           state.matchedLocation.startsWith('/checkout') ||
           state.matchedLocation.startsWith('/addresses');
 
-      if (user == null && requiresAuth) {
+      if (user == null && domainUser == null && requiresAuth) {
         return '/login';
       }
       return null;
@@ -81,6 +85,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/orders/track/:id',
         builder: (_, state) => OrderTrackingScreen(
+          orderId: state.pathParameters['id']!,
+        ),
+      ),
+      GoRoute(
+        path: '/orders/:id/exchange',
+        builder: (_, state) => OrderExchangeScreen(
           orderId: state.pathParameters['id']!,
         ),
       ),

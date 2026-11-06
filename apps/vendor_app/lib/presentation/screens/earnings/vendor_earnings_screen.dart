@@ -119,7 +119,7 @@ class VendorEarningsScreen extends ConsumerWidget {
                       ),
                       const SizedBox(height: 16),
                       const Text(
-                        'Share your unique store referral code with local customers in Kubernagar/Gandhinagar. Earn Store Coins on their qualifying purchases!',
+                        'Share your unique store referral link with local customers in Kubernagar, Gandhinagar & Vapi. Earn Store Coins on qualifying purchases!',
                         style: TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 14),
@@ -134,15 +134,31 @@ class VendorEarningsScreen extends ConsumerWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(earnings.referralCode, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1)),
-                            TextButton.icon(
-                              icon: const Icon(Icons.copy_rounded, size: 16),
-                              label: const Text('Copy'),
-                              onPressed: () {
-                                Clipboard.setData(ClipboardData(text: earnings.referralCode));
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text('Referral code copied!')),
-                                );
-                              },
+                            Row(
+                              children: [
+                                TextButton.icon(
+                                  icon: const Icon(Icons.copy_rounded, size: 16),
+                                  label: const Text('Copy'),
+                                  onPressed: () {
+                                    Clipboard.setData(ClipboardData(text: earnings.referralCode));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Referral code copied!')),
+                                    );
+                                  },
+                                ),
+                                const SizedBox(width: 6),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.share_rounded, size: 16),
+                                  label: const Text('Share Link'),
+                                  onPressed: () {
+                                    final link = 'https://hyperlocalfashion.in/store/store-kubernagar-1?ref=${earnings.referralCode}';
+                                    Clipboard.setData(ClipboardData(text: link));
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text('Store affiliate link copied:\n$link')),
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
                           ],
                         ),

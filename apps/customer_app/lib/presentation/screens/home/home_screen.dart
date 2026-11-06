@@ -345,6 +345,20 @@ class HomeScreen extends ConsumerWidget {
                     Navigator.pop(context);
                   },
                 ),
+                ListTile(
+                  leading: const Icon(Icons.storefront, color: AppColors.primary),
+                  title: const Text('Vapi, Gujarat'),
+                  subtitle: const Text('Gunjan Market, Koparli Rd & GIDC cluster'),
+                  onTap: () {
+                    ref.read(locationProvider.notifier).setPresetLocation(
+                          area: 'Gunjan Market',
+                          city: 'Vapi',
+                          lat: 20.3712,
+                          lng: 72.9044,
+                        );
+                    Navigator.pop(context);
+                  },
+                ),
               ],
             ),
           ),

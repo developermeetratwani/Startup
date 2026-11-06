@@ -23,4 +23,9 @@ abstract class OrderRepository {
     required String orderId,
     required String reason,
   });
+  Future<Failure?> requestOrderExchange({
+    required String orderId,
+    required String reason,
+    required String requestedSize,
+  });
 }

@@ -22,40 +22,58 @@ final vendorEarningsRepoProvider = Provider<VendorEarningsRepository>((ref) {
   return VendorEarningsRepository();
 });
 
+final vendorStoreStatusOverrideProvider = StateProvider<bool?>((ref) => null);
+
 // Current active store for this vendor
 final currentStoreProvider = StreamProvider<StoreEntity?>((ref) {
   final repo = ref.watch(vendorStoreRepoProvider);
+  final statusOverride = ref.watch(vendorStoreStatusOverrideProvider);
   String uid = 'vendor-preview-1';
   try {
     uid = FirebaseAuth.instance.currentUser?.uid ?? uid;
   } catch (_) {}
 
   return repo.watchStoreByVendorId(uid).map((store) {
-    if (store == null) {
+    final baseStore = store ?? StoreEntity(
+      id: 'store-kubernagar-1',
+      vendorId: uid,
+      name: 'Shreeji Ethnic & Bridal Studio',
+      description: 'Authentic Chaniya Choli, Kurtis & Designer Bridal Wear in Kubernagar Market',
+      bannerImageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop',
+      logoImageUrl: null,
+      categoryIds: const ['women', 'ethnic'],
+      location: const GeoLocation(
+        latitude: 23.0768,
+        longitude: 72.6346,
+        geohash: 'ts5g',
+        address: 'Shop 12-14, Main Market, Kubernagar',
+        city: 'Ahmedabad',
+        pincode: '382340',
+      ),
+      isOpen: true,
+      isActive: true,
+      rating: 4.8,
+      totalRatings: 142,
+      createdAt: DateTime.now(),
+    );
+    if (statusOverride != null) {
       return StoreEntity(
-        id: 'store-kubernagar-1',
-        vendorId: uid,
-        name: 'Shreeji Ethnic & Bridal Studio',
-        description: 'Authentic Chaniya Choli, Kurtis & Designer Bridal Wear in Kubernagar Market',
-        bannerImageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop',
-        logoImageUrl: null,
-        categoryIds: const ['women', 'ethnic'],
-        location: const GeoLocation(
-          latitude: 23.0768,
-          longitude: 72.6346,
-          geohash: 'ts5g',
-          address: 'Shop 12-14, Main Market, Kubernagar',
-          city: 'Ahmedabad',
-          pincode: '382340',
-        ),
-        isOpen: true,
-        isActive: true,
-        rating: 4.8,
-        totalRatings: 142,
-        createdAt: DateTime.now(),
+        id: baseStore.id,
+        vendorId: baseStore.vendorId,
+        name: baseStore.name,
+        description: baseStore.description,
+        bannerImageUrl: baseStore.bannerImageUrl,
+        logoImageUrl: baseStore.logoImageUrl,
+        categoryIds: baseStore.categoryIds,
+        location: baseStore.location,
+        isOpen: statusOverride,
+        isActive: baseStore.isActive,
+        rating: baseStore.rating,
+        totalRatings: baseStore.totalRatings,
+        createdAt: baseStore.createdAt,
       );
     }
-    return store;
+    return baseStore;
   });
 });
 
@@ -77,6 +95,7 @@ final vendorProductsProvider = StreamProvider<List<ProductEntity>>((ref) {
           categoryId: 'women',
           imageUrls: const [
             'https://images.unsplash.com/photo-1583391733956-3750e0ff4e8b?w=800&auto=format&fit=crop',
+            'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop',
           ],
           basePrice: 129900,
           discountedPrice: 89900,
@@ -176,9 +195,11 @@ final vendorOrdersProvider = StreamProvider<List<OrderEntity>>((ref) {
           pricing: const OrderPricing(
             productTotal: 89900,
             deliveryCharge: 2500,
+            packagingCharge: 899,
+            codCharge: 2100,
             discount: 0,
             coinRedemption: 0,
-            grandTotal: 92400,
+            grandTotal: 95399,
             platformCommission: 8990,
             vendorEarning: 80910,
             driverEarning: 2500,
@@ -198,14 +219,16 @@ final vendorOrdersProvider = StreamProvider<List<OrderEntity>>((ref) {
             'addressLine1': 'Flat 202, Shivalik Tower, Sector 21',
             'city': 'Gandhinagar',
           },
-          paymentMethod: PaymentMethod.online,
+          paymentMethod: PaymentMethod.payOnline,
           paymentStatus: PaymentStatus.paid,
           pricing: const OrderPricing(
             productTotal: 249900,
             deliveryCharge: 0,
+            packagingCharge: 2499,
+            codCharge: 0,
             discount: 0,
             coinRedemption: 0,
-            grandTotal: 249900,
+            grandTotal: 252399,
             platformCommission: 24990,
             vendorEarning: 224910,
             driverEarning: 2500,

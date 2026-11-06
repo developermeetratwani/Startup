@@ -13,7 +13,7 @@ class StoreRepositoryImpl implements StoreRepository {
   Future<(List<StoreEntity>?, Failure?)> getNearbyStores({
     required double latitude,
     required double longitude,
-    double radiusKm = 10.0,
+    double radiusKm = 15.0,
     String? categoryId,
     int limit = 20,
   }) async {
@@ -23,7 +23,7 @@ class StoreRepositoryImpl implements StoreRepository {
           .where('isActive', isEqualTo: true)
           .where('isDeleted', isEqualTo: false);
 
-      if (categoryId != null && categoryId.isNotEmpty) {
+      if (categoryId != null && categoryId.isNotEmpty && categoryId != 'all') {
         query = query.where('categoryIds', arrayContains: categoryId);
       }
 
@@ -46,12 +46,12 @@ class StoreRepositoryImpl implements StoreRepository {
 
       // Return mock stores if database has no stores yet
       if (stores.isEmpty) {
-        return (_getMockStores(latitude, longitude, categoryId), null);
+        return (_getMockStores(latitude, longitude, categoryId, radiusKm), null);
       }
       return (stores, null);
     } catch (e) {
       AppLogger.error('StoreRepositoryImpl.getNearbyStores', e.toString());
-      return (_getMockStores(latitude, longitude, categoryId), null);
+      return (_getMockStores(latitude, longitude, categoryId, radiusKm), null);
     }
   }
 
@@ -60,9 +60,9 @@ class StoreRepositoryImpl implements StoreRepository {
     try {
       final doc = await _firestore.collection('stores').doc(storeId).get();
       if (!doc.exists) {
-        final mock = _getMockStores(0, 0, null).firstWhere(
+        final mock = _getMockStores(0, 0, null, 0).firstWhere(
           (s) => s.id == storeId,
-          orElse: () => _getMockStores(0, 0, null).first,
+          orElse: () => _getMockStores(0, 0, null, 0).first,
         );
         return (mock, null);
       }
@@ -76,9 +76,9 @@ class StoreRepositoryImpl implements StoreRepository {
         loc,
       ), null);
     } catch (e) {
-      final mock = _getMockStores(0, 0, null).firstWhere(
+      final mock = _getMockStores(0, 0, null, 0).firstWhere(
         (s) => s.id == storeId,
-        orElse: () => _getMockStores(0, 0, null).first,
+        orElse: () => _getMockStores(0, 0, null, 0).first,
       );
       return (mock, null);
     }
@@ -92,7 +92,13 @@ class StoreRepositoryImpl implements StoreRepository {
           .where('vendorId', isEqualTo: vendorId)
           .limit(1)
           .get();
-      if (snap.docs.isEmpty) return (null, const NotFoundFailure('Store not found'));
+      if (snap.docs.isEmpty) {
+        final mock = _getMockStores(0, 0, null, 0).firstWhere(
+          (s) => s.vendorId == vendorId,
+          orElse: () => _getMockStores(0, 0, null, 0).first,
+        );
+        return (mock, null);
+      }
       final doc = snap.docs.first;
       final data = doc.data();
       final loc = data['location'] as Map<String, dynamic>? ?? {};
@@ -104,22 +110,38 @@ class StoreRepositoryImpl implements StoreRepository {
         loc,
       ), null);
     } catch (e) {
-      return (null, ServerFailure(e.toString()));
+      final mock = _getMockStores(0, 0, null, 0).firstWhere(
+        (s) => s.vendorId == vendorId,
+        orElse: () => _getMockStores(0, 0, null, 0).first,
+      );
+      return (mock, null);
     }
   }
 
   @override
   Stream<StoreEntity?> watchStore(String storeId) {
     return _firestore.collection('stores').doc(storeId).snapshots().map((doc) {
-      if (!doc.exists) return null;
-      final data = doc.data()!;
-      final loc = data['location'] as Map<String, dynamic>? ?? {};
-      return _mapToStoreEntity(
-        doc.id,
-        data,
-        (loc['latitude'] as num?)?.toDouble() ?? 0.0,
-        (loc['longitude'] as num?)?.toDouble() ?? 0.0,
-        loc,
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        final loc = data['location'] as Map<String, dynamic>? ?? {};
+        return _mapToStoreEntity(
+          doc.id,
+          data,
+          (loc['latitude'] as num?)?.toDouble() ?? 0.0,
+          (loc['longitude'] as num?)?.toDouble() ?? 0.0,
+          loc,
+        );
+      }
+      final allMocks = _getMockStores(0, 0, null, 0);
+      return allMocks.firstWhere(
+        (s) => s.id == storeId,
+        orElse: () => allMocks.first,
+      );
+    }).handleError((_) {
+      final allMocks = _getMockStores(0, 0, null, 0);
+      return allMocks.firstWhere(
+        (s) => s.id == storeId,
+        orElse: () => allMocks.first,
       );
     });
   }
@@ -130,10 +152,10 @@ class StoreRepositoryImpl implements StoreRepository {
     required Map<String, dynamic> fields,
   }) async {
     try {
-      await _firestore.collection('stores').doc(storeId).update({
+      await _firestore.collection('stores').doc(storeId).set({
         ...fields,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
       return null;
     } catch (e) {
       return ServerFailure(e.toString());
@@ -190,7 +212,7 @@ class StoreRepositoryImpl implements StoreRepository {
     return 12742 * math.asin(math.sqrt(a));
   }
 
-  List<StoreEntity> _getMockStores(double lat, double lng, String? categoryId) {
+  List<StoreEntity> _getMockStores(double lat, double lng, String? categoryId, double radiusKm) {
     final list = [
       StoreEntity(
         id: 'store-kubernagar-1',
@@ -280,11 +302,68 @@ class StoreRepositoryImpl implements StoreRepository {
         totalRatings: 73,
         createdAt: DateTime.now(),
       ),
+      StoreEntity(
+        id: 'store-vapi-1',
+        vendorId: 'vendor-5',
+        name: 'Navkar Menswear & Suits',
+        description: 'Bespoke blazers, sherwanis, formal shirts and customized ethnic suits',
+        bannerImageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=800&auto=format&fit=crop',
+        logoImageUrl: null,
+        categoryIds: const ['men', 'western', 'ethnic'],
+        location: const GeoLocation(
+          latitude: 20.3712,
+          longitude: 72.9044,
+          geohash: 'te7t',
+          address: 'Main Bazaar Road, Near Gunjan Char Rasta',
+          city: 'Vapi',
+          pincode: '396191',
+        ),
+        isOpen: true,
+        isActive: true,
+        rating: 4.8,
+        totalRatings: 112,
+        createdAt: DateTime.now(),
+      ),
+      StoreEntity(
+        id: 'store-vapi-2',
+        vendorId: 'vendor-6',
+        name: 'Vapi Silk Palace & Designer Studio',
+        description: 'Bridal lehengas, pure silk sarees and designer western gowns',
+        bannerImageUrl: 'https://images.unsplash.com/photo-1610030469983-98e550d6193c?w=800&auto=format&fit=crop',
+        logoImageUrl: null,
+        categoryIds: const ['women', 'ethnic'],
+        location: const GeoLocation(
+          latitude: 20.3780,
+          longitude: 72.9120,
+          geohash: 'te7t',
+          address: 'Opp. City Mall, Koparli Road',
+          city: 'Vapi',
+          pincode: '396195',
+        ),
+        isOpen: true,
+        isActive: true,
+        rating: 4.9,
+        totalRatings: 156,
+        createdAt: DateTime.now(),
+      ),
     ];
 
-    if (categoryId != null && categoryId.isNotEmpty) {
-      return list.where((s) => s.categoryIds.contains(categoryId)).toList();
+    var filtered = list;
+
+    // Filter by radius if location is provided
+    if (lat != 0 && lng != 0 && radiusKm > 0) {
+      final nearby = list.where((s) {
+        final d = _calculateDistanceKm(lat, lng, s.location.latitude, s.location.longitude);
+        return d <= radiusKm;
+      }).toList();
+      if (nearby.isNotEmpty) {
+        filtered = nearby;
+      }
     }
-    return list;
+
+    if (categoryId != null && categoryId.isNotEmpty && categoryId != 'all') {
+      filtered = filtered.where((s) => s.categoryIds.contains(categoryId)).toList();
+    }
+    return filtered;
   }
 }

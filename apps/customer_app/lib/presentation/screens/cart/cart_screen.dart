@@ -118,6 +118,8 @@ class CartScreen extends ConsumerWidget {
                         const Divider(height: 20),
                         _BillRow(title: 'Item Total', value: cartSummary.subtotalDisplay),
                         const SizedBox(height: 8),
+                        _BillRow(title: 'Packaging & Handling (1%)', value: cartSummary.packagingDisplay),
+                        const SizedBox(height: 8),
                         _BillRow(
                           title: 'Delivery Partner Fee',
                           value: cartSummary.deliveryDisplay,

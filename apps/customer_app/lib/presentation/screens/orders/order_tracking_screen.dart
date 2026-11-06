@@ -35,18 +35,80 @@ class OrderTrackingScreen extends ConsumerWidget {
             {'title': 'Order Confirmed', 'subtitle': 'Store accepted your order', 'status': OrderStatus.confirmed},
             {'title': 'Preparing Item', 'subtitle': 'Store is packing your clothing', 'status': OrderStatus.preparing},
             {'title': 'Ready for Pickup', 'subtitle': 'Handover to delivery partner', 'status': OrderStatus.readyForPickup},
-            {'title': 'Out for Delivery', 'subtitle': 'Driver on the way to you', 'status': OrderStatus.pickedUp},
+            {'title': 'Out for Delivery', 'subtitle': 'Driver on the way to your address', 'status': OrderStatus.pickedUp},
             {'title': 'Delivered', 'subtitle': 'Package delivered to doorstep', 'status': OrderStatus.delivered},
           ];
 
           final int currentStepIndex = _getStepIndex(order.status);
           final bool isCancelled = order.status == OrderStatus.cancelled;
+          final bool isExchange = order.status == OrderStatus.exchangeRequested || order.status == OrderStatus.exchanged;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.pagePadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Estimated Time Header Banner
+                if (!isCancelled && order.status != OrderStatus.delivered)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.timer_outlined, color: AppColors.primary, size: 28),
+                        const SizedBox(width: 12),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Estimated Delivery: ${order.estimatedDeliveryMinutes} Mins',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                            const Text('Dispatched via dedicated hyperlocal courier', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Size Exchange Requested Banner
+                if (isExchange)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(color: AppColors.warning),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.change_circle_rounded, color: AppColors.warning, size: 30),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Size Exchange Active: ${order.requestedExchangeSize ?? 'Requested'}',
+                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                              ),
+                              Text(
+                                'Reason: ${order.exchangeReason ?? 'Size adjustment'}. Rider is en route with your replacement size.',
+                                style: const TextStyle(fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
                 // Order Status Summary Card
                 AppCard(
                   child: Column(
@@ -55,7 +117,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Order #${order.id.substring(0, 8)}', style: AppTextStyles.titleMedium),
+                          Text('Order #${order.id.length > 8 ? order.id.substring(0, 8) : order.id}', style: AppTextStyles.titleMedium),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
@@ -75,10 +137,15 @@ class OrderTrackingScreen extends ConsumerWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 8),
+                      const Divider(height: 16),
                       Text(
-                        'Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)} • ${order.paymentMethod == PaymentMethod.cod ? 'Cash on Delivery' : 'Online Paid'}',
-                        style: AppTextStyles.bodyMedium,
+                        'Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)} • ${_formatPaymentMethod(order.paymentMethod)}',
+                        style: AppTextStyles.bodyMedium.copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Packaging (1%): ₹${(order.pricing.packagingCharge / 100).toStringAsFixed(0)} • COD Fee: ₹${(order.pricing.codCharge / 100).toStringAsFixed(0)}',
+                        style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                       ),
                       const SizedBox(height: 4),
                       Text(
@@ -108,14 +175,14 @@ class OrderTrackingScreen extends ConsumerWidget {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Reason: ${order.cancellationReason ?? 'Cancelled upon request'}',
+                          'Reason: ${order.cancellationReason ?? 'Cancelled upon customer request'}',
                           style: const TextStyle(fontSize: 12),
                         ),
                       ],
                     ),
                   )
                 else ...[
-                  Text('Live Order Status', style: AppTextStyles.titleLarge),
+                  Text('Live Delivery Timeline', style: AppTextStyles.titleLarge),
                   const SizedBox(height: 16),
 
                   // Status timeline
@@ -184,7 +251,32 @@ class OrderTrackingScreen extends ConsumerWidget {
 
                 const SizedBox(height: 20),
 
-                // Cancellation Option
+                // Size Exchange Button (if delivered)
+                if (order.status == OrderStatus.delivered && !isExchange)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 16),
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceVariant,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('Size didn\'t fit well?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        const SizedBox(height: 4),
+                        const Text('Request a size exchange within 48 hours for immediate replacement.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        const SizedBox(height: 12),
+                        AppButton(
+                          label: 'Request Size Exchange',
+                          variant: AppButtonVariant.primary,
+                          onPressed: () => context.push('/orders/${order.id}/exchange'),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                // Cancellation Option (if pending)
                 if (order.status == OrderStatus.pending)
                   AppButton(
                     label: 'Cancel Order',
@@ -219,6 +311,15 @@ class OrderTrackingScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
       ),
     );
+  }
+
+  String _formatPaymentMethod(PaymentMethod method) {
+    return switch (method) {
+      PaymentMethod.cod => 'Cash on Delivery',
+      PaymentMethod.payOnDelivery => 'Pay on Delivery (QR)',
+      PaymentMethod.payOnline => 'Online Paid',
+      PaymentMethod.directPay => 'Direct Store Pay',
+    };
   }
 
   int _getStepIndex(OrderStatus status) {

@@ -44,7 +44,7 @@ class _VendorOrdersScreenState extends ConsumerState<VendorOrdersScreen>
             Tab(text: 'New Orders'),
             Tab(text: 'Confirmed'),
             Tab(text: 'Ready for Pickup'),
-            Tab(text: 'Completed'),
+            Tab(text: 'Completed / Exchanges'),
           ],
         ),
       ),
@@ -53,7 +53,7 @@ class _VendorOrdersScreenState extends ConsumerState<VendorOrdersScreen>
           final newOrders = orders.where((o) => o.status == OrderStatus.pending).toList();
           final preparingOrders = orders.where((o) => o.status == OrderStatus.confirmed || o.status == OrderStatus.preparing).toList();
           final readyOrders = orders.where((o) => o.status == OrderStatus.readyForPickup || o.status == OrderStatus.pickedUp).toList();
-          final completedOrders = orders.where((o) => o.status == OrderStatus.delivered || o.status == OrderStatus.cancelled).toList();
+          final completedOrders = orders.where((o) => o.status == OrderStatus.delivered || o.status == OrderStatus.cancelled || o.status == OrderStatus.exchangeRequested || o.status == OrderStatus.exchanged).toList();
 
           return TabBarView(
             controller: _tabController,
@@ -98,8 +98,7 @@ class _OrderListView extends ConsumerWidget {
       itemCount: orders.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, i) {
-        final order = orders[i];
-        return _OrderCard(order: order);
+        return _OrderCard(order: orders[i]);
       },
     );
   }
@@ -121,11 +120,14 @@ class _OrderCard extends ConsumerWidget {
       OrderStatus.delivered => AppColors.success,
       OrderStatus.cancelled => AppColors.error,
       OrderStatus.refunded => AppColors.error,
+      OrderStatus.exchangeRequested || OrderStatus.exchanged => AppColors.warning,
     };
 
     final customerName = order.deliveryAddressSnapshot['recipientName'] ?? 'Customer';
     final address = order.deliveryAddressSnapshot['addressLine1'] ?? 'Local Street';
     final city = order.deliveryAddressSnapshot['city'] ?? 'Ahmedabad';
+
+    final displayId = order.id.length > 8 ? order.id.substring(0, 8).toUpperCase() : order.id.toUpperCase();
 
     return AppCard(
       child: Column(
@@ -134,7 +136,7 @@ class _OrderCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order #${order.id.substring(0, 8).toUpperCase()}', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+              Text('Order #$displayId', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(

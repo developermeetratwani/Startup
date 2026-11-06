@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
+import '../../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -32,11 +33,33 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    // TODO: call register use case
-    await Future.delayed(const Duration(seconds: 1));
+    try {
+      final authRepo = ref.read(authRepositoryProvider);
+      final (user, failure) = await authRepo.registerWithEmail(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        displayName: _nameController.text.trim(),
+      );
 
-    setState(() => _isLoading = false);
-    if (mounted) context.go('/home');
+      setState(() => _isLoading = false);
+
+      if (failure != null) {
+        if (mounted) {
+          AppSnackbar.show(context, message: failure.message, type: SnackbarType.error);
+        }
+        return;
+      }
+
+      if (mounted) {
+        AppSnackbar.show(context, message: 'Account created! Welcome, ${user?.displayName}!', type: SnackbarType.success);
+        context.go('/home');
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        AppSnackbar.show(context, message: 'Registration failed: $e', type: SnackbarType.error);
+      }
+    }
   }
 
   @override
@@ -60,9 +83,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 Text('Create Account', style: AppTextStyles.displayMedium),
                 const SizedBox(height: 8),
                 Text(
-                  'Discover local fashion near you',
-                  style: AppTextStyles.bodyLarge
-                      .copyWith(color: AppColors.textSecondary),
+                  'Discover local fashion near you with 45-minute delivery',
+                  style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 32),
 
@@ -71,8 +93,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   hint: 'Enter your name',
                   controller: _nameController,
                   textInputAction: TextInputAction.next,
-                  validator: (v) =>
-                      (v == null || v.isEmpty) ? 'Name is required' : null,
+                  validator: (v) => (v == null || v.isEmpty) ? 'Name is required' : null,
                 ),
                 const SizedBox(height: AppSpacing.md),
 
@@ -98,13 +119,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   textInputAction: TextInputAction.next,
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off_rounded
-                          : Icons.visibility_rounded,
+                      _obscurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                       color: AppColors.textSecondary,
                     ),
-                    onPressed: () =>
-                        setState(() => _obscurePassword = !_obscurePassword),
+                    onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                   ),
                   validator: (v) {
                     if (v == null || v.isEmpty) return 'Password is required';
@@ -116,7 +134,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                 AppTextField(
                   label: 'Referral Code (Optional)',
-                  hint: 'Enter store referral code',
+                  hint: 'Enter store referral code for 50 coins',
                   controller: _referralController,
                   textInputAction: TextInputAction.done,
                   onFieldSubmitted: (_) => _register(),
@@ -135,8 +153,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     Text(
                       'Already have an account? ',
-                      style: AppTextStyles.bodyMedium
-                          .copyWith(color: AppColors.textSecondary),
+                      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                     ),
                     GestureDetector(
                       onTap: () => context.go('/login'),

@@ -50,10 +50,11 @@ class VendorStoreRepository {
     required bool isOpen,
   }) async {
     try {
-      await _firestore.collection('stores').doc(storeId).update({
+      await _firestore.collection('stores').doc(storeId).set({
+        'id': storeId,
         'isOpen': isOpen,
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
     } catch (e) {
       AppLogger.error('updateStoreStatus', e.toString());
     }
@@ -67,13 +68,15 @@ class VendorStoreRepository {
     required String city,
   }) async {
     try {
-      await _firestore.collection('stores').doc(storeId).update({
+      await _firestore.collection('stores').doc(storeId).set({
         'name': name,
         'description': description,
-        'location.address': address,
-        'location.city': city,
+        'location': {
+          'address': address,
+          'city': city,
+        },
         'updatedAt': FieldValue.serverTimestamp(),
-      });
+      }, SetOptions(merge: true));
     } catch (e) {
       AppLogger.error('updateStoreProfile', e.toString());
     }

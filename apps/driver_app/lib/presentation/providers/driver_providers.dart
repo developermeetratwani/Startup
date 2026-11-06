@@ -23,27 +23,7 @@ final driverDeliveriesProvider = StreamProvider<List<DeliveryEntity>>((ref) {
     driverId = FirebaseAuth.instance.currentUser?.uid ?? driverId;
   } catch (_) {}
 
-  return repo.watchDriverDeliveries(driverId).map((list) {
-    if (list.isEmpty) {
-      return [
-        DeliveryEntity(
-          id: 'del-101',
-          orderId: 'ord-101',
-          driverId: driverId,
-          vendorId: 'vendor-1',
-          customerId: 'cust-1',
-          pickupLat: 23.0768,
-          pickupLng: 72.6346,
-          dropLat: 23.0795,
-          dropLng: 72.6380,
-          status: DeliveryStatus.assigned,
-          deliveryFee: 4500, // ₹45
-          assignedAt: DateTime.now().subtract(const Duration(minutes: 5)),
-        ),
-      ];
-    }
-    return list;
-  });
+  return repo.watchDriverDeliveries(driverId);
 });
 
 // Active Delivery (current ongoing trip)
@@ -69,3 +49,58 @@ final driverEarningsProvider = StreamProvider<DriverEarningsSummary>((ref) {
 
   return repo.watchEarnings(driverId);
 });
+
+// Driver Profile & Fleet Security state
+class DriverProfileState {
+  final String name;
+  final String phone;
+  final String vehicleModel;
+  final String vehicleRegNo;
+  final String vehicleType;
+  final String aadhaarNumber;
+  final String electricityBillProvider;
+  final String cluster;
+  final bool isVerified;
+  final bool isBlacklisted;
+
+  const DriverProfileState({
+    this.name = 'Suresh Solanki',
+    this.phone = '+91 98980 12345',
+    this.vehicleModel = 'Honda Activa 6G',
+    this.vehicleRegNo = 'GJ-01-AB-1234',
+    this.vehicleType = 'Two-Wheeler Scooter',
+    this.aadhaarNumber = 'XXXX-XXXX-8912',
+    this.electricityBillProvider = 'Torrent Power (Ahmedabad)',
+    this.cluster = 'Kubernagar, Gandhinagar & Vapi',
+    this.isVerified = true,
+    this.isBlacklisted = false,
+  });
+
+  DriverProfileState copyWith({
+    String? name,
+    String? phone,
+    String? vehicleModel,
+    String? vehicleRegNo,
+    String? vehicleType,
+    String? aadhaarNumber,
+    String? electricityBillProvider,
+    String? cluster,
+    bool? isVerified,
+    bool? isBlacklisted,
+  }) {
+    return DriverProfileState(
+      name: name ?? this.name,
+      phone: phone ?? this.phone,
+      vehicleModel: vehicleModel ?? this.vehicleModel,
+      vehicleRegNo: vehicleRegNo ?? this.vehicleRegNo,
+      vehicleType: vehicleType ?? this.vehicleType,
+      aadhaarNumber: aadhaarNumber ?? this.aadhaarNumber,
+      electricityBillProvider: electricityBillProvider ?? this.electricityBillProvider,
+      cluster: cluster ?? this.cluster,
+      isVerified: isVerified ?? this.isVerified,
+      isBlacklisted: isBlacklisted ?? this.isBlacklisted,
+    );
+  }
+}
+
+final driverProfileProvider = StateProvider<DriverProfileState>((ref) => const DriverProfileState());

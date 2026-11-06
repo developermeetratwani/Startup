@@ -63,6 +63,8 @@ class _OrderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final displayId = order.id.length > 8 ? order.id.substring(0, 8) : order.id;
+
     return AppCard(
       onTap: () => context.push('/orders/track/${order.id}'),
       child: Column(
@@ -71,7 +73,7 @@ class _OrderTile extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order #${order.id.substring(0, 8)}', style: AppTextStyles.labelLarge),
+              Text('Order #$displayId', style: AppTextStyles.labelLarge),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
@@ -91,7 +93,7 @@ class _OrderTile extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)} • ${order.paymentMethod == PaymentMethod.cod ? 'COD' : 'Paid Online'}',
+            'Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)} • ${_formatPaymentMethod(order.paymentMethod)}',
             style: AppTextStyles.bodyMedium,
           ),
           const SizedBox(height: 4),
@@ -104,16 +106,16 @@ class _OrderTile extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                order.isActive ? 'Active Delivery' : 'Completed',
+                order.isActive ? 'Active Delivery' : (order.status == OrderStatus.exchangeRequested ? 'Exchange Pending' : 'Completed'),
                 style: TextStyle(
                   fontSize: 12,
-                  color: order.isActive ? AppColors.accent : AppColors.textSecondary,
+                  color: order.isActive ? AppColors.accent : (order.status == OrderStatus.exchangeRequested ? AppColors.warning : AppColors.textSecondary),
                   fontWeight: FontWeight.w600,
                 ),
               ),
               const Row(
                 children: [
-                  Text('Track', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold)),
+                  Text('Track & Exchange', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold)),
                   Icon(Icons.arrow_forward_ios_rounded, size: 12, color: AppColors.primary),
                 ],
               ),
@@ -124,10 +126,20 @@ class _OrderTile extends StatelessWidget {
     );
   }
 
+  String _formatPaymentMethod(PaymentMethod method) {
+    return switch (method) {
+      PaymentMethod.cod => 'COD (₹21 fee)',
+      PaymentMethod.payOnDelivery => 'Pay on Delivery',
+      PaymentMethod.payOnline => 'Online Paid',
+      PaymentMethod.directPay => 'Direct Store Pay',
+    };
+  }
+
   Color _statusColor(OrderStatus status) {
     return switch (status) {
       OrderStatus.delivered => AppColors.success,
       OrderStatus.cancelled => AppColors.error,
+      OrderStatus.exchangeRequested || OrderStatus.exchanged => AppColors.warning,
       _ => AppColors.accent,
     };
   }
