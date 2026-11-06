@@ -12,6 +12,8 @@ google-services.json
 GoogleService-Info.plist
 **/google-services.json
 **/GoogleService-Info.plist
+firebase_options.dart
+**/firebase_options.dart
 .env
 *.env
 .firebaserc.local

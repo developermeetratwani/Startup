@@ -38,6 +38,10 @@ class VendorApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: router,
+      builder: (context, child) => PhoneSimulatorWrapper(
+        badgeText: 'XYZ Retailer Portal (Vendor)',
+        child: child ?? const SizedBox.shrink(),
+      ),
     );
   }
 }
