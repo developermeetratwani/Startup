@@ -23,6 +23,8 @@ dependencies:
   firebase_database: ^11.1.5
   shared_preferences: ^2.3.3
   logger: ^2.5.0
+  http: ^1.6.0
+  mailer: ^7.2.2
 
 dev_dependencies:
   flutter_test:

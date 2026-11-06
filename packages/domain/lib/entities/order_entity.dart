@@ -2,24 +2,37 @@ import 'package:equatable/equatable.dart';
 
 enum OrderStatus {
   pending, confirmed, preparing, readyForPickup,
-  pickedUp, delivered, cancelled, refunded,
+  pickedUp, delivered, cancelled, refunded, exchangeRequested, exchanged
 }
-enum PaymentMethod { cod, online }
+
+enum PaymentMethod {
+  cod,           // Cash on delivery (₹21 fee)
+  payOnDelivery, // UPI / Card upon delivery via driver QR
+  payOnline,     // Pre-paid through Razorpay gateway
+  directPay      // Store direct / Instant UPI
+}
+
 enum PaymentStatus { pending, paid, refunded, failed }
 
 class OrderPricing extends Equatable {
-  final int productTotal;
-  final int deliveryCharge;
-  final int discount;
-  final int coinRedemption;
-  final int grandTotal;
-  final int platformCommission;
-  final int vendorEarning;
-  final int driverEarning;
+  final int productTotal;         // in paise
+  final int deliveryCharge;       // in paise
+  final int packagingCharge;      // in paise (1% per quantity base)
+  final int codCharge;            // in paise (₹21 = 2100 paise if COD)
+  final int exchangeCharge;       // in paise (if size exchange applied)
+  final int discount;             // in paise
+  final int coinRedemption;       // in paise
+  final int grandTotal;           // in paise
+  final int platformCommission;   // in paise
+  final int vendorEarning;        // in paise
+  final int driverEarning;        // in paise
 
   const OrderPricing({
     required this.productTotal,
     required this.deliveryCharge,
+    this.packagingCharge = 0,
+    this.codCharge = 0,
+    this.exchangeCharge = 0,
     this.discount = 0,
     this.coinRedemption = 0,
     required this.grandTotal,
@@ -29,7 +42,7 @@ class OrderPricing extends Equatable {
   });
 
   @override
-  List<Object?> get props => [grandTotal];
+  List<Object?> get props => [grandTotal, packagingCharge, codCharge, exchangeCharge];
 }
 
 class OrderEntity extends Equatable {
@@ -46,7 +59,10 @@ class OrderEntity extends Equatable {
   final String? razorpayOrderId;
   final String? razorpayPaymentId;
   final OrderPricing pricing;
+  final String? exchangeReason;
+  final String? requestedExchangeSize;
   final String? cancellationReason;
+  final int estimatedDeliveryMinutes;
   final DateTime placedAt;
   final DateTime? deliveredAt;
 
@@ -64,7 +80,10 @@ class OrderEntity extends Equatable {
     this.razorpayOrderId,
     this.razorpayPaymentId,
     required this.pricing,
+    this.exchangeReason,
+    this.requestedExchangeSize,
     this.cancellationReason,
+    this.estimatedDeliveryMinutes = 45,
     required this.placedAt,
     this.deliveredAt,
   });
@@ -76,5 +95,5 @@ class OrderEntity extends Equatable {
   ].contains(status);
 
   @override
-  List<Object?> get props => [id, customerId];
+  List<Object?> get props => [id, customerId, status];
 }

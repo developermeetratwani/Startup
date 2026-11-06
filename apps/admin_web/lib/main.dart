@@ -48,7 +48,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     'Vendor Approvals',
     'Clothing Stores',
     'Order Monitoring',
-    'Driver Fleet',
+    'Driver Fleet & KYC',
+    'Size Exchanges',
+    'Multi-Region Settings',
     'Commissions & Coins',
   ];
 
@@ -88,97 +90,109 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 const SizedBox(height: 36),
                 const Text('MAIN NAVIGATION', style: TextStyle(color: Color(0xFF6C757D), fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _tabs.length,
+                    itemBuilder: (context, index) {
+                      final isSelected = _selectedTab == index;
+                      final icons = [
+                        Icons.dashboard_rounded,
+                        Icons.verified_user_rounded,
+                        Icons.storefront_rounded,
+                        Icons.shopping_bag_rounded,
+                        Icons.two_wheeler_rounded,
+                        Icons.change_circle_rounded,
+                        Icons.map_rounded,
+                        Icons.account_balance_wallet_rounded,
+                      ];
 
-                ...List.generate(_tabs.length, (index) {
-                  final isSelected = _selectedTab == index;
-                  final icons = [
-                    Icons.analytics_rounded,
-                    Icons.how_to_reg_rounded,
-                    Icons.store_mall_directory_rounded,
-                    Icons.receipt_long_rounded,
-                    Icons.two_wheeler_rounded,
-                    Icons.account_balance_wallet_rounded,
-                  ];
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 6),
-                    child: ListTile(
-                      dense: true,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                      tileColor: isSelected ? const Color(0xFFE94560) : Colors.transparent,
-                      leading: Icon(icons[index], color: isSelected ? Colors.white : const Color(0xFFADB5BD), size: 20),
-                      title: Text(
-                        _tabs[index],
-                        style: TextStyle(
-                          color: isSelected ? Colors.white : const Color(0xFFADB5BD),
-                          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                          fontSize: 13,
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 6),
+                        child: ListTile(
+                          selected: isSelected,
+                          selectedTileColor: const Color(0xFF0F3460),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          leading: Icon(icons[index], color: isSelected ? const Color(0xFFE94560) : const Color(0xFFADB5BD), size: 20),
+                          title: Text(
+                            _tabs[index],
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : const Color(0xFFADB5BD),
+                              fontSize: 13,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            ),
+                          ),
+                          onTap: () => setState(() => _selectedTab = index),
                         ),
-                      ),
-                      onTap: () => setState(() => _selectedTab = index),
-                    ),
-                  );
-                }),
-
-                const Spacer(),
-                const Divider(color: Color(0xFF2B2D42)),
-                const Row(
-                  children: [
-                    Icon(Icons.location_on, color: Color(0xFFE94560), size: 16),
-                    SizedBox(width: 6),
-                    Text('Kubernagar & Gandhinagar', style: TextStyle(color: Color(0xFFADB5BD), fontSize: 11)),
-                  ],
+                      );
+                    },
+                  ),
+                ),
+                const Divider(color: Color(0xFF2E3856)),
+                const ListTile(
+                  dense: true,
+                  leading: CircleAvatar(
+                    backgroundColor: Color(0xFFE94560),
+                    child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 12)),
+                  ),
+                  title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+                  subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: Color(0xFFADB5BD), fontSize: 11)),
                 ),
               ],
             ),
           ),
 
-          // Main Content View
+          // Main Content Area
           Expanded(
-            child: Column(
-              children: [
-                // Top App Bar
-                Container(
-                  height: 64,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(bottom: BorderSide(color: Color(0xFFE9ECEF))),
+            child: Container(
+              color: const Color(0xFFF8F9FA),
+              child: Column(
+                children: [
+                  // Top App Bar
+                  Container(
+                    height: 70,
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      border: Border(bottom: BorderSide(color: Color(0xFFE9ECEF))),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _tabs[_selectedTab],
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF212529)),
+                        ),
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFD1E7DD),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.cloud_done_rounded, color: Color(0xFF0F5132), size: 16),
+                                  SizedBox(width: 8),
+                                  Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: Color(0xFF0F5132), fontSize: 12, fontWeight: FontWeight.bold)),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        _tabs[_selectedTab],
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                      ),
-                      Row(
-                        children: [
-                          Chip(
-                            avatar: const Icon(Icons.circle, color: Colors.green, size: 10),
-                            label: const Text('Live Network Asia-South1'),
-                            backgroundColor: Colors.green.withValues(alpha: 0.1),
-                          ),
-                          const SizedBox(width: 16),
-                          const CircleAvatar(
-                            radius: 16,
-                            backgroundColor: Color(0xFF1A1A2E),
-                            child: Icon(Icons.admin_panel_settings, color: Colors.white, size: 18),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
 
-                // Body based on tab
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
-                    child: _buildCurrentTab(),
+                  // Dashboard Body Content
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(32),
+                      child: _buildBodyContent(),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],
@@ -186,12 +200,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  Widget _buildCurrentTab() {
+  Widget _buildBodyContent() {
     switch (_selectedTab) {
       case 0:
         return _buildOverviewTab();
       case 1:
-        return _buildVendorApprovalsTab();
+        return _buildApprovalsTab();
       case 2:
         return _buildStoresTab();
       case 3:
@@ -199,6 +213,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       case 4:
         return _buildDriversTab();
       case 5:
+        return _buildExchangeTab();
+      case 6:
+        return _buildMultiRegionTab();
+      case 7:
         return _buildCommissionsTab();
       default:
         return _buildOverviewTab();
@@ -210,100 +228,21 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
-          children: [
-            Expanded(child: _KPICard(title: 'Gross Platform Sales', value: '₹4,82,500', subtitle: '+18% this week', color: AppColors.primary)),
-            const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Platform Commission (10%)', value: '₹48,250', subtitle: 'Configurable rate', color: AppColors.success)),
-            const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Active Clothing Stores', value: '18 Stores', subtitle: 'Kubernagar & Gandhinagar', color: AppColors.accent)),
-            const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Active Delivery Riders', value: '24 Riders', subtitle: '16 Online on duty', color: AppColors.info)),
-          ],
-        ),
-        const SizedBox(height: 24),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 2,
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Recent Live Marketplace Orders', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      const SizedBox(height: 16),
-                      DataTable(
-                        columns: const [
-                          DataColumn(label: Text('Order ID')),
-                          DataColumn(label: Text('Market Cluster')),
-                          DataColumn(label: Text('Store Name')),
-                          DataColumn(label: Text('Amount')),
-                          DataColumn(label: Text('Status')),
-                        ],
-                        rows: const [
-                          DataRow(cells: [
-                            DataCell(Text('#ORD-9021')),
-                            DataCell(Text('Kubernagar')),
-                            DataCell(Text('Shreeji Ethnic Studio')),
-                            DataCell(Text('₹2,499')),
-                            DataCell(Chip(label: Text('Preparing', style: TextStyle(fontSize: 11)), backgroundColor: Color(0xFFFFF3CD))),
-                          ]),
-                          DataRow(cells: [
-                            DataCell(Text('#ORD-9020')),
-                            DataCell(Text('Gandhinagar (Sec 21)')),
-                            DataCell(Text('Infocity Fashion Hub')),
-                            DataCell(Text('₹1,199')),
-                            DataCell(Chip(label: Text('Delivered', style: TextStyle(fontSize: 11)), backgroundColor: Color(0xFFD1E7DD))),
-                          ]),
-                          DataRow(cells: [
-                            DataCell(Text('#ORD-9019')),
-                            DataCell(Text('Kubernagar')),
-                            DataCell(Text('Vogue Mens Club')),
-                            DataCell(Text('₹899')),
-                            DataCell(Chip(label: Text('Out for Delivery', style: TextStyle(fontSize: 11)), backgroundColor: Color(0xFFCFE2FF))),
-                          ]),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Card(
-                elevation: 0,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
-                child: Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('Market Breakdown', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      const SizedBox(height: 16),
-                      _MarketProgress(market: 'Kubernagar (East Ahmedabad)', share: '62% of volume', percentage: 0.62),
-                      const SizedBox(height: 14),
-                      _MarketProgress(market: 'Gandhinagar (Sectors 1-30)', share: '38% of volume', percentage: 0.38),
-                      const Divider(height: 32),
-                      const Text('Referral Coins Engine', style: TextStyle(fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      const Text('12,450 Store Coins issued to referring retailers across 14 campaigns.', style: TextStyle(fontSize: 12, color: Color(0xFF6C757D))),
-                    ],
-                  ),
-                ),
-              ),
-            ),
+          children: const [
+            Expanded(child: _KPICard(title: 'Gross Merchandise Value (GMV)', value: '₹1,84,520', subtitle: 'This Month (+18.4%)', color: Color(0xFF0D6EFD))),
+            SizedBox(width: 16),
+            Expanded(child: _KPICard(title: 'Active Stores (Kubernagar/Vapi)', value: '38 Stores', subtitle: '94% Onboarded & Verified', color: Color(0xFF198754))),
+            SizedBox(width: 16),
+            Expanded(child: _KPICard(title: 'Platform Commission (10%)', value: '₹18,452', subtitle: 'Direct Net Margin', color: Color(0xFF6F42C1))),
+            SizedBox(width: 16),
+            Expanded(child: _KPICard(title: 'Verified Riders Fleet', value: '42 Drivers', subtitle: 'Aadhaar & License KYC Verified', color: Color(0xFFFD7E14))),
           ],
         ),
       ],
     );
   }
 
-  Widget _buildVendorApprovalsTab() {
+  Widget _buildApprovalsTab() {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
@@ -312,40 +251,29 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Pending Retailer Applications', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const Text('Verify retail store presence and approve to generate store credentials & referral code', style: TextStyle(fontSize: 12, color: Color(0xFF6C757D))),
-            const SizedBox(height: 20),
+            const Text('Merchant KYC & Store Onboarding Requests', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
             DataTable(
               columns: const [
                 DataColumn(label: Text('Store Name')),
                 DataColumn(label: Text('Owner')),
+                DataColumn(label: Text('Cluster / City')),
                 DataColumn(label: Text('Phone')),
-                DataColumn(label: Text('Market Cluster')),
-                DataColumn(label: Text('Applied Date')),
-                DataColumn(label: Text('Action')),
+                DataColumn(label: Text('Status')),
+                DataColumn(label: Text('Actions')),
               ],
               rows: [
                 DataRow(cells: [
-                  const DataCell(Text('Kalamandir Handlooms & Sarees')),
-                  const DataCell(Text('Sanjay Somani')),
-                  const DataCell(Text('+91 98250 11223')),
-                  const DataCell(Text('Gandhinagar (Sec 16)')),
-                  const DataCell(Text('Today, 01:15 PM')),
+                  const DataCell(Text('Navkar Menswear & Suits')),
+                  const DataCell(Text('Prakash Jain')),
+                  const DataCell(Text('Vapi Main Market')),
+                  const DataCell(Text('+91 98251 44556')),
+                  const DataCell(Chip(label: Text('PENDING KYC'), backgroundColor: Color(0xFFFFF3CD))),
                   DataCell(Row(
                     children: [
-                      ElevatedButton(
-                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.success, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
-                        onPressed: () {
-                          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Store Approved! Custom claims & Store Coins generated.')));
-                        },
-                        child: const Text('Approve Store', style: TextStyle(color: Colors.white, fontSize: 11)),
-                      ),
+                      ElevatedButton(onPressed: () {}, child: const Text('Approve')),
                       const SizedBox(width: 8),
-                      OutlinedButton(
-                        style: OutlinedButton.styleFrom(foregroundColor: AppColors.error, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
-                        onPressed: () {},
-                        child: const Text('Reject', style: TextStyle(fontSize: 11)),
-                      ),
+                      OutlinedButton(onPressed: () {}, child: const Text('Reject')),
                     ],
                   )),
                 ]),
@@ -361,51 +289,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Registered Clothing Retailers (18 Active)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            DataTable(
-              columns: const [
-                DataColumn(label: Text('Store Name')),
-                DataColumn(label: Text('Cluster')),
-                DataColumn(label: Text('Categories')),
-                DataColumn(label: Text('Status')),
-                DataColumn(label: Text('Rating')),
-                DataColumn(label: Text('Store Coins Balance')),
-              ],
-              rows: const [
-                DataRow(cells: [
-                  DataCell(Text('Shreeji Ethnic & Bridal Studio')),
-                  DataCell(Text('Kubernagar')),
-                  DataCell(Text('Women, Ethnic')),
-                  DataCell(Chip(label: Text('Active (Online)'), backgroundColor: Color(0xFFD1E7DD))),
-                  DataCell(Text('4.8 ★ (142)')),
-                  DataCell(Text('350 Coins')),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text('Vogue Mens Club & Denim')),
-                  DataCell(Text('Kubernagar')),
-                  DataCell(Text('Men, Western')),
-                  DataCell(Chip(label: Text('Active (Online)'), backgroundColor: Color(0xFFD1E7DD))),
-                  DataCell(Text('4.6 ★ (98)')),
-                  DataCell(Text('200 Coins')),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text('Infocity Fashion Hub')),
-                  DataCell(Text('Gandhinagar')),
-                  DataCell(Text('Women, Men, Western')),
-                  DataCell(Chip(label: Text('Active (Online)'), backgroundColor: Color(0xFFD1E7DD))),
-                  DataCell(Text('4.9 ★ (215)')),
-                  DataCell(Text('520 Coins')),
-                ]),
-              ],
-            ),
-          ],
-        ),
+      child: const Padding(
+        padding: EdgeInsets.all(20),
+        child: Text('Live Store Catalogs across Kubernagar, Gandhinagar, and Vapi are healthy and operational.'),
       ),
     );
   }
@@ -419,33 +305,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('All Marketplace Orders', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const Text('Live Orders & Delivery Tracking', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             DataTable(
               columns: const [
                 DataColumn(label: Text('Order ID')),
                 DataColumn(label: Text('Store')),
                 DataColumn(label: Text('Customer')),
-                DataColumn(label: Text('Total')),
-                DataColumn(label: Text('Payment')),
+                DataColumn(label: Text('Amount')),
+                DataColumn(label: Text('Packaging + COD Fee')),
                 DataColumn(label: Text('Status')),
               ],
               rows: const [
                 DataRow(cells: [
-                  DataCell(Text('ORD-8921')),
+                  DataCell(Text('ORD-8920')),
                   DataCell(Text('Shreeji Ethnic Studio')),
-                  DataCell(Text('Kavya Sharma')),
-                  DataCell(Text('₹924')),
-                  DataCell(Text('COD')),
-                  DataCell(Text('Preparing')),
-                ]),
-                DataRow(cells: [
-                  DataCell(Text('ORD-8919')),
-                  DataCell(Text('Shreeji Ethnic Studio')),
-                  DataCell(Text('Priya Patel')),
-                  DataCell(Text('₹2,499')),
-                  DataCell(Text('Razorpay Online (Paid)')),
-                  DataCell(Text('Confirmed')),
+                  DataCell(Text('Meet Ratwani')),
+                  DataCell(Text('₹899')),
+                  DataCell(Text('₹9 (1% Pack) + ₹21 COD')),
+                  DataCell(Text('Out for Delivery')),
                 ]),
               ],
             ),
@@ -464,35 +342,133 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Delivery Fleet & Live Rider Status', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Rider Fleet, Aadhaar KYC & Vehicle Photos', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ElevatedButton.icon(
+                  onPressed: () {},
+                  icon: const Icon(Icons.person_add_rounded),
+                  label: const Text('Register New Rider'),
+                ),
+              ],
+            ),
             const SizedBox(height: 16),
             DataTable(
               columns: const [
-                DataColumn(label: Text('Driver Name')),
-                DataColumn(label: Text('Vehicle')),
-                DataColumn(label: Text('Assigned Cluster')),
+                DataColumn(label: Text('Rider & Photo')),
+                DataColumn(label: Text('Vehicle & Reg No.')),
+                DataColumn(label: Text('Aadhaar / KYC')),
+                DataColumn(label: Text('Electricity Bill')),
+                DataColumn(label: Text('Cluster')),
                 DataColumn(label: Text('Duty Status')),
-                DataColumn(label: Text('Active Deliveries')),
-                DataColumn(label: Text('Rating')),
+                DataColumn(label: Text('Security Status')),
               ],
               rows: const [
                 DataRow(cells: [
-                  DataCell(Text('Suresh Solanki')),
-                  DataCell(Text('Honda Activa (GJ-01-AB-1234)')),
-                  DataCell(Text('Kubernagar')),
+                  DataCell(Row(
+                    children: [
+                      CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100')),
+                      SizedBox(width: 8),
+                      Text('Suresh Solanki'),
+                    ],
+                  )),
+                  DataCell(Text('Honda Activa (GJ-01-AB-1234)\nPhoto: Uploaded ✅')),
+                  DataCell(Text('XXXX-XXXX-8912\nVerified ✅')),
+                  DataCell(Text('Torrent Power Bill ✅')),
+                  DataCell(Text('Kubernagar Cluster')),
                   DataCell(Chip(label: Text('ONLINE'), backgroundColor: Color(0xFFD1E7DD))),
-                  DataCell(Text('1 Active Drop')),
-                  DataCell(Text('4.9 ★')),
+                  DataCell(Chip(label: Text('CLEAN RECORD'), backgroundColor: Color(0xFFD1E7DD))),
                 ]),
                 DataRow(cells: [
-                  DataCell(Text('Manish Vaghela')),
-                  DataCell(Text('Hero Splendor (GJ-18-CD-5678)')),
-                  DataCell(Text('Gandhinagar')),
+                  DataCell(Row(
+                    children: [
+                      CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100')),
+                      SizedBox(width: 8),
+                      Text('Manish Vaghela'),
+                    ],
+                  )),
+                  DataCell(Text('Hero Splendor (GJ-18-CD-5678)\nPhoto: Uploaded ✅')),
+                  DataCell(Text('XXXX-XXXX-4567\nVerified ✅')),
+                  DataCell(Text('UGVCL Bill Verified ✅')),
+                  DataCell(Text('Gandhinagar & Vapi')),
                   DataCell(Chip(label: Text('ONLINE'), backgroundColor: Color(0xFFD1E7DD))),
-                  DataCell(Text('Idle (Waiting)')),
-                  DataCell(Text('4.8 ★')),
+                  DataCell(Chip(label: Text('CLEAN RECORD'), backgroundColor: Color(0xFFD1E7DD))),
                 ]),
               ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExchangeTab() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      child: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text('Size Exchange Portal & Reverse Logistics', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            const Text('Customers can request size exchanges within 48 hours of delivery. Reverse pickup is auto-assigned to nearest cluster rider.', style: TextStyle(color: Color(0xFF6C757D))),
+            const SizedBox(height: 16),
+            DataTable(
+              columns: const [
+                DataColumn(label: Text('Exchange ID')),
+                DataColumn(label: Text('Original Order')),
+                DataColumn(label: Text('Item & From Size')),
+                DataColumn(label: Text('Requested Size')),
+                DataColumn(label: Text('Exchange Fee')),
+                DataColumn(label: Text('Reverse Status')),
+              ],
+              rows: const [
+                DataRow(cells: [
+                  DataCell(Text('EXC-101')),
+                  DataCell(Text('ORD-8920')),
+                  DataCell(Text('Royal Velvet Kurti (Size M)')),
+                  DataCell(Text('Size L')),
+                  DataCell(Text('₹49 (Exchange Surcharge)')),
+                  DataCell(Chip(label: Text('RIDER ASSIGNED'), backgroundColor: Color(0xFFD1E7DD))),
+                ]),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMultiRegionTab() {
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      child: const Padding(
+        padding: EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Multi-Region Geofencing & Delivery Radius Orchestrator', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            SizedBox(height: 16),
+            ListTile(
+              leading: Icon(Icons.location_on, color: AppColors.primary),
+              title: Text('Cluster 1: Kubernagar & East Ahmedabad'),
+              subtitle: Text('Max Delivery Radius: 12 km • Max Promised Time: 45 Minutes'),
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.location_on, color: AppColors.accent),
+              title: Text('Cluster 2: Gandhinagar Capital Region'),
+              subtitle: Text('Max Delivery Radius: 15 km • Max Promised Time: 50 Minutes'),
+            ),
+            Divider(),
+            ListTile(
+              leading: Icon(Icons.location_on, color: AppColors.success),
+              title: Text('Cluster 3: Vapi Industrial & Retail Belt'),
+              subtitle: Text('Max Delivery Radius: 14 km • Max Promised Time: 40 Minutes • Distance matrix automated'),
             ),
           ],
         ),
@@ -514,19 +490,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ListTile(
               leading: Icon(Icons.tune_rounded, color: AppColors.primary),
               title: Text('Platform Commission Rate'),
-              subtitle: Text('Default: 10% on delivered order subtotal (Configurable via Remote Config)'),
+              subtitle: Text('Default: 10% on delivered order subtotal'),
             ),
             Divider(),
             ListTile(
               leading: Icon(Icons.monetization_on_rounded, color: AppColors.accent),
               title: Text('Store Coins Referral Ratio'),
-              subtitle: Text('1 Coin earned per ₹100 of referral order value • Redeemable against platform fees'),
-            ),
-            Divider(),
-            ListTile(
-              leading: Icon(Icons.calendar_today_rounded, color: AppColors.success),
-              title: Text('Settlement Schedule'),
-              subtitle: Text('Weekly automated cycle every Tuesday to retailer registered bank accounts'),
+              subtitle: Text('1 Coin earned per ₹100 of referral order value • Direct shareable affiliate referral link supported'),
             ),
           ],
         ),
@@ -561,32 +531,6 @@ class _KPICard extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-class _MarketProgress extends StatelessWidget {
-  final String market;
-  final String share;
-  final double percentage;
-
-  const _MarketProgress({required this.market, required this.share, required this.percentage});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(market, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-            Text(share, style: const TextStyle(fontSize: 11, color: Color(0xFF6C757D))),
-          ],
-        ),
-        const SizedBox(height: 6),
-        LinearProgressIndicator(value: percentage, backgroundColor: const Color(0xFFE9ECEF), color: AppColors.accent, minHeight: 6),
-      ],
     );
   }
 }
