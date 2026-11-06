@@ -3,13 +3,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'core/constants/app_constants.dart';
-import 'core/router/app_router.dart';
+import 'presentation/router/app_router.dart';
 import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Safe Firebase Initialization to avoid duplicate-app crashes
   try {
     if (Firebase.apps.isEmpty) {
       await Firebase.initializeApp(
@@ -40,7 +39,7 @@ class CustomerApp extends ConsumerWidget {
       theme: AppTheme.light,
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'XYZ Customer App',
+        badgeText: 'XYZ Customer Marketplace',
         child: child ?? const SizedBox.shrink(),
       ),
     );
