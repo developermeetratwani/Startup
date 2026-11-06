@@ -47,7 +47,7 @@ class VendorProfileScreen extends ConsumerWidget {
                           children: [
                             Text(store.name, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
                             const SizedBox(height: 4),
-                            Text('${store.location.area}, ${store.location.city}', style: AppTextStyles.bodySmall),
+                            Text(store.location.address.isNotEmpty ? store.location.address : store.location.city, style: AppTextStyles.bodySmall),
                             const SizedBox(height: 6),
                             Row(
                               children: [

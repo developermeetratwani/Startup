@@ -18,11 +18,11 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
   final _basePriceController = TextEditingController();
   final _discountPriceController = TextEditingController();
   final _imageUrlController = TextEditingController();
+  final _colorController = TextEditingController(text: 'Multicolor');
+  final _stockController = TextEditingController(text: '10');
 
   String _selectedCategory = 'women';
   final List<String> _sizes = ['M', 'L'];
-  String _color = 'Multicolor';
-  int _stockPerVariant = 10;
   bool _isLoading = false;
 
   final _categories = [
@@ -40,6 +40,8 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
     _basePriceController.dispose();
     _discountPriceController.dispose();
     _imageUrlController.dispose();
+    _colorController.dispose();
+    _stockController.dispose();
     super.dispose();
   }
 
@@ -58,13 +60,16 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
       final baseInPaise = (baseInRupees * 100).toInt();
       final discountInPaise = (discountInRupees * 100).toInt();
 
+      final color = _colorController.text.trim().isEmpty ? 'Multicolor' : _colorController.text.trim();
+      final stock = int.tryParse(_stockController.text.trim()) ?? 10;
+
       final variants = _sizes.map((s) => {
             'size': s,
-            'color': _color,
+            'color': color,
             'colorHex': '#E94560',
             'additionalPrice': 0,
             'sku': '${_nameController.text.substring(0, 3).toUpperCase()}-$s',
-            'stockCount': _stockPerVariant,
+            'stockCount': stock,
           }).toList();
 
       final imgUrl = _imageUrlController.text.trim().isNotEmpty
@@ -213,8 +218,7 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
                     child: AppTextField(
                       label: 'Primary Color',
                       hint: 'e.g. Maroon / Indigo',
-                      initialValue: _color,
-                      onChanged: (v) => _color = v,
+                      controller: _colorController,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -222,9 +226,8 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
                     child: AppTextField(
                       label: 'Stock Per Size',
                       hint: '10',
-                      initialValue: '$_stockPerVariant',
+                      controller: _stockController,
                       keyboardType: TextInputType.number,
-                      onChanged: (v) => _stockPerVariant = int.tryParse(v) ?? 10,
                     ),
                   ),
                 ],

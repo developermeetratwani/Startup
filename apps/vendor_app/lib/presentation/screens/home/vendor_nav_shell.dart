@@ -31,7 +31,7 @@ class _VendorNavShellState extends ConsumerState<VendorNavShell> {
   Widget build(BuildContext context) {
     final ordersAsync = ref.watch(vendorOrdersProvider);
     final pendingCount = ordersAsync.valueOrNull
-            ?.where((o) => o.status == OrderStatus.PLACED)
+            ?.where((o) => o.status == OrderStatus.pending)
             .length ??
         0;
 

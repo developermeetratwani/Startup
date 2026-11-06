@@ -25,13 +25,12 @@ class VendorDashboardScreen extends ConsumerWidget {
               style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
             ),
             Text(
-              '${storeAsync.valueOrNull?.location.area ?? "Kubernagar"}, ${storeAsync.valueOrNull?.location.city ?? "Ahmedabad"}',
+              storeAsync.valueOrNull?.location.city ?? 'Ahmedabad',
               style: AppTextStyles.bodySmall,
             ),
           ],
         ),
         actions: [
-          // Store Status Toggle (Open/Closed)
           Padding(
             padding: const EdgeInsets.only(right: AppSpacing.pagePadding),
             child: storeAsync.when(
@@ -78,13 +77,12 @@ class VendorDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Notice banner if store is offline
               if (storeAsync.valueOrNull?.isOpen == false)
                 Container(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.error.withOpacity(0.1),
+                    color: AppColors.error.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                     border: Border.all(color: AppColors.error),
                   ),
@@ -102,7 +100,6 @@ class VendorDashboardScreen extends ConsumerWidget {
                   ),
                 ),
 
-              // KPI Cards: Sales, Commission, Payout
               earningsAsync.when(
                 data: (earnings) => Row(
                   children: [
@@ -141,7 +138,6 @@ class VendorDashboardScreen extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.lg),
 
-              // Referral & Store Coins Banner
               earningsAsync.when(
                 data: (earnings) => Container(
                   padding: const EdgeInsets.all(16),
@@ -158,7 +154,7 @@ class VendorDashboardScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE94560).withOpacity(0.2),
+                          color: const Color(0xFFE94560).withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(Icons.monetization_on_rounded, color: Color(0xFFE94560), size: 28),
@@ -197,7 +193,6 @@ class VendorDashboardScreen extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Quick Actions
               Text('Quick Actions', style: AppTextStyles.titleMedium),
               const SizedBox(height: 12),
               Row(
@@ -230,7 +225,6 @@ class VendorDashboardScreen extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.xl),
 
-              // Incoming Active Orders
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -245,7 +239,7 @@ class VendorDashboardScreen extends ConsumerWidget {
 
               ordersAsync.when(
                 data: (orders) {
-                  final activeOrders = orders.where((o) => o.status != OrderStatus.DELIVERED && o.status != OrderStatus.CANCELLED).toList();
+                  final activeOrders = orders.where((o) => o.isActive).toList();
                   if (activeOrders.isEmpty) {
                     return Container(
                       padding: const EdgeInsets.all(24),
@@ -334,7 +328,8 @@ class _DashboardOrderTile extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isNew = order.status == OrderStatus.PLACED;
+    final isNew = order.status == OrderStatus.pending;
+    final customerName = order.deliveryAddressSnapshot['recipientName'] ?? 'Customer';
 
     return AppCard(
       onTap: () => context.push('/orders'),
@@ -344,7 +339,7 @@ class _DashboardOrderTile extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('#${order.orderNumber}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              Text('#${order.id.substring(0, 8).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
@@ -359,8 +354,8 @@ class _DashboardOrderTile extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 8),
-          Text('${order.items.length} item(s) • ₹${(order.pricing.subtotal / 100).toStringAsFixed(0)}'),
-          Text('Deliver to: ${order.deliveryAddress.recipientName} (${order.deliveryAddress.area})', style: AppTextStyles.bodySmall),
+          Text('Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}'),
+          Text('Customer: $customerName', style: AppTextStyles.bodySmall),
           const SizedBox(height: 12),
           if (isNew)
             Row(
@@ -386,7 +381,7 @@ class _DashboardOrderTile extends ConsumerWidget {
                 ),
               ],
             )
-          else if (order.status == OrderStatus.CONFIRMED)
+          else if (order.status == OrderStatus.confirmed)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(

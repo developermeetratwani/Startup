@@ -42,7 +42,7 @@ class _VendorOrdersScreenState extends ConsumerState<VendorOrdersScreen>
           indicatorColor: AppColors.accent,
           tabs: const [
             Tab(text: 'New Orders'),
-            Tab(text: 'Preparing'),
+            Tab(text: 'Confirmed'),
             Tab(text: 'Ready for Pickup'),
             Tab(text: 'Completed'),
           ],
@@ -50,10 +50,10 @@ class _VendorOrdersScreenState extends ConsumerState<VendorOrdersScreen>
       ),
       body: ordersAsync.when(
         data: (orders) {
-          final newOrders = orders.where((o) => o.status == OrderStatus.PLACED).toList();
-          final preparingOrders = orders.where((o) => o.status == OrderStatus.CONFIRMED).toList();
-          final readyOrders = orders.where((o) => o.status == OrderStatus.READY_FOR_PICKUP || o.status == OrderStatus.OUT_FOR_DELIVERY).toList();
-          final completedOrders = orders.where((o) => o.status == OrderStatus.DELIVERED || o.status == OrderStatus.CANCELLED).toList();
+          final newOrders = orders.where((o) => o.status == OrderStatus.pending).toList();
+          final preparingOrders = orders.where((o) => o.status == OrderStatus.confirmed || o.status == OrderStatus.preparing).toList();
+          final readyOrders = orders.where((o) => o.status == OrderStatus.readyForPickup || o.status == OrderStatus.pickedUp).toList();
+          final completedOrders = orders.where((o) => o.status == OrderStatus.delivered || o.status == OrderStatus.cancelled).toList();
 
           return TabBarView(
             controller: _tabController,
@@ -113,13 +113,19 @@ class _OrderCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusColor = switch (order.status) {
-      OrderStatus.PLACED => AppColors.accent,
-      OrderStatus.CONFIRMED => AppColors.primary,
-      OrderStatus.READY_FOR_PICKUP => AppColors.warning,
-      OrderStatus.OUT_FOR_DELIVERY => AppColors.info,
-      OrderStatus.DELIVERED => AppColors.success,
-      OrderStatus.CANCELLED => AppColors.error,
+      OrderStatus.pending => AppColors.accent,
+      OrderStatus.confirmed => AppColors.primary,
+      OrderStatus.preparing => AppColors.warning,
+      OrderStatus.readyForPickup => AppColors.info,
+      OrderStatus.pickedUp => AppColors.info,
+      OrderStatus.delivered => AppColors.success,
+      OrderStatus.cancelled => AppColors.error,
+      OrderStatus.refunded => AppColors.error,
     };
+
+    final customerName = order.deliveryAddressSnapshot['recipientName'] ?? 'Customer';
+    final address = order.deliveryAddressSnapshot['addressLine1'] ?? 'Local Street';
+    final city = order.deliveryAddressSnapshot['city'] ?? 'Ahmedabad';
 
     return AppCard(
       child: Column(
@@ -128,11 +134,11 @@ class _OrderCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Order #${order.orderNumber}', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+              Text('Order #${order.id.substring(0, 8).toUpperCase()}', style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  color: statusColor.withOpacity(0.15),
+                  color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -143,47 +149,24 @@ class _OrderCard extends ConsumerWidget {
             ],
           ),
           const Divider(height: 20),
-          // Items
-          ...order.items.map((item) => Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(4),
-                      ),
-                      child: Text('${item.quantity}x', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text('${item.productName} (${item.size}, ${item.color})', style: AppTextStyles.bodyMedium),
-                    ),
-                    Text('₹${(item.lineTotal / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.w600)),
-                  ],
-                ),
-              )),
-          const Divider(height: 20),
-          // Delivery & Pricing Breakdown
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Customer: ${order.deliveryAddress.recipientName}', style: AppTextStyles.bodySmall),
-                  Text('Area: ${order.deliveryAddress.area}, ${order.deliveryAddress.city}', style: AppTextStyles.bodySmall),
+                  Text('Customer: $customerName', style: AppTextStyles.bodySmall),
+                  Text('Destination: $address, $city', style: AppTextStyles.bodySmall),
                   Text('Payment: ${order.paymentMethod.name} (${order.paymentStatus.name})', style: const TextStyle(fontSize: 11, color: AppColors.accent)),
                 ],
               ),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Subtotal: ₹${(order.pricing.subtotal / 100).toStringAsFixed(0)}', style: AppTextStyles.bodySmall),
-                  Text('Commission (10%): -₹${(order.pricing.platformCommission / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, color: AppColors.error)),
+                  Text('Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}', style: AppTextStyles.bodySmall),
+                  Text('10% Comm: -₹${(order.pricing.platformCommission / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, color: AppColors.error)),
                   Text(
-                    'Net Payout: ₹${(order.pricing.retailerPayout / 100).toStringAsFixed(0)}',
+                    'Net: ₹${(order.pricing.vendorEarning / 100).toStringAsFixed(0)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 13),
                   ),
                 ],
@@ -191,8 +174,7 @@ class _OrderCard extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // Actions
-          if (order.status == OrderStatus.PLACED)
+          if (order.status == OrderStatus.pending)
             Row(
               children: [
                 Expanded(
@@ -217,7 +199,7 @@ class _OrderCard extends ConsumerWidget {
                 ),
               ],
             )
-          else if (order.status == OrderStatus.CONFIRMED)
+          else if (order.status == OrderStatus.confirmed || order.status == OrderStatus.preparing)
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(

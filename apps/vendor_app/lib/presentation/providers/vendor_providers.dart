@@ -32,7 +32,6 @@ final currentStoreProvider = StreamProvider<StoreEntity?>((ref) {
 
   return repo.watchStoreByVendorId(uid).map((store) {
     if (store == null) {
-      // Return default preview store for Kubernagar Market
       return StoreEntity(
         id: 'store-kubernagar-1',
         vendorId: uid,
@@ -68,7 +67,6 @@ final vendorProductsProvider = StreamProvider<List<ProductEntity>>((ref) {
 
   return repo.watchVendorProducts(storeId).map((products) {
     if (products.isEmpty) {
-      // Demo products for preview
       return [
         ProductEntity(
           id: 'vprod-1',
@@ -159,99 +157,60 @@ final vendorOrdersProvider = StreamProvider<List<OrderEntity>>((ref) {
 
   return repo.watchVendorOrders(storeId).map((orders) {
     if (orders.isEmpty) {
-      // Demo incoming orders
       return [
         OrderEntity(
           id: 'ord-101',
-          orderNumber: 'ORD-8921',
           customerId: 'cust-1',
           storeId: storeId,
           vendorId: 'vendor-1',
-          status: OrderStatus.PLACED,
-          items: const [
-            OrderItemEntity(
-              productId: 'vprod-1',
-              variantId: 'v1',
-              productName: 'Royal Velvet Embroidered Kurti',
-              size: 'M',
-              color: 'Maroon',
-              unitPrice: 89900,
-              quantity: 1,
-              lineTotal: 89900,
-            ),
-          ],
+          status: OrderStatus.pending,
+          deliveryAddressId: 'addr-1',
+          deliveryAddressSnapshot: const {
+            'recipientName': 'Kavya Sharma',
+            'phone': '+91 98765 43210',
+            'addressLine1': 'Block C-4, Krishna Complex, Kubernagar',
+            'city': 'Ahmedabad',
+          },
+          paymentMethod: PaymentMethod.cod,
+          paymentStatus: PaymentStatus.pending,
           pricing: const OrderPricing(
-            subtotal: 89900,
-            deliveryFee: 2500,
+            productTotal: 89900,
+            deliveryCharge: 2500,
             discount: 0,
             coinRedemption: 0,
-            platformCommission: 8990,
-            retailerPayout: 80910,
             grandTotal: 92400,
+            platformCommission: 8990,
+            vendorEarning: 80910,
+            driverEarning: 2500,
           ),
-          deliveryAddress: const AddressEntity(
-            id: 'addr-1',
-            userId: 'cust-1',
-            tag: AddressTag.home,
-            recipientName: 'Kavya Sharma',
-            phone: '+91 98765 43210',
-            addressLine1: 'Block C-4, Krishna Complex',
-            area: 'Kubernagar',
-            city: 'Ahmedabad',
-            pincode: '382340',
-            latitude: 23.0768,
-            longitude: 72.6346,
-            isDefault: true,
-          ),
-          paymentMethod: PaymentMethod.COD,
-          paymentStatus: PaymentStatus.PENDING,
-          createdAt: DateTime.now().subtract(const Duration(minutes: 8)),
+          placedAt: DateTime.now().subtract(const Duration(minutes: 8)),
         ),
         OrderEntity(
           id: 'ord-102',
-          orderNumber: 'ORD-8919',
           customerId: 'cust-2',
           storeId: storeId,
           vendorId: 'vendor-1',
-          status: OrderStatus.CONFIRMED,
-          items: const [
-            OrderItemEntity(
-              productId: 'vprod-2',
-              variantId: 'v3',
-              productName: 'Navratri Chaniya Choli Set',
-              size: 'Free Size',
-              color: 'Multicolor',
-              unitPrice: 249900,
-              quantity: 1,
-              lineTotal: 249900,
-            ),
-          ],
+          status: OrderStatus.confirmed,
+          deliveryAddressId: 'addr-2',
+          deliveryAddressSnapshot: const {
+            'recipientName': 'Priya Patel',
+            'phone': '+91 91234 56789',
+            'addressLine1': 'Flat 202, Shivalik Tower, Sector 21',
+            'city': 'Gandhinagar',
+          },
+          paymentMethod: PaymentMethod.online,
+          paymentStatus: PaymentStatus.paid,
           pricing: const OrderPricing(
-            subtotal: 249900,
-            deliveryFee: 0,
+            productTotal: 249900,
+            deliveryCharge: 0,
             discount: 0,
             coinRedemption: 0,
-            platformCommission: 24990,
-            retailerPayout: 224910,
             grandTotal: 249900,
+            platformCommission: 24990,
+            vendorEarning: 224910,
+            driverEarning: 2500,
           ),
-          deliveryAddress: const AddressEntity(
-            id: 'addr-2',
-            userId: 'cust-2',
-            tag: AddressTag.home,
-            recipientName: 'Priya Patel',
-            phone: '+91 91234 56789',
-            addressLine1: 'Flat 202, Shivalik Tower',
-            area: 'Sector 21',
-            city: 'Gandhinagar',
-            pincode: '382021',
-            latitude: 23.2156,
-            longitude: 72.6369,
-            isDefault: true,
-          ),
-          paymentMethod: PaymentMethod.RAZORPAY,
-          paymentStatus: PaymentStatus.PAID,
-          createdAt: DateTime.now().subtract(const Duration(minutes: 25)),
+          placedAt: DateTime.now().subtract(const Duration(minutes: 25)),
         ),
       ];
     }
@@ -269,9 +228,9 @@ final vendorEarningsProvider = StreamProvider<VendorEarningsSummary>((ref) {
   return repo.watchEarnings(storeId, vendorId).map((summary) {
     if (summary.totalSales == 0) {
       return const VendorEarningsSummary(
-        totalSales: 339800, // ₹3,398
-        platformCommission: 33980, // 10% = ₹339.80
-        netEarnings: 305820, // ₹3,058.20
+        totalSales: 339800,
+        platformCommission: 33980,
+        netEarnings: 305820,
         completedOrders: 3,
         storeCoins: 350,
         referralCode: 'SHREEJI-KUBER',
