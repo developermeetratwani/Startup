@@ -1,0 +1,195 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helpers ──────────────────────────────────────────
+    function isAuth() { return request.auth != null; }
+    function role() { return request.auth.token.role; }
+    function isRole(r) { return isAuth() && role() == r; }
+    function isAdmin()    { return isRole('admin'); }
+    function isCustomer() { return isRole('customer'); }
+    function isVendor()   { return isRole('vendor'); }
+    function isDriver()   { return isRole('driver'); }
+    function isOwner(uid) { return isAuth() && request.auth.uid == uid; }
+    function isVendorOfStore(sid) {
+      return isVendor() && request.auth.token.storeId == sid;
+    }
+
+    // ── users ─────────────────────────────────────────────
+    match /users/{uid} {
+      allow read:   if isOwner(uid) || isAdmin();
+      allow create: if false;   // Cloud Function only
+      allow update: if isOwner(uid)
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['role','uid']);
+      allow delete: if false;
+    }
+
+    // ── customerProfiles ──────────────────────────────────
+    match /customerProfiles/{uid} {
+      allow read:   if isOwner(uid) || isAdmin();
+      allow create: if false;
+      allow update: if isOwner(uid)
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['userId','totalOrders','referredByVendorId']);
+      allow delete: if false;
+    }
+
+    // ── vendorProfiles ────────────────────────────────────
+    match /vendorProfiles/{uid} {
+      allow read:   if isOwner(uid) || isAdmin();
+      allow create: if isAuth() && isOwner(uid);
+      allow update: if (isOwner(uid)
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['approvalStatus','coinBalance','totalEarnings','referralCode']))
+                    || isAdmin();
+      allow delete: if false;
+    }
+
+    // ── driverProfiles ────────────────────────────────────
+    match /driverProfiles/{uid} {
+      allow read:   if isOwner(uid) || isAdmin();
+      allow create: if isAuth() && isOwner(uid);
+      allow update: if (isOwner(uid)
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['approvalStatus','totalEarnings','totalDeliveries']))
+                    || isAdmin();
+      allow delete: if false;
+    }
+
+    // ── stores ────────────────────────────────────────────
+    match /stores/{storeId} {
+      allow read:   if isAuth();
+      allow create: if false;   // Cloud Function (vendor approval)
+      allow update: if isVendorOfStore(storeId)
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['vendorId','rating','totalRatings'])
+                    || isAdmin();
+      allow delete: if false;
+    }
+
+    // ── categories ────────────────────────────────────────
+    match /categories/{id} {
+      allow read:  if isAuth();
+      allow write: if isAdmin();
+    }
+
+    // ── products ──────────────────────────────────────────
+    match /products/{pid} {
+      allow read:   if isAuth();
+      allow create: if isVendor() && request.resource.data.vendorId == request.auth.uid;
+      allow update: if (isVendor() && resource.data.vendorId == request.auth.uid
+                    && !request.resource.data.diff(resource.data)
+                        .affectedKeys().hasAny(['vendorId','storeId','totalSold','rating','totalRatings']))
+                    || isAdmin();
+      allow delete: if false;
+
+      match /variants/{vid} {
+        allow read:   if isAuth();
+        allow create: if isVendor()
+                      && get(/databases/$(database)/documents/products/$(pid)).data.vendorId == request.auth.uid;
+        allow update: if isVendor()
+                      && get(/databases/$(database)/documents/products/$(pid)).data.vendorId == request.auth.uid
+                      || isAdmin();
+        allow delete: if false;
+      }
+    }
+
+    // ── addresses ─────────────────────────────────────────
+    match /addresses/{aid} {
+      allow read:   if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isCustomer() && request.resource.data.userId == request.auth.uid;
+      allow update: if isCustomer() && resource.data.userId == request.auth.uid;
+      allow delete: if isCustomer() && resource.data.userId == request.auth.uid;
+    }
+
+    // ── carts ─────────────────────────────────────────────
+    match /carts/{cid} {
+      allow read, write: if isCustomer() && isOwner(cid);
+      match /items/{iid} {
+        allow read, write: if isCustomer() && isOwner(cid);
+      }
+    }
+
+    // ── orders ────────────────────────────────────────────
+    match /orders/{oid} {
+      allow read: if isAuth()
+                  && (resource.data.customerId == request.auth.uid
+                   || resource.data.vendorId   == request.auth.uid
+                   || resource.data.driverId   == request.auth.uid
+                   || isAdmin());
+      allow create: if false;   // Cloud Function only
+      allow update: if false;   // Cloud Function only
+      allow delete: if false;
+
+      match /items/{iid} {
+        allow read: if isAuth()
+                    && (get(/databases/$(database)/documents/orders/$(oid)).data.customerId == request.auth.uid
+                     || get(/databases/$(database)/documents/orders/$(oid)).data.vendorId   == request.auth.uid
+                     || isAdmin());
+        allow write: if false;
+      }
+    }
+
+    // ── payments ──────────────────────────────────────────
+    match /payments/{pid} {
+      allow read:  if isAuth() && (resource.data.customerId == request.auth.uid || isAdmin());
+      allow write: if false;
+    }
+
+    // ── deliveries ────────────────────────────────────────
+    match /deliveries/{did} {
+      allow read: if isAuth()
+                  && (resource.data.driverId   == request.auth.uid
+                   || resource.data.customerId == request.auth.uid
+                   || resource.data.vendorId   == request.auth.uid
+                   || isAdmin());
+      allow create: if false;
+      allow update: if isDriver() && resource.data.driverId == request.auth.uid
+                    && request.resource.data.diff(resource.data)
+                        .affectedKeys().hasOnly(['status','pickedUpAt','deliveredAt','updatedAt'])
+                    || isAdmin();
+      allow delete: if false;
+    }
+
+    // ── reviews ───────────────────────────────────────────
+    match /reviews/{rid} {
+      allow read:   if isAuth();
+      allow create: if isCustomer() && request.resource.data.customerId == request.auth.uid;
+      allow update: if isCustomer() && resource.data.customerId == request.auth.uid
+                    && request.resource.data.diff(resource.data)
+                        .affectedKeys().hasOnly(['rating','comment','updatedAt']);
+      allow delete: if false;
+    }
+
+    // ── financial / audit (Cloud Function only) ───────────
+    match /referralCodes/{id}         { allow read: if isAuth(); allow write: if false; }
+    match /referralTransactions/{id}  { allow read: if isAuth() && (resource.data.vendorId == request.auth.uid || isAdmin()); allow write: if false; }
+    match /storeCoins/{vid}           { allow read: if isOwner(vid) || isAdmin(); allow write: if false; }
+    match /coinTransactions/{id}      { allow read: if isAuth() && (resource.data.vendorId == request.auth.uid || isAdmin()); allow write: if false; }
+    match /commissionRecords/{id}     { allow read: if isAuth() && (resource.data.vendorId == request.auth.uid || isAdmin()); allow write: if false; }
+    match /settlements/{id}           { allow read: if isAuth() && (resource.data.vendorId == request.auth.uid || isAdmin()); allow write: if false; }
+
+    // ── promoCodes ────────────────────────────────────────
+    match /promoCodes/{id}  { allow read: if isAuth(); allow write: if isAdmin(); }
+    match /promoUsage/{id}  { allow read: if isAdmin(); allow write: if false; }
+
+    // ── notifications ─────────────────────────────────────
+    match /notifications/{id} {
+      allow read:   if isAuth() && resource.data.userId == request.auth.uid;
+      allow create: if false;
+      allow update: if isAuth() && resource.data.userId == request.auth.uid
+                    && request.resource.data.diff(resource.data)
+                        .affectedKeys().hasOnly(['isRead','readAt']);
+      allow delete: if false;
+    }
+
+    // ── supportTickets ────────────────────────────────────
+    match /supportTickets/{id} {
+      allow read:   if isAuth() && (resource.data.userId == request.auth.uid || isAdmin());
+      allow create: if isAuth() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+  }
+}

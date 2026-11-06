@@ -1,0 +1,33 @@
+# Flutter
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+*.iml
+build/
+.pub-cache/
+.pub/
+
+# Firebase — NEVER commit these
+google-services.json
+GoogleService-Info.plist
+**/google-services.json
+**/GoogleService-Info.plist
+.env
+*.env
+.firebaserc.local
+
+# Cloud Functions
+functions/node_modules/
+functions/lib/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Melos
+.melos_tool/
+pubspec_overrides.yaml

@@ -1,0 +1,297 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui_kit/ui_kit.dart';
+import 'package:domain/domain.dart';
+import '../../providers/product_provider.dart';
+import '../../providers/cart_provider.dart';
+import '../../providers/auth_provider.dart';
+
+class ProductDetailScreen extends ConsumerStatefulWidget {
+  final String productId;
+
+  const ProductDetailScreen({super.key, required this.productId});
+
+  @override
+  ConsumerState<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
+  String? _selectedSize;
+  String? _selectedColor;
+  int _quantity = 1;
+  bool _isAdding = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final productAsync = ref.watch(singleProductProvider(widget.productId));
+    final user = ref.watch(currentUserProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Product Details'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.shopping_bag_outlined),
+            onPressed: () => context.push('/cart'),
+          ),
+        ],
+      ),
+      body: productAsync.when(
+        data: (product) {
+          if (product == null) {
+            return const Center(child: Text('Product not found'));
+          }
+
+          final sizes = product.variants.map((v) => v.size).toSet().toList();
+          final colors = product.variants.map((v) => v.color).toSet().toList();
+
+          _selectedSize ??= sizes.isNotEmpty ? sizes.first : 'Standard';
+          _selectedColor ??= colors.isNotEmpty ? colors.first : 'Standard';
+
+          // Find current variant stock
+          final matchingVariant = product.variants.firstWhere(
+            (v) => v.size == _selectedSize && v.color == _selectedColor,
+            orElse: () => product.variants.isNotEmpty
+                ? product.variants.first
+                : const ProductVariantEntity(
+                    id: 'default',
+                    productId: '',
+                    size: 'M',
+                    color: 'Standard',
+                    colorHex: '#000',
+                    sku: '',
+                    stockCount: 5,
+                  ),
+          );
+
+          final bool inStock = matchingVariant.stockCount > 0;
+
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSpacing.pagePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Product Image
+                      ProductImage(
+                        imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : null,
+                        height: 280,
+                        width: double.infinity,
+                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Name & Rating
+                      Text(product.name, style: AppTextStyles.headlineMedium),
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          const Icon(Icons.star_rounded, color: AppColors.warning, size: 20),
+                          const SizedBox(width: 4),
+                          Text(product.rating.toStringAsFixed(1), style: AppTextStyles.labelLarge),
+                          const SizedBox(width: 8),
+                          Text('(${product.totalRatings} reviews)', style: AppTextStyles.bodySmall),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: inStock ? AppColors.success.withOpacity(0.15) : AppColors.error.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Text(
+                              inStock ? 'IN STOCK (${matchingVariant.stockCount})' : 'OUT OF STOCK',
+                              style: TextStyle(
+                                color: inStock ? AppColors.success : AppColors.error,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Price
+                      Row(
+                        children: [
+                          Text(product.priceDisplay, style: AppTextStyles.price.copyWith(fontSize: 24)),
+                          if (product.discountedPrice > 0 && product.discountedPrice < product.basePrice) ...[
+                            const SizedBox(width: 10),
+                            Text(
+                              '₹${(product.basePrice / 100).toStringAsFixed(0)}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                decoration: TextDecoration.lineThrough,
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const Divider(height: 24),
+
+                      // Size Selection
+                      if (sizes.isNotEmpty) ...[
+                        Text('Select Size', style: AppTextStyles.titleMedium),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: sizes.map((size) {
+                            final isSel = _selectedSize == size;
+                            return ChoiceChip(
+                              label: Text(size),
+                              selected: isSel,
+                              selectedColor: AppColors.primary,
+                              labelStyle: TextStyle(color: isSel ? Colors.white : AppColors.textPrimary),
+                              onSelected: (_) => setState(() => _selectedSize = size),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // Color Selection
+                      if (colors.isNotEmpty) ...[
+                        Text('Select Color', style: AppTextStyles.titleMedium),
+                        const SizedBox(height: 8),
+                        Wrap(
+                          spacing: 8,
+                          children: colors.map((col) {
+                            final isSel = _selectedColor == col;
+                            return ChoiceChip(
+                              label: Text(col),
+                              selected: isSel,
+                              selectedColor: AppColors.primary,
+                              labelStyle: TextStyle(color: isSel ? Colors.white : AppColors.textPrimary),
+                              onSelected: (_) => setState(() => _selectedColor = col),
+                            );
+                          }).toList(),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // Quantity Selector
+                      Row(
+                        children: [
+                          Text('Quantity', style: AppTextStyles.titleMedium),
+                          const Spacer(),
+                          Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: AppColors.divider),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              children: [
+                                IconButton(
+                                  icon: const Icon(Icons.remove, size: 18),
+                                  onPressed: _quantity > 1 ? () => setState(() => _quantity--) : null,
+                                ),
+                                Text('$_quantity', style: AppTextStyles.titleMedium),
+                                IconButton(
+                                  icon: const Icon(Icons.add, size: 18),
+                                  onPressed: _quantity < matchingVariant.stockCount
+                                      ? () => setState(() => _quantity++)
+                                      : null,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Description
+                      Text('Product Description', style: AppTextStyles.titleMedium),
+                      const SizedBox(height: 6),
+                      Text(
+                        product.description.isNotEmpty
+                            ? product.description
+                            : 'High quality clothing crafted for style and everyday comfort. Available for hyperlocal delivery.',
+                        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                      ),
+                      const SizedBox(height: 32),
+                    ],
+                  ),
+                ),
+              ),
+
+              // Sticky Add to Cart Bottom Bar
+              Container(
+                padding: const EdgeInsets.all(AppSpacing.pagePadding),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 10,
+                      offset: const Offset(0, -4),
+                    ),
+                  ],
+                ),
+                child: SafeArea(
+                  child: Row(
+                    children: [
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Total Price', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                          Text(
+                            '₹${((product.effectivePrice * _quantity) / 100).toStringAsFixed(0)}',
+                            style: AppTextStyles.price,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 20),
+                      Expanded(
+                        child: AppButton(
+                          label: inStock ? 'Add to Cart' : 'Out of Stock',
+                          isLoading: _isAdding,
+                          onPressed: inStock
+                              ? () async {
+                                  if (user == null) {
+                                    context.push('/login');
+                                    return;
+                                  }
+                                  setState(() => _isAdding = true);
+                                  final cartRepo = ref.read(cartRepositoryProvider);
+                                  await cartRepo.addToCart(
+                                    CartItemEntity(
+                                      id: '${product.id}_${_selectedSize}_${_selectedColor}',
+                                      customerId: user.uid,
+                                      productId: product.id,
+                                      variantId: matchingVariant.id,
+                                      storeId: product.storeId,
+                                      vendorId: product.vendorId,
+                                      productName: product.name,
+                                      imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : '',
+                                      unitPrice: product.effectivePrice,
+                                      quantity: _quantity,
+                                      size: _selectedSize ?? '',
+                                      color: _selectedColor ?? '',
+                                    ),
+                                  );
+                                  setState(() => _isAdding = false);
+                                  if (mounted) {
+                                    AppSnackbar.show(context, message: 'Added to cart!', type: SnackbarType.success);
+                                  }
+                                }
+                              : null,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text('Error: $err')),
+      ),
+    );
+  }
+}
