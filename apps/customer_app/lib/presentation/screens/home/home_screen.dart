@@ -8,7 +8,6 @@ import '../../providers/location_provider.dart';
 import '../../providers/store_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
-import '../../widgets/live_rider_tracking_sheet.dart';
 import '../../widgets/support_chatbot_sheet.dart';
 import '../../widgets/floating_cart_bar.dart';
 
@@ -74,22 +73,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 12),
-            child: InkWell(
-              onTap: () => LiveRiderTrackingSheet.show(context),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
-                decoration: BoxDecoration(
-                  color: AppColors.accent.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.6)),
-                ),
-                child: const Text('Radar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
-              ),
-            ),
-          ),
           IconButton(
             icon: Stack(
               clipBehavior: Clip.none,
@@ -337,17 +320,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       ),
                       const SizedBox(height: 10),
                       InkWell(
-                        onTap: () => LiveRiderTrackingSheet.show(context),
+                        onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
                         borderRadius: BorderRadius.circular(20),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
                           decoration: BoxDecoration(
                             color: AppColors.accent,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 4),
-                            child: Text('Track Nearby Riders on Map', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.near_me_rounded, color: Colors.white, size: 14),
+                              SizedBox(width: 6),
+                              Text('Track Active Delivery', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            ],
                           ),
                         ),
                       ),
@@ -547,25 +534,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           duration: const Duration(milliseconds: 200),
           child: IgnorePointer(
             ignoring: !_isNavBarVisible,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FloatingActionButton.extended(
-                  heroTag: 'fab_helpbot',
-                  backgroundColor: AppColors.primary,
-                  icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
-                  label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                  onPressed: () => SupportChatbotSheet.show(context),
-                ),
-                const SizedBox(width: 10),
-                FloatingActionButton.extended(
-                  heroTag: 'fab_radar',
-                  backgroundColor: AppColors.accent,
-                  icon: const Icon(Icons.near_me_rounded, color: Colors.white, size: 20),
-                  label: const Text('Live Radar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-                  onPressed: () => LiveRiderTrackingSheet.show(context),
-                ),
-              ],
+            child: FloatingActionButton.extended(
+              heroTag: 'fab_helpbot',
+              backgroundColor: AppColors.primary,
+              icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+              label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+              onPressed: () => SupportChatbotSheet.show(context),
             ),
           ),
         ),

@@ -9,7 +9,6 @@ import 'package:ui_kit/ui_kit.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
 import '../../providers/order_provider.dart';
-import '../../widgets/live_rider_tracking_sheet.dart';
 import '../../widgets/driver_chat_dialog.dart';
 import '../../widgets/support_chatbot_sheet.dart';
 
@@ -189,23 +188,20 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                             ],
                           ),
                         ),
-                        InkWell(
-                          onTap: () => LiveRiderTrackingSheet.show(context),
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
-                            ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.radar_rounded, size: 14, color: Color(0xFFE23744)),
-                                SizedBox(width: 4),
-                                Text('Radar', style: TextStyle(color: Color(0xFFE23744), fontSize: 11, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CircleAvatar(radius: 4, backgroundColor: Colors.green),
+                              SizedBox(width: 5),
+                              Text('LIVE ROUTE', style: TextStyle(color: Color(0xFF171717), fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.5)),
+                            ],
                           ),
                         ),
                       ],
@@ -541,7 +537,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                                   ),
                                   const SizedBox(width: 6),
                                   const Text(
-                                    'LIVE GPS RADAR',
+                                    'LIVE DRIVER GPS',
                                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: 0.3),
                                   ),
                                   const SizedBox(width: 6),
@@ -636,44 +632,183 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
 
                   // ── SWIGGY / ZOMATO DELIVERY PARTNER PROFILE & ACTION CARD ───
                   Container(
-                    padding: const EdgeInsets.all(14),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: BorderRadius.circular(16),
                       border: Border.all(color: Colors.grey.shade200),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2)),
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.05),
+                          blurRadius: 14,
+                          offset: const Offset(0, 3),
+                        ),
                       ],
                     ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Header with Delivery Partner Label & Verification
                         Row(
                           children: [
-                            CircleAvatar(
-                              radius: 22,
-                              backgroundColor: const Color(0xFFE23744).withValues(alpha: 0.12),
-                              child: const Icon(Icons.person_rounded, color: Color(0xFFE23744), size: 24),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: AppColors.accent.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: const Text(
+                                'ASSIGNED DELIVERY PARTNER',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.accent,
+                                  letterSpacing: 0.5,
+                                ),
+                              ),
                             ),
-                            const SizedBox(width: 12),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF16A34A).withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.verified_rounded, size: 12, color: Color(0xFF16A34A)),
+                                  SizedBox(width: 4),
+                                  Text(
+                                    'Verified Partner',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF16A34A),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+
+                        // Driver Profile Main Row
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              children: [
+                                CircleAvatar(
+                                  radius: 26,
+                                  backgroundColor: AppColors.onyx.withValues(alpha: 0.08),
+                                  child: const Icon(Icons.person_rounded, color: AppColors.onyx, size: 30),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(2),
+                                    decoration: const BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.two_wheeler_rounded, size: 14, color: AppColors.accent),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(width: 14),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Row(
-                                    children: [
-                                      Text('Suresh Solanki', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                                      SizedBox(width: 6),
-                                      Icon(Icons.verified_user_rounded, color: Colors.blue, size: 14),
-                                    ],
+                                  // 1. Driver Name
+                                  const Text(
+                                    'Suresh Solanki',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 16,
+                                      color: Color(0xFF171717),
+                                      letterSpacing: -0.2,
+                                    ),
                                   ),
-                                  const SizedBox(height: 2),
-                                  const Text('Honda Activa 6G • GJ-01-AB-1234', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                                  const SizedBox(height: 2),
-                                  Row(
+                                  const SizedBox(height: 3),
+
+                                  // Vehicle
+                                  const Text(
+                                    'Honda Activa 6G • GJ-01-AB-1234',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: AppColors.textSecondary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+
+                                  // 2. Rating & 3. Since when is he driving
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 6,
                                     children: [
-                                      const Icon(Icons.star_rounded, size: 13, color: Colors.amber),
-                                      const SizedBox(width: 2),
-                                      Text('4.9 ★ (1,240 deliveries)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+                                      // Rating Badge
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFF15803D),
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Text(
+                                              '4.9',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 11,
+                                              ),
+                                            ),
+                                            SizedBox(width: 3),
+                                            Icon(Icons.star_rounded, size: 12, color: Colors.white),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              '(1,240 ratings)',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+
+                                      // Driving Experience Badge (Since when is he driving)
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFEEF2F6),
+                                          borderRadius: BorderRadius.circular(6),
+                                          border: Border.all(color: const Color(0xFFCBD5E1)),
+                                        ),
+                                        child: const Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(Icons.history_toggle_off_rounded, size: 12, color: Color(0xFF475569)),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              'Driving since 2022 (3+ yrs)',
+                                              style: TextStyle(
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w600,
+                                                color: Color(0xFF334155),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ],
@@ -681,28 +816,40 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                             ),
                           ],
                         ),
-                        const SizedBox(height: 10),
-                        // Hygiene & Safety Badges
+
+                        const SizedBox(height: 12),
+
+                        // Experience & Trust Highlights Bar
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
                           decoration: BoxDecoration(
-                            color: Colors.green.shade50,
+                            color: const Color(0xFFF8FAFC),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: Colors.green.shade200),
+                            border: Border.all(color: const Color(0xFFE2E8F0)),
                           ),
                           child: const Row(
                             children: [
-                              Icon(Icons.health_and_safety_rounded, size: 14, color: Color(0xFF047857)),
+                              Icon(Icons.military_tech_rounded, size: 15, color: Color(0xFFD97706)),
                               SizedBox(width: 6),
                               Expanded(
-                                child: Text('🛡️ Vaccinated • Temperature Normal • Sanitized Packaging', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF047857))),
+                                child: Text(
+                                  'Top Delivery Partner • 1,240+ deliveries completed with 99.4% on-time record',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Color(0xFF475569),
+                                  ),
+                                ),
                               ),
                             ],
                           ),
                         ),
+
                         const SizedBox(height: 12),
                         const Divider(height: 1),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
+
+                        // Action Buttons: Chat & Call
                         Row(
                           children: [
                             // Direct Chat Button
@@ -710,12 +857,12 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                               child: OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: AppColors.primary,
-                                  side: const BorderSide(color: AppColors.primary),
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  side: const BorderSide(color: AppColors.primary, width: 1.2),
+                                  padding: const EdgeInsets.symmetric(vertical: 11),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
                                 icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16),
-                                label: const Text('Chat with Driver', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                label: const Text('Chat with Suresh', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                 onPressed: () => DriverChatDialog.show(
                                   context,
                                   orderId: order.id,
@@ -729,13 +876,13 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                             Expanded(
                               child: ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.success,
+                                  backgroundColor: const Color(0xFF16A34A),
                                   foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                  padding: const EdgeInsets.symmetric(vertical: 11),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                                 ),
                                 icon: const Icon(Icons.phone_rounded, size: 16),
-                                label: const Text('Call Partner', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                label: const Text('Call Driver', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                                 onPressed: () async {
                                   final uri = Uri.parse('tel:+919898012345');
                                   if (await canLaunchUrl(uri)) {
