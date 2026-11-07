@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
@@ -185,6 +185,8 @@ class OrderRepositoryImpl implements OrderRepository {
     required String paymentMethod,
     String? promoCode,
     int coinRedemptionAmount = 0,
+    String? razorpayPaymentId,
+    String? razorpayOrderId,
   }) async {
     try {
       // Direct Firestore creation ensures resilient local & offline functioning
@@ -192,9 +194,10 @@ class OrderRepositoryImpl implements OrderRepository {
       final orderId = orderRef.id;
 
       final isCod = paymentMethod == 'cod';
+      final isPaidOnline = paymentMethod == 'online' || razorpayPaymentId != null;
       final int subtotal = 149900;
       final int packagingCharge = (subtotal * 0.01).round(); // 1% packaging charge
-      final int codCharge = isCod ? 2100 : 0;                 // â‚¹21 COD charge
+      final int codCharge = isCod ? 2100 : 0;                 // ₹21 COD charge
       final int deliveryCharge = 2500;
       final int grandTotal = subtotal + packagingCharge + codCharge + deliveryCharge;
 
@@ -214,6 +217,8 @@ class OrderRepositoryImpl implements OrderRepository {
         'status': 'confirmed',
         'paymentMethod': paymentMethod,
         'paymentStatus': isCod ? 'pending' : 'paid',
+        'razorpayPaymentId': razorpayPaymentId,
+        'razorpayOrderId': razorpayOrderId,
         'pricing': {
           'productTotal': subtotal,
           'deliveryCharge': deliveryCharge,
@@ -253,7 +258,9 @@ class OrderRepositoryImpl implements OrderRepository {
         },
         status: OrderStatus.confirmed,
         paymentMethod: _parsePaymentMethod(paymentMethod),
-        paymentStatus: isCod ? PaymentStatus.pending : PaymentStatus.paid,
+        paymentStatus: isPaidOnline ? PaymentStatus.paid : (isCod ? PaymentStatus.pending : PaymentStatus.paid),
+        razorpayPaymentId: razorpayPaymentId,
+        razorpayOrderId: razorpayOrderId,
         pricing: OrderPricing(
           productTotal: subtotal,
           deliveryCharge: deliveryCharge,

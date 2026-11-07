@@ -14,4 +14,5 @@ export 'services/order_sync_service.dart';
 export 'services/driver_chat_service.dart';
 export 'services/support_chatbot_service.dart';
 export 'services/legal_consent_service.dart';
+export 'services/razorpay_service.dart';
 export 'utils/app_logger.dart';

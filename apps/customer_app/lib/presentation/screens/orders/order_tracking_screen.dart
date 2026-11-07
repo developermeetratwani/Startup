@@ -65,9 +65,9 @@ class OrderTrackingScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Estimated Time Header Banner (Zomato-style)
-                if (!isCancelled && order.status != OrderStatus.delivered)
+                if (!isCancelled && order.status != OrderStatus.delivered) ...[
                   Container(
-                    margin: const EdgeInsets.only(bottom: 14),
+                    margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
@@ -93,10 +93,17 @@ class OrderTrackingScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Arriving in ~${order.estimatedDeliveryMinutes} Mins',
+                                order.status == OrderStatus.pickedUp
+                                    ? 'On the Way • Arriving in ~${order.estimatedDeliveryMinutes} Mins'
+                                    : 'Preparing & Packing • ~${order.estimatedDeliveryMinutes} Mins',
                                 style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                               ),
-                              const Text('Hyperlocal Rider dispatched • Live GPS', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                              Text(
+                                order.status == OrderStatus.pickedUp
+                                    ? 'Driver Suresh Solanki picked up parcel from store'
+                                    : 'Clothing boutique preparing your order for handover',
+                                style: const TextStyle(fontSize: 11, color: Colors.white70),
+                              ),
                             ],
                           ),
                         ),
@@ -121,6 +128,45 @@ class OrderTrackingScreen extends ConsumerWidget {
                       ],
                     ),
                   ),
+
+                  // Dynamic Traffic & Delay Status Banner (Zomato-style Green/Orange/Red)
+                  Container(
+                    margin: const EdgeInsets.only(bottom: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade50,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.amber.shade400),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Colors.orange,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text(
+                            'Moderate Traffic on Kubernagar / S.G. Highway (+4 mins delay calculated)',
+                            style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Color(0xFF7A4F01)),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade100,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text('SLIGHT DELAY', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.orange)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
 
                 // Size Exchange Requested Banner
                 if (isExchange)
