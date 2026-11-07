@@ -131,32 +131,34 @@ class DriverProfileScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Vehicle Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              height: 120,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                image: const DecorationImage(
-                  image: NetworkImage('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=300'),
-                  fit: BoxFit.cover,
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                height: 120,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  image: const DecorationImage(
+                    image: NetworkImage('https://images.unsplash.com/photo-1558981403-c5f9899a28bc?w=300'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: modelCtrl,
-              decoration: const InputDecoration(labelText: 'Vehicle Model (e.g. Activa 6G / Splendor)'),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: regCtrl,
-              decoration: const InputDecoration(labelText: 'Registration Number (e.g. GJ-01-AB-1234)'),
-            ),
-          ],
+              const SizedBox(height: 12),
+              TextField(
+                controller: modelCtrl,
+                decoration: const InputDecoration(labelText: 'Vehicle Model (e.g. Activa 6G / Splendor)'),
+              ),
+              const SizedBox(height: 8),
+              TextField(
+                controller: regCtrl,
+                decoration: const InputDecoration(labelText: 'Registration Number (e.g. GJ-01-AB-1234)'),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -183,23 +185,25 @@ class DriverProfileScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Identity & Anti-Theft Verification'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'To prevent theft and protect customer deliveries, every rider undergoes mandatory Aadhaar & address verification.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 14),
-            _DocRow(title: 'Aadhaar Card', value: profile.aadhaarNumber, status: 'Verified ✅'),
-            const SizedBox(height: 8),
-            _DocRow(title: 'Electricity Bill', value: profile.electricityBillProvider, status: 'Verified ✅'),
-            const SizedBox(height: 8),
-            const _DocRow(title: 'Driving License', value: 'GJ01-20210045678', status: 'Active ✅'),
-            const SizedBox(height: 8),
-            const _DocRow(title: 'Police Clearance', value: 'Anti-Theft Check', status: 'Clean Record ✅'),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'To prevent theft and protect customer deliveries, every rider undergoes mandatory Aadhaar & address verification.',
+                style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              ),
+              const SizedBox(height: 14),
+              _DocRow(title: 'Aadhaar Card', value: profile.aadhaarNumber, status: 'Verified ✅'),
+              const SizedBox(height: 8),
+              _DocRow(title: 'Electricity Bill', value: profile.electricityBillProvider, status: 'Verified ✅'),
+              const SizedBox(height: 8),
+              const _DocRow(title: 'Driving License', value: 'GJ01-20210045678', status: 'Active ✅'),
+              const SizedBox(height: 8),
+              const _DocRow(title: 'Police Clearance', value: 'Anti-Theft Check', status: 'Clean Record ✅'),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
@@ -213,35 +217,40 @@ class DriverProfileScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Select Delivery Cluster'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('Kubernagar & East Ahmedabad'),
-              subtitle: const Text('12 km delivery radius • Clothing retail corridor'),
-              onTap: () {
-                ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Kubernagar & East Ahmedabad');
-                Navigator.pop(ctx);
-              },
-            ),
-            ListTile(
-              title: const Text('Gandhinagar Capital Region'),
-              subtitle: const Text('15 km delivery radius • Handlooms & Khadi'),
-              onTap: () {
-                ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Gandhinagar Capital Region');
-                Navigator.pop(ctx);
-              },
-            ),
-            ListTile(
-              title: const Text('Sindhu Bhavan & Bodakdev (West Ahmedabad)'),
-              subtitle: const Text('20 km cross-city radius • SBR, SG Highway & Prahlad Nagar'),
-              onTap: () {
-                ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Sindhu Bhavan & Bodakdev (West Ahmedabad)');
-                Navigator.pop(ctx);
-              },
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                title: const Text('Kubernagar & East Ahmedabad'),
+                subtitle: const Text('12 km delivery radius • Clothing retail corridor'),
+                onTap: () {
+                  ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Kubernagar & East Ahmedabad');
+                  Navigator.pop(ctx);
+                },
+              ),
+              ListTile(
+                title: const Text('Gandhinagar Capital Region'),
+                subtitle: const Text('15 km delivery radius • Handlooms & Khadi'),
+                onTap: () {
+                  ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Gandhinagar Capital Region');
+                  Navigator.pop(ctx);
+                },
+              ),
+              ListTile(
+                title: const Text('Sindhu Bhavan & Bodakdev (West Ahmedabad)'),
+                subtitle: const Text('20 km cross-city radius • SBR, SG Highway & Prahlad Nagar'),
+                onTap: () {
+                  ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Sindhu Bhavan & Bodakdev (West Ahmedabad)');
+                  Navigator.pop(ctx);
+                },
+              ),
+            ],
+          ),
         ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+        ],
       ),
     );
   }
@@ -251,16 +260,18 @@ class DriverProfileScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('24x7 Delivery Partner Support'),
-        content: const Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Partner Helpline: +91 79 2281 9000'),
-            SizedBox(height: 6),
-            Text('Email: rider-help@hyperlocalfashion.in'),
-            SizedBox(height: 12),
-            Text('Live roadside assistance and insurance claims support is active during all online duty hours.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-          ],
+        content: const SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Partner Helpline: +91 79 2281 9000'),
+              SizedBox(height: 6),
+              Text('Email: rider-help@hyperlocalfashion.in'),
+              SizedBox(height: 12),
+              Text('Live roadside assistance and insurance claims support is active during all online duty hours.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),

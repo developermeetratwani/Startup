@@ -94,7 +94,7 @@ class VendorProfileScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.access_time_rounded, color: AppColors.textPrimary),
                   title: const Text('Operating Hours'),
-                  subtitle: const Text('09:30 AM â€“ 10:00 PM (Monday â€“ Sunday)'),
+                  subtitle: const Text('09:30 AM - 10:00 PM (Monday - Sunday)'),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => _showOperatingHoursDialog(context),
                 ),
@@ -104,7 +104,7 @@ class VendorProfileScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.receipt_long_rounded, color: AppColors.warning),
                   title: const Text('Platform Terms & Commissions'),
-                  subtitle: const Text('10% Flat commission â€¢ 1% Packaging â€¢ 48h size exchange'),
+                  subtitle: const Text('10% Flat commission • 1% Packaging • 48h size exchange'),
                   trailing: const Icon(Icons.info_outline, size: 18),
                   onTap: () => _showPlatformTermsSheet(context),
                 ),
@@ -246,19 +246,21 @@ class VendorProfileScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Store Location Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: addressCtrl,
-              decoration: const InputDecoration(labelText: 'Store Address / Landmark'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: cityCtrl,
-              decoration: const InputDecoration(labelText: 'City / Region'),
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: addressCtrl,
+                decoration: const InputDecoration(labelText: 'Store Address / Landmark'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: cityCtrl,
+                decoration: const InputDecoration(labelText: 'City / Region'),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -291,40 +293,42 @@ class VendorProfileScreen extends ConsumerWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Platform Terms & Settlement',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-            const SizedBox(height: 16),
-            const _TermItem(
-              title: '10% Platform Commission',
-              desc: 'Subtracted from the item subtotal automatically at settlement.',
-            ),
-            const SizedBox(height: 12),
-            const _TermItem(
-              title: 'Weekly Payout Settlement',
-              desc: 'Paid directly to your linked UPI/Bank account every Monday with unique UTR tracking.',
-            ),
-            const SizedBox(height: 12),
-            const _TermItem(
-              title: '48h Local Size Exchange Guarantee',
-              desc: 'Customers can exchange unworn garments within 48h for alternate sizes.',
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(ctx),
-                child: const Text('Understood'),
+      builder: (ctx) => SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Platform Terms & Settlement',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              const _TermItem(
+                title: '10% Platform Commission',
+                desc: 'Subtracted from the item subtotal automatically at settlement.',
+              ),
+              const SizedBox(height: 12),
+              const _TermItem(
+                title: 'Weekly Payout Settlement',
+                desc: 'Paid directly to your linked UPI/Bank account every Monday with unique UTR tracking.',
+              ),
+              const SizedBox(height: 12),
+              const _TermItem(
+                title: '48h Local Size Exchange Guarantee',
+                desc: 'Customers can exchange unworn garments within 48h for alternate sizes.',
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Understood'),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

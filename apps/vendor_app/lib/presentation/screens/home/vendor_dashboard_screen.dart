@@ -144,7 +144,7 @@ class VendorDashboardScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF16213E), Color(0xFF0F3460)],
+                      colors: [AppColors.primary, AppColors.primaryLight],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -155,10 +155,10 @@ class VendorDashboardScreen extends ConsumerWidget {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE94560).withValues(alpha: 0.2),
+                          color: AppColors.accent.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.monetization_on_rounded, color: Color(0xFFE94560), size: 28),
+                        child: const Icon(Icons.monetization_on_rounded, color: AppColors.accent, size: 28),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -172,14 +172,14 @@ class VendorDashboardScreen extends ConsumerWidget {
                             const SizedBox(height: 2),
                             Text(
                               'Referral Code: ${earnings.referralCode} • Share to earn coins',
-                              style: const TextStyle(color: Color(0xFFADB5BD), fontSize: 12),
+                              style: const TextStyle(color: AppColors.textHint, fontSize: 12),
                             ),
                           ],
                         ),
                       ),
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFE94560),
+                          backgroundColor: AppColors.accent,
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         ),
                         onPressed: () => context.push('/earnings'),

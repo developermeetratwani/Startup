@@ -214,9 +214,19 @@ class _MiniCard extends StatelessWidget {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(height: 6),
-          Text(title, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           const SizedBox(height: 2),
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+          Text(
+            value,
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );
@@ -239,7 +249,14 @@ class _ActiveDeliveryCard extends ConsumerWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Delivery Fee: ₹${(delivery.deliveryFee / 100).toStringAsFixed(0)}', style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 16)),
+              Flexible(
+                child: Text(
+                  'Delivery Fee: ₹${(delivery.deliveryFee / 100).toStringAsFixed(0)}',
+                  style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 16),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(

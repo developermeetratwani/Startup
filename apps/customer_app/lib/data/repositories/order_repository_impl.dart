@@ -1,11 +1,9 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
 
 class OrderRepositoryImpl implements OrderRepository {
-  final FirebaseFirestore _firestore;
-
   static final List<OrderEntity> _mockOrders = [
     OrderEntity(
       id: 'ord-kubernagar-8920',
@@ -68,15 +66,29 @@ class OrderRepositoryImpl implements OrderRepository {
     ),
   ];
 
+  final FirebaseFirestore? _customFirestore;
+  FirebaseFirestore? _firestoreInstance;
+
   OrderRepositoryImpl({
     FirebaseFirestore? firestore,
     FirebaseFunctions? functions,
-  })  : _firestore = firestore ?? FirebaseFirestore.instance;
+  })  : _customFirestore = firestore;
+
+  FirebaseFirestore? get _firestore {
+    if (_customFirestore != null) return _customFirestore;
+    try {
+      return _firestoreInstance ??= FirebaseFirestore.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Stream<List<OrderEntity>> watchCustomerOrders(String customerId) {
     try {
-      return _firestore
+      final fs = _firestore;
+      if (fs == null) return Stream.value(_mockOrders);
+      return fs
           .collection('orders')
           .where('customerId', isEqualTo: customerId)
           .snapshots()
@@ -93,7 +105,9 @@ class OrderRepositoryImpl implements OrderRepository {
   @override
   Stream<List<OrderEntity>> watchVendorOrders(String vendorId) {
     try {
-      return _firestore
+      final fs = _firestore;
+      if (fs == null) return Stream.value(_mockOrders);
+      return fs
           .collection('orders')
           .where('vendorId', isEqualTo: vendorId)
           .snapshots()
@@ -113,8 +127,10 @@ class OrderRepositoryImpl implements OrderRepository {
     int limit = 20,
     dynamic lastDocument,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return (_mockOrders, null);
     try {
-      Query<Map<String, dynamic>> query = _firestore
+      Query<Map<String, dynamic>> query = fs
           .collection('orders')
           .where('customerId', isEqualTo: customerId)
           .limit(limit);
@@ -135,8 +151,16 @@ class OrderRepositoryImpl implements OrderRepository {
 
   @override
   Future<(OrderEntity?, Failure?)> getOrderById(String orderId) async {
+    final fs = _firestore;
+    if (fs == null) {
+      final fallback = _mockOrders.firstWhere(
+        (o) => o.id == orderId,
+        orElse: () => _mockOrders.first,
+      );
+      return (fallback, null);
+    }
     try {
-      final doc = await _firestore.collection('orders').doc(orderId).get();
+      final doc = await fs.collection('orders').doc(orderId).get();
       if (doc.exists) {
         return (_mapToOrderEntity(doc), null);
       }
@@ -157,7 +181,14 @@ class OrderRepositoryImpl implements OrderRepository {
   @override
   Stream<OrderEntity?> watchOrder(String orderId) {
     try {
-      return _firestore.collection('orders').doc(orderId).snapshots().map((doc) {
+      final fs = _firestore;
+      if (fs == null) {
+        return Stream.value(_mockOrders.firstWhere(
+          (o) => o.id == orderId,
+          orElse: () => _mockOrders.first,
+        ));
+      }
+      return fs.collection('orders').doc(orderId).snapshots().map((doc) {
         if (doc.exists) return _mapToOrderEntity(doc);
         return _mockOrders.firstWhere(
           (o) => o.id == orderId,
@@ -186,9 +217,11 @@ class OrderRepositoryImpl implements OrderRepository {
     String? promoCode,
     int coinRedemptionAmount = 0,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return ('ord-local-${DateTime.now().millisecondsSinceEpoch}', null);
     try {
       // Direct Firestore creation ensures resilient local & offline functioning
-      final orderRef = _firestore.collection('orders').doc();
+      final orderRef = fs.collection('orders').doc();
       final orderId = orderRef.id;
 
       final isCod = paymentMethod == 'cod';
@@ -280,8 +313,10 @@ class OrderRepositoryImpl implements OrderRepository {
     required String orderId,
     required String reason,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return null;
     try {
-      await _firestore.collection('orders').doc(orderId).update({
+      await fs.collection('orders').doc(orderId).update({
         'status': 'cancelled',
         'cancellationReason': reason,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -298,41 +333,42 @@ class OrderRepositoryImpl implements OrderRepository {
     required String reason,
     required String requestedSize,
   }) async {
-    try {
-      await _firestore.collection('orders').doc(orderId).update({
-        'status': 'exchange_requested',
-        'exchangeReason': reason,
-        'requestedExchangeSize': requestedSize,
-        'exchangeRequestedAt': FieldValue.serverTimestamp(),
-      });
-
-      // Update in local mock
-      final idx = _mockOrders.indexWhere((o) => o.id == orderId);
-      if (idx != -1) {
-        final existing = _mockOrders[idx];
-        _mockOrders[idx] = OrderEntity(
-          id: existing.id,
-          customerId: existing.customerId,
-          storeId: existing.storeId,
-          vendorId: existing.vendorId,
-          driverId: existing.driverId,
-          deliveryAddressId: existing.deliveryAddressId,
-          deliveryAddressSnapshot: existing.deliveryAddressSnapshot,
-          status: OrderStatus.exchangeRequested,
-          paymentMethod: existing.paymentMethod,
-          paymentStatus: existing.paymentStatus,
-          pricing: existing.pricing,
-          exchangeReason: reason,
-          requestedExchangeSize: requestedSize,
-          estimatedDeliveryMinutes: existing.estimatedDeliveryMinutes,
-          placedAt: existing.placedAt,
-          deliveredAt: existing.deliveredAt,
-        );
-      }
-      return null;
-    } catch (e) {
-      return null;
+    final fs = _firestore;
+    if (fs != null) {
+      try {
+        await fs.collection('orders').doc(orderId).update({
+          'status': 'exchange_requested',
+          'exchangeReason': reason,
+          'requestedExchangeSize': requestedSize,
+          'exchangeRequestedAt': FieldValue.serverTimestamp(),
+        });
+      } catch (_) {}
     }
+
+    // Update in local mock
+    final idx = _mockOrders.indexWhere((o) => o.id == orderId);
+    if (idx != -1) {
+      final existing = _mockOrders[idx];
+      _mockOrders[idx] = OrderEntity(
+        id: existing.id,
+        customerId: existing.customerId,
+        storeId: existing.storeId,
+        vendorId: existing.vendorId,
+        driverId: existing.driverId,
+        deliveryAddressId: existing.deliveryAddressId,
+        deliveryAddressSnapshot: existing.deliveryAddressSnapshot,
+        status: OrderStatus.exchangeRequested,
+        paymentMethod: existing.paymentMethod,
+        paymentStatus: existing.paymentStatus,
+        pricing: existing.pricing,
+        exchangeReason: reason,
+        requestedExchangeSize: requestedSize,
+        estimatedDeliveryMinutes: existing.estimatedDeliveryMinutes,
+        placedAt: existing.placedAt,
+        deliveredAt: existing.deliveredAt,
+      );
+    }
+    return null;
   }
 
   OrderEntity _mapToOrderEntity(DocumentSnapshot<Map<String, dynamic>> doc) {

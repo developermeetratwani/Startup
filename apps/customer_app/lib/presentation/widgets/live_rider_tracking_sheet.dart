@@ -295,12 +295,12 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                                   Container(
                                     padding: const EdgeInsets.all(7),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? AppColors.accent : const Color(0xFF6C5CE7),
+                                      color: isSelected ? AppColors.accent : AppColors.purple,
                                       shape: BoxShape.circle,
                                       border: Border.all(color: Colors.white, width: isSelected ? 3 : 2),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: isSelected ? AppColors.accent.withValues(alpha: 0.5) : Colors.black26,
+                                          color: isSelected ? AppColors.accent.withValues(alpha: 0.5) : AppColors.shadow,
                                           blurRadius: isSelected ? 10 : 4,
                                           spreadRadius: isSelected ? 2 : 0,
                                         ),
@@ -368,8 +368,8 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.15),
-                      child: const Icon(Icons.two_wheeler_rounded, color: Color(0xFF6C5CE7), size: 26),
+                      backgroundColor: AppColors.purple.withValues(alpha: 0.15),
+                      child: const Icon(Icons.two_wheeler_rounded, color: AppColors.purple, size: 26),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

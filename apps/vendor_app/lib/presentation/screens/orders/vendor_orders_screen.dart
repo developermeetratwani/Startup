@@ -1,4 +1,4 @@
-﻿import 'package:core/core.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -113,11 +113,11 @@ class _OrderCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statusColor = switch (order.status) {
-      OrderStatus.pending => AppColors.accent,
+      OrderStatus.pending => AppColors.accentTomato,
       OrderStatus.confirmed => AppColors.primary,
-      OrderStatus.preparing => AppColors.warning,
-      OrderStatus.readyForPickup => AppColors.info,
-      OrderStatus.pickedUp => AppColors.info,
+      OrderStatus.preparing => AppColors.purple,
+      OrderStatus.readyForPickup => AppColors.accent,
+      OrderStatus.pickedUp => AppColors.purple,
       OrderStatus.delivered => AppColors.success,
       OrderStatus.cancelled => AppColors.error,
       OrderStatus.refunded => AppColors.error,
@@ -153,23 +153,26 @@ class _OrderCard extends ConsumerWidget {
           ),
           const Divider(height: 20),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Customer: $customerName', style: AppTextStyles.bodySmall),
-                  Text('Destination: $address, $city', style: AppTextStyles.bodySmall),
-                  Text('Payment: ${order.paymentMethod.name} (${order.paymentStatus.name})', style: const TextStyle(fontSize: 11, color: AppColors.accent)),
-                ],
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Customer: $customerName', style: AppTextStyles.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text('Destination: $address, $city', style: AppTextStyles.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text('Payment: ${order.paymentMethod.name} (${order.paymentStatus.name})', style: const TextStyle(fontSize: 11, color: AppColors.accent)),
+                  ],
+                ),
               ),
+              const SizedBox(width: 8),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Total: â‚¹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}', style: AppTextStyles.bodySmall),
-                  Text('10% Comm: -â‚¹${(order.pricing.platformCommission / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, color: AppColors.error)),
+                  Text('Total: \u20B9${(order.pricing.grandTotal / 100).toStringAsFixed(0)}', style: AppTextStyles.bodySmall),
+                  Text('10% Comm: -\u20B9${(order.pricing.platformCommission / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, color: AppColors.error)),
                   Text(
-                    'Net: â‚¹${(order.pricing.vendorEarning / 100).toStringAsFixed(0)}',
+                    'Net: \u20B9${(order.pricing.vendorEarning / 100).toStringAsFixed(0)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 13),
                   ),
                 ],

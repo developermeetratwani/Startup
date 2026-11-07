@@ -4,21 +4,35 @@ import 'package:domain/domain.dart';
 import 'package:core/core.dart';
 
 class CartRepositoryImpl implements CartRepository {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _customFirestore;
+  FirebaseFirestore? _firestoreInstance;
 
   static final Map<String, List<CartItemEntity>> _inMemoryCarts = {};
   static final StreamController<List<CartItemEntity>> _cartController = StreamController<List<CartItemEntity>>.broadcast();
 
   CartRepositoryImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _customFirestore = firestore;
 
-  CollectionReference<Map<String, dynamic>> _cartItems(String customerId) =>
-      _firestore.collection('carts').doc(customerId).collection('items');
+  FirebaseFirestore? get _firestore {
+    if (_customFirestore != null) return _customFirestore;
+    try {
+      return _firestoreInstance ??= FirebaseFirestore.instance;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  CollectionReference<Map<String, dynamic>>? _cartItems(String customerId) =>
+      _firestore?.collection('carts').doc(customerId).collection('items');
 
   @override
   Future<(List<CartItemEntity>?, Failure?)> getCartItems(String customerId) async {
     try {
-      final snap = await _cartItems(customerId).get();
+      final itemsRef = _cartItems(customerId);
+      if (itemsRef == null) {
+        return (_inMemoryCarts[customerId] ?? [], null);
+      }
+      final snap = await itemsRef.get();
       final items = snap.docs.map((doc) => _mapToCartItem(doc.id, doc.data())).toList();
       return (items.isNotEmpty ? items : (_inMemoryCarts[customerId] ?? []), null);
     } catch (e) {
@@ -29,7 +43,11 @@ class CartRepositoryImpl implements CartRepository {
   @override
   Stream<List<CartItemEntity>> watchCart(String customerId) {
     try {
-      return _cartItems(customerId).snapshots().map((snap) {
+      final itemsRef = _cartItems(customerId);
+      if (itemsRef == null) {
+        return Stream.value(_inMemoryCarts[customerId] ?? []);
+      }
+      return itemsRef.snapshots().map((snap) {
         final list = snap.docs.map((doc) => _mapToCartItem(doc.id, doc.data())).toList();
         if (list.isNotEmpty) {
           _inMemoryCarts[customerId] = list;
@@ -68,31 +86,34 @@ class CartRepositoryImpl implements CartRepository {
     _cartController.add(list);
 
     try {
-      final ref = _cartItems(item.customerId).doc(item.id);
-      final existing = await ref.get();
+      final itemsRef = _cartItems(item.customerId);
+      if (itemsRef != null) {
+        final ref = itemsRef.doc(item.id);
+        final existing = await ref.get();
 
-      if (existing.exists) {
-        final currentQty = (existing.data()?['quantity'] as num?)?.toInt() ?? 1;
-        await ref.update({
-          'quantity': currentQty + item.quantity,
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
-      } else {
-        await ref.set({
-          'customerId': item.customerId,
-          'productId': item.productId,
-          'variantId': item.variantId,
-          'storeId': item.storeId,
-          'vendorId': item.vendorId,
-          'productName': item.productName,
-          'imageUrl': item.imageUrl,
-          'unitPrice': item.unitPrice,
-          'quantity': item.quantity,
-          'size': item.size,
-          'color': item.color,
-          'createdAt': FieldValue.serverTimestamp(),
-          'updatedAt': FieldValue.serverTimestamp(),
-        });
+        if (existing.exists) {
+          final currentQty = (existing.data()?['quantity'] as num?)?.toInt() ?? 1;
+          await ref.update({
+            'quantity': currentQty + item.quantity,
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        } else {
+          await ref.set({
+            'customerId': item.customerId,
+            'productId': item.productId,
+            'variantId': item.variantId,
+            'storeId': item.storeId,
+            'vendorId': item.vendorId,
+            'productName': item.productName,
+            'imageUrl': item.imageUrl,
+            'unitPrice': item.unitPrice,
+            'quantity': item.quantity,
+            'size': item.size,
+            'color': item.color,
+            'createdAt': FieldValue.serverTimestamp(),
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
       }
     } catch (e) {
       AppLogger.warning('CartRepositoryImpl.addToCart', 'Firestore sync pending: $e');
@@ -131,7 +152,7 @@ class CartRepositoryImpl implements CartRepository {
     }
 
     try {
-      await _cartItems(customerId).doc(itemId).update({
+      await _cartItems(customerId)?.doc(itemId).update({
         'quantity': quantity,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -149,7 +170,7 @@ class CartRepositoryImpl implements CartRepository {
     _cartController.add(list);
 
     try {
-      await _cartItems(customerId).doc(itemId).delete();
+      await _cartItems(customerId)?.doc(itemId).delete();
     } catch (_) {}
     return null;
   }
@@ -159,14 +180,18 @@ class CartRepositoryImpl implements CartRepository {
     _inMemoryCarts[customerId]?.clear();
     _cartController.add([]);
 
-    try {
-      final snap = await _cartItems(customerId).get();
-      final batch = _firestore.batch();
-      for (var doc in snap.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-    } catch (_) {}
+    final itemsRef = _cartItems(customerId);
+    final fs = _firestore;
+    if (itemsRef != null && fs != null) {
+      try {
+        final snap = await itemsRef.get();
+        final batch = fs.batch();
+        for (var doc in snap.docs) {
+          batch.delete(doc.reference);
+        }
+        await batch.commit();
+      } catch (_) {}
+    }
     return null;
   }
 

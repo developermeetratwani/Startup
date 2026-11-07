@@ -109,23 +109,33 @@ class _ProductInventoryCard extends ConsumerWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(product.name, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+                    Text(
+                      product.name,
+                      style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                     const SizedBox(height: 4),
                     Text(
                       '₹${(product.discountedPrice / 100).toStringAsFixed(0)}  •  Base: ₹${(product.basePrice / 100).toStringAsFixed(0)}',
                       style: const TextStyle(color: AppColors.accent, fontWeight: FontWeight.w600),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 6),
-                    Row(
+                    Wrap(
+                      spacing: 6,
+                      runSpacing: 4,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
-                            color: inStock ? AppColors.success.withOpacity(0.15) : AppColors.error.withOpacity(0.15),
+                            color: inStock ? AppColors.success.withValues(alpha: 0.15) : AppColors.error.withValues(alpha: 0.15),
                             borderRadius: BorderRadius.circular(4),
                           ),
                           child: Text(
-                            inStock ? 'In Stock ($totalStock units)' : 'OUT OF STOCK',
+                            inStock ? 'In Stock ($totalStock)' : 'OUT OF STOCK',
                             style: TextStyle(
                               color: inStock ? AppColors.success : AppColors.error,
                               fontSize: 10,
@@ -133,7 +143,6 @@ class _ProductInventoryCard extends ConsumerWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
                         Text('${product.variants.length} variant(s)', style: AppTextStyles.bodySmall),
                       ],
                     ),

@@ -71,14 +71,14 @@ class OrderTrackingScreen extends ConsumerWidget {
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [Color(0xFFE23744), Color(0xFFFF616D)],
+                        colors: [AppColors.accent, AppColors.accentLight],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFFE23744).withValues(alpha: 0.25),
+                          color: AppColors.accent.withValues(alpha: 0.25),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -111,9 +111,9 @@ class OrderTrackingScreen extends ConsumerWidget {
                             ),
                             child: const Row(
                               children: [
-                                Icon(Icons.map_rounded, size: 14, color: Color(0xFFE23744)),
+                                Icon(Icons.map_rounded, size: 14, color: AppColors.accent),
                                 SizedBox(width: 4),
-                                Text('Radar', style: TextStyle(color: Color(0xFFE23744), fontSize: 11, fontWeight: FontWeight.bold)),
+                                Text('Radar', style: TextStyle(color: AppColors.accent, fontSize: 11, fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -183,7 +183,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                                 polylines: [
                                   Polyline(
                                     points: const [storeLocation, riderLocation, customerLocation],
-                                    color: const Color(0xFF6C5CE7),
+                                    color: AppColors.purple,
                                     strokeWidth: 3.5,
                                   ),
                                 ],
@@ -198,10 +198,10 @@ class OrderTrackingScreen extends ConsumerWidget {
                                     height: 44,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.blue.shade700,
+                                        color: AppColors.primary,
                                         shape: BoxShape.circle,
                                         border: Border.all(color: Colors.white, width: 2),
-                                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4)],
                                       ),
                                       child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 18),
                                     ),
@@ -213,10 +213,10 @@ class OrderTrackingScreen extends ConsumerWidget {
                                     height: 50,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: const Color(0xFFE23744),
+                                        color: AppColors.accent,
                                         shape: BoxShape.circle,
                                         border: Border.all(color: Colors.white, width: 2.5),
-                                        boxShadow: const [BoxShadow(color: Color(0x66E23744), blurRadius: 8, spreadRadius: 2)],
+                                        boxShadow: [BoxShadow(color: AppColors.accent.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 2)],
                                       ),
                                       child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 22),
                                     ),
@@ -228,10 +228,10 @@ class OrderTrackingScreen extends ConsumerWidget {
                                     height: 44,
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        color: Colors.green.shade600,
+                                        color: AppColors.success,
                                         shape: BoxShape.circle,
                                         border: Border.all(color: Colors.white, width: 2),
-                                        boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4)],
                                       ),
                                       child: const Icon(Icons.home_rounded, color: Colors.white, size: 20),
                                     ),
@@ -284,8 +284,8 @@ class OrderTrackingScreen extends ConsumerWidget {
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundColor: const Color(0xFFE23744).withValues(alpha: 0.12),
-                              child: const Icon(Icons.person_rounded, color: Color(0xFFE23744), size: 24),
+                              backgroundColor: AppColors.accent.withValues(alpha: 0.12),
+                              child: const Icon(Icons.person_rounded, color: AppColors.accent, size: 24),
                             ),
                             const SizedBox(width: 12),
                             Expanded(

@@ -3,13 +3,23 @@ import 'package:domain/domain.dart';
 import 'package:core/core.dart';
 
 class AddressRepositoryImpl implements AddressRepository {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _customFirestore;
+  FirebaseFirestore? _firestoreInstance;
 
   AddressRepositoryImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _customFirestore = firestore;
 
-  CollectionReference<Map<String, dynamic>> get _collection =>
-      _firestore.collection('addresses');
+  FirebaseFirestore? get _firestore {
+    if (_customFirestore != null) return _customFirestore;
+    try {
+      return _firestoreInstance ??= FirebaseFirestore.instance;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  CollectionReference<Map<String, dynamic>>? get _collection =>
+      _firestore?.collection('addresses');
 
   static final List<AddressEntity> _fallbackAddresses = [
     const AddressEntity(
@@ -42,8 +52,10 @@ class AddressRepositoryImpl implements AddressRepository {
 
   @override
   Future<(List<AddressEntity>?, Failure?)> getAddresses(String userId) async {
+    final col = _collection;
+    if (col == null) return (_fallbackAddresses, null);
     try {
-      final snap = await _collection.where('userId', isEqualTo: userId).get();
+      final snap = await col.where('userId', isEqualTo: userId).get();
       final list = snap.docs.map((doc) => _mapToAddressEntity(doc)).toList();
       return (list.isNotEmpty ? list : _fallbackAddresses, null);
     } catch (e) {
@@ -55,7 +67,9 @@ class AddressRepositoryImpl implements AddressRepository {
   @override
   Stream<List<AddressEntity>> watchAddresses(String userId) {
     try {
-      return _collection
+      final col = _collection;
+      if (col == null) return Stream.value(_fallbackAddresses);
+      return col
           .where('userId', isEqualTo: userId)
           .snapshots()
           .map((snap) {
@@ -78,8 +92,10 @@ class AddressRepositoryImpl implements AddressRepository {
 
   @override
   Future<(String?, Failure?)> addAddress(AddressEntity address) async {
+    final col = _collection;
+    if (col == null) return ('addr-local-${DateTime.now().millisecondsSinceEpoch}', null);
     try {
-      final docRef = await _collection.add({
+      final docRef = await col.add({
         'userId': address.userId,
         'label': address.label,
         'line1': address.line1,
@@ -105,8 +121,10 @@ class AddressRepositoryImpl implements AddressRepository {
 
   @override
   Future<Failure?> updateAddress(AddressEntity address) async {
+    final col = _collection;
+    if (col == null) return null;
     try {
-      await _collection.doc(address.id).update({
+      await col.doc(address.id).update({
         'label': address.label,
         'line1': address.line1,
         'line2': address.line2,
@@ -126,8 +144,10 @@ class AddressRepositoryImpl implements AddressRepository {
 
   @override
   Future<Failure?> deleteAddress(String addressId) async {
+    final col = _collection;
+    if (col == null) return null;
     try {
-      await _collection.doc(addressId).delete();
+      await col.doc(addressId).delete();
       return null;
     } catch (e) {
       return ServerFailure(e.toString());
@@ -136,9 +156,12 @@ class AddressRepositoryImpl implements AddressRepository {
 
   @override
   Future<Failure?> setDefaultAddress(String userId, String addressId) async {
+    final col = _collection;
+    final fs = _firestore;
+    if (col == null || fs == null) return null;
     try {
-      final snap = await _collection.where('userId', isEqualTo: userId).get();
-      final batch = _firestore.batch();
+      final snap = await col.where('userId', isEqualTo: userId).get();
+      final batch = fs.batch();
       for (var doc in snap.docs) {
         batch.update(doc.reference, {'isDefault': doc.id == addressId});
       }

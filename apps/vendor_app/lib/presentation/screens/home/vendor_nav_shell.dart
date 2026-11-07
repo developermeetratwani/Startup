@@ -44,7 +44,7 @@ class _VendorNavShellState extends ConsumerState<VendorNavShell> {
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.textSecondary,
         items: [
           const BottomNavigationBarItem(

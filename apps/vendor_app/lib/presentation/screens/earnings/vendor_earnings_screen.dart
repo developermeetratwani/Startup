@@ -82,48 +82,50 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
             Text('Company Settlement Payout'),
           ],
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Disbursing vendor earnings for ${batch.batchId}:', style: const TextStyle(fontSize: 13)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(8),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Disbursing vendor earnings for ${batch.batchId}:', style: const TextStyle(fontSize: 13)),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceVariant,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text('Net Payout Amount:'),
+                        Text(batch.amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.success)),
+                      ],
+                    ),
+                    const SizedBox(height: 6),
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Vendor UPI / Bank:'),
+                        Text('shreeji-kuber@axisbank', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Net Payout Amount:'),
-                      Text(batch.amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.success)),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Vendor UPI / Bank:'),
-                      Text('shreeji-kuber@axisbank', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                    ],
-                  ),
-                ],
+              const SizedBox(height: 14),
+              TextField(
+                controller: utrController,
+                decoration: const InputDecoration(
+                  labelText: 'Bank UTR / Transaction Reference',
+                  prefixIcon: Icon(Icons.receipt_long_rounded),
+                  helperText: 'Unique reference to prevent duplicate payout',
+                ),
               ),
-            ),
-            const SizedBox(height: 14),
-            TextField(
-              controller: utrController,
-              decoration: const InputDecoration(
-                labelText: 'Bank UTR / Transaction Reference',
-                prefixIcon: Icon(Icons.receipt_long_rounded),
-                helperText: 'Unique reference to prevent duplicate payout',
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -177,7 +179,7 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+                      colors: [AppColors.primary, AppColors.primaryLight],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -188,7 +190,7 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                     children: [
                       const Text(
                         'TOTAL NET PAYOUT',
-                        style: TextStyle(color: Color(0xFFADB5BD), fontSize: 12, letterSpacing: 1),
+                        style: TextStyle(color: AppColors.textHint, fontSize: 12, letterSpacing: 1),
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -243,11 +245,14 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Company Settlement & Payout Ledger', style: AppTextStyles.titleMedium),
+                    Expanded(
+                      child: Text('Company Settlement & Payout Ledger', style: AppTextStyles.titleMedium),
+                    ),
+                    const SizedBox(width: 8),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
-                        color: AppColors.success.withOpacity(0.12),
+                        color: AppColors.success.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: const Text('AUTO-RECONCILED', style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold)),
@@ -296,16 +301,16 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE94560).withOpacity(0.08),
+                    color: AppColors.accent.withValues(alpha: 0.08),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    border: Border.all(color: const Color(0xFFE94560).withOpacity(0.3)),
+                    border: Border.all(color: AppColors.accent.withValues(alpha: 0.3)),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          const Icon(Icons.stars_rounded, color: Color(0xFFE94560), size: 28),
+                          const Icon(Icons.stars_rounded, color: AppColors.accent, size: 28),
                           const SizedBox(width: 10),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,11 +337,15 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                           borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                           border: Border.all(color: AppColors.divider),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Wrap(
+                          alignment: WrapAlignment.spaceBetween,
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             Text(earnings.referralCode, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, letterSpacing: 1)),
-                            Row(
+                            Wrap(
+                              spacing: 6,
                               children: [
                                 TextButton.icon(
                                   icon: const Icon(Icons.copy_rounded, size: 16),
@@ -348,7 +357,6 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                                     );
                                   },
                                 ),
-                                const SizedBox(width: 6),
                                 ElevatedButton.icon(
                                   icon: const Icon(Icons.share_rounded, size: 16),
                                   label: const Text('Share Link'),
@@ -467,7 +475,7 @@ class _StatMini extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFFADB5BD), fontSize: 10)),
+        Text(label, style: const TextStyle(color: AppColors.textHint, fontSize: 10)),
         const SizedBox(height: 2),
         Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
       ],

@@ -3,10 +3,20 @@ import 'package:domain/domain.dart';
 import 'package:core/core.dart';
 
 class ProductRepositoryImpl implements ProductRepository {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _customFirestore;
+  FirebaseFirestore? _firestoreInstance;
 
   ProductRepositoryImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _customFirestore = firestore;
+
+  FirebaseFirestore? get _firestore {
+    if (_customFirestore != null) return _customFirestore;
+    try {
+      return _firestoreInstance ??= FirebaseFirestore.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Future<(List<ProductEntity>?, Failure?)> getProductsByStore({
@@ -15,8 +25,12 @@ class ProductRepositoryImpl implements ProductRepository {
     int limit = 20,
     dynamic lastDocument,
   }) async {
+    final fs = _firestore;
+    if (fs == null) {
+      return (_getMockProducts(storeId: storeId, categoryId: categoryId), null);
+    }
     try {
-      Query<Map<String, dynamic>> query = _firestore
+      Query<Map<String, dynamic>> query = fs
           .collection('products')
           .where('storeId', isEqualTo: storeId)
           .where('isPublished', isEqualTo: true)
@@ -52,8 +66,12 @@ class ProductRepositoryImpl implements ProductRepository {
     int limit = 20,
     dynamic lastDocument,
   }) async {
+    final fs = _firestore;
+    if (fs == null) {
+      return (_getMockProducts(categoryId: categoryId), null);
+    }
     try {
-      Query<Map<String, dynamic>> query = _firestore
+      Query<Map<String, dynamic>> query = fs
           .collection('products')
           .where('categoryId', isEqualTo: categoryId)
           .where('isPublished', isEqualTo: true)
@@ -80,8 +98,16 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<(ProductEntity?, Failure?)> getProductById(String productId) async {
+    final fs = _firestore;
+    if (fs == null) {
+      final mock = _getMockProducts().firstWhere(
+        (p) => p.id == productId,
+        orElse: () => _getMockProducts().first,
+      );
+      return (mock, null);
+    }
     try {
-      final doc = await _firestore.collection('products').doc(productId).get();
+      final doc = await fs.collection('products').doc(productId).get();
       if (!doc.exists) {
         final mock = _getMockProducts().firstWhere(
           (p) => p.id == productId,
@@ -106,8 +132,16 @@ class ProductRepositoryImpl implements ProductRepository {
     String? storeId,
     int limit = 20,
   }) async {
+    final fs = _firestore;
+    if (fs == null) {
+      final mock = _getMockProducts(storeId: storeId).where((p) {
+        final l = query.toLowerCase();
+        return p.name.toLowerCase().contains(l) || p.description.toLowerCase().contains(l);
+      }).toList();
+      return (mock, null);
+    }
     try {
-      Query<Map<String, dynamic>> q = _firestore
+      Query<Map<String, dynamic>> q = fs
           .collection('products')
           .where('isPublished', isEqualTo: true)
           .where('isDeleted', isEqualTo: false);
@@ -147,8 +181,10 @@ class ProductRepositoryImpl implements ProductRepository {
 
   @override
   Future<(String?, Failure?)> createProduct(ProductEntity product) async {
+    final fs = _firestore;
+    if (fs == null) return ('mock-prod-${DateTime.now().millisecondsSinceEpoch}', null);
     try {
-      final ref = await _firestore.collection('products').add({
+      final ref = await fs.collection('products').add({
         'storeId': product.storeId,
         'vendorId': product.vendorId,
         'name': product.name,
@@ -177,8 +213,10 @@ class ProductRepositoryImpl implements ProductRepository {
     required String productId,
     required Map<String, dynamic> fields,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return null;
     try {
-      await _firestore.collection('products').doc(productId).update({
+      await fs.collection('products').doc(productId).update({
         ...fields,
         'updatedAt': FieldValue.serverTimestamp(),
       });
@@ -193,8 +231,10 @@ class ProductRepositoryImpl implements ProductRepository {
     required String productId,
     required ProductVariantEntity variant,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return null;
     try {
-      await _firestore
+      await fs
           .collection('products')
           .doc(productId)
           .collection('variants')
@@ -222,8 +262,10 @@ class ProductRepositoryImpl implements ProductRepository {
     required String variantId,
     required int newStock,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return null;
     try {
-      await _firestore
+      await fs
           .collection('products')
           .doc(productId)
           .collection('variants')

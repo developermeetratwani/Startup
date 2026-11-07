@@ -73,17 +73,18 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (ctx) => Padding(
-        padding: EdgeInsets.only(
-          left: 20,
-          right: 20,
-          top: 20,
-          bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
+      builder: (ctx) => SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.only(
+            left: 20,
+            right: 20,
+            top: 20,
+            bottom: MediaQuery.of(ctx).viewInsets.bottom + 20,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -139,7 +140,8 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
           ],
         ),
       ),
-    );
+    ),
+  );
   }
 
   Future<void> _submit() async {
@@ -163,7 +165,7 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
       final variants = _sizes.map((s) => {
             'size': s,
             'color': color,
-            'colorHex': '#E94560',
+            'colorHex': '#D93670',
             'additionalPrice': 0,
             'sku': '${_nameController.text.substring(0, _nameController.text.length.clamp(1, 3)).toUpperCase()}-$s',
             'stockCount': stock,
@@ -255,10 +257,16 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Product Photos (${_imageUrls.length}/5)', style: AppTextStyles.titleMedium),
+                  Flexible(
+                    child: Text(
+                      'Product Photos (${_imageUrls.length}/5)',
+                      style: AppTextStyles.titleMedium,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
                   TextButton.icon(
-                    icon: const Icon(Icons.add_photo_alternate_rounded, size: 18),
-                    label: const Text('Add Photo (Cloudinary)'),
+                    icon: const Icon(Icons.add_photo_alternate_rounded, size: 16),
+                    label: const Text('Add Photo'),
                     onPressed: _showAddPhotoSheet,
                   ),
                 ],

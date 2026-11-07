@@ -48,7 +48,7 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
               Text(
-                '${location.cityName} â€¢ Hyperlocal Delivery',
+                '${location.cityName} • Hyperlocal Delivery',
                 style: AppTextStyles.bodySmall,
               ),
             ],
@@ -125,12 +125,20 @@ class HomeScreen extends ConsumerWidget {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.surfaceVariant,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                      border: Border.all(color: AppColors.cardBorder, width: 1),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x08171717),
+                          blurRadius: 10,
+                          offset: Offset(0, 3),
+                        ),
+                      ],
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.search, color: AppColors.textSecondary),
+                        const Icon(Icons.search, color: AppColors.accent, size: 20),
                         const SizedBox(width: 10),
                         Text(
                           'Search kurta, sarees, jeans, shirts...',
@@ -149,38 +157,91 @@ class HomeScreen extends ConsumerWidget {
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
                 child: Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+                      colors: [Color(0xFF171717), Color(0xFF262422)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Color(0x1F171717),
+                        blurRadius: 16,
+                        offset: Offset(0, 8),
+                      ),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: AppColors.accent,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text(
-                          'LOCAL DISCOVERY',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                            decoration: BoxDecoration(
+                              gradient: const LinearGradient(
+                                colors: [AppColors.accentTomato, AppColors.accent],
+                              ),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: const Text(
+                              'LOCAL DISCOVERY',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.6,
+                              ),
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.purple.withOpacity(0.18),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppColors.purple.withOpacity(0.4),
+                                width: 1,
+                              ),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.flash_on_rounded, color: AppColors.purple, size: 12),
+                                const SizedBox(width: 3),
+                                Text(
+                                  '< 2h delivery',
+                                  style: TextStyle(
+                                    color: AppColors.purple,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 12),
                       const Text(
                         'Direct from Gandhinagar &\nKubernagar Stores',
-                        style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          color: AppColors.linen,
+                          fontSize: 19,
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                        ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Get local delivery in under 2 hours',
-                        style: TextStyle(color: Color(0xFFADB5BD), fontSize: 12),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Curated boutique collections delivered straight to your door',
+                        style: TextStyle(
+                          color: AppColors.linen.withOpacity(0.72),
+                          fontSize: 12,
+                        ),
                       ),
                       const SizedBox(height: 10),
                       InkWell(
@@ -231,14 +292,23 @@ class HomeScreen extends ConsumerWidget {
                       avatar: Icon(
                         cat['icon'] as IconData,
                         size: 16,
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        color: isSelected ? Colors.white : AppColors.purple,
                       ),
                       label: Text(cat['label'] as String),
                       selected: isSelected,
                       selectedColor: AppColors.primary,
+                      backgroundColor: AppColors.surface,
+                      side: BorderSide(
+                        color: isSelected ? AppColors.primary : AppColors.cardBorder,
+                        width: 1,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(22),
+                      ),
                       labelStyle: TextStyle(
                         color: isSelected ? Colors.white : AppColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                        fontSize: 13,
                       ),
                       onSelected: (_) {
                         ref.read(selectedCategoryProvider.notifier).state = catId;
@@ -329,9 +399,18 @@ class HomeScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFFE23744),
-        icon: const Icon(Icons.two_wheeler_rounded, color: Colors.white),
-        label: const Text('Live Radar (Zomato Map)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.textOnDark,
+        elevation: 4,
+        icon: const Icon(Icons.near_me_rounded, color: AppColors.accent, size: 20),
+        label: const Text(
+          'Live Delivery Radar',
+          style: TextStyle(
+            color: AppColors.textOnDark,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.3,
+          ),
+        ),
         onPressed: () => LiveRiderTrackingSheet.show(context),
       ),
     );
@@ -401,7 +480,7 @@ class _StoreCard extends StatelessWidget {
                 imageUrl: store.bannerImageUrl,
                 height: 140,
                 width: double.infinity,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusMd)),
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
               ),
               Positioned(
                 top: 10,
@@ -410,11 +489,11 @@ class _StoreCard extends StatelessWidget {
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: store.isOpen ? AppColors.success : AppColors.error,
-                    borderRadius: BorderRadius.circular(4),
+                    borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
                     store.isOpen ? 'OPEN' : 'CLOSED',
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                   ),
                 ),
               ),
@@ -435,7 +514,7 @@ class _StoreCard extends StatelessWidget {
                       Text(
                         store.location.address.isNotEmpty
                             ? store.location.address
-                            : '${store.location.city} â€¢ Fast Local Pickup',
+                            : '${store.location.city} • Fast Local Pickup',
                         style: AppTextStyles.bodySmall,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -450,7 +529,7 @@ class _StoreCard extends StatelessWidget {
                             style: AppTextStyles.labelSmall.copyWith(color: AppColors.textPrimary),
                           ),
                           const SizedBox(width: 8),
-                          Text('â€¢  ${store.totalRatings} ratings', style: AppTextStyles.bodySmall),
+                          Text('•  ${store.totalRatings} ratings', style: AppTextStyles.bodySmall),
                         ],
                       ),
                     ],

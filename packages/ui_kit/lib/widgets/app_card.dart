@@ -22,15 +22,18 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final effectiveRadius = borderRadius ?? BorderRadius.circular(AppSpacing.radiusLg);
     return Card(
       color: color ?? AppColors.surface,
-      elevation: elevation ?? 2,
+      elevation: elevation ?? 0,
+      clipBehavior: Clip.antiAlias,
       shape: RoundedRectangleBorder(
-        borderRadius: borderRadius ?? BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: effectiveRadius,
+        side: const BorderSide(color: AppColors.cardBorder, width: 1),
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: borderRadius ?? BorderRadius.circular(AppSpacing.radiusMd),
+        borderRadius: effectiveRadius,
         child: Padding(
           padding: padding ?? const EdgeInsets.all(AppSpacing.cardPadding),
           child: child,

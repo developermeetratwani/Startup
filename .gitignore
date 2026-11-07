@@ -33,3 +33,7 @@ Thumbs.db
 # Melos
 .melos_tool/
 pubspec_overrides.yaml
+
+# Logs
+*.log
+*-debug.log

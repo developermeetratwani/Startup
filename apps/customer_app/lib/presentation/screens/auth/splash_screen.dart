@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:ui_kit/ui_kit.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -58,7 +59,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: AppColors.primary,
       body: Center(
         child: FadeTransition(
           opacity: _fadeAnimation,
@@ -69,8 +70,19 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE94560),
-                  borderRadius: BorderRadius.circular(20),
+                  gradient: const LinearGradient(
+                    colors: [AppColors.accent, AppColors.accentTomato],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(22),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Color(0x33D93670),
+                      blurRadius: 20,
+                      offset: Offset(0, 8),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Icons.shopping_bag_rounded,
@@ -78,22 +90,23 @@ class _SplashScreenState extends State<SplashScreen>
                   size: 44,
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
               const Text(
                 'XYZ Startup',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: AppColors.linen,
                   fontSize: 28,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 1,
+                  letterSpacing: 1.2,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Fashion from your neighbourhood',
                 style: TextStyle(
-                  color: Color(0xFFADB5BD),
+                  color: AppColors.linen.withOpacity(0.7),
                   fontSize: 14,
+                  letterSpacing: 0.2,
                 ),
               ),
               const SizedBox(height: 48),
@@ -101,7 +114,7 @@ class _SplashScreenState extends State<SplashScreen>
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: Color(0xFFE94560),
+                  color: AppColors.accent,
                   strokeWidth: 2,
                 ),
               ),

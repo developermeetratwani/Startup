@@ -44,12 +44,21 @@ class ProfileScreen extends ConsumerWidget {
 
             // Store Coins / Referral Rewards Banner
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
                 gradient: const LinearGradient(
-                  colors: [Color(0xFFE94560), Color(0xFFFF6B8A)],
+                  colors: [AppColors.accent, AppColors.accentTomato],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x22D93670),
+                    blurRadius: 14,
+                    offset: Offset(0, 6),
+                  ),
+                ],
               ),
               child: Row(
                 children: [

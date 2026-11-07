@@ -30,7 +30,7 @@ class _DriverNavShellState extends State<DriverNavShell> {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
-        selectedItemColor: AppColors.primary,
+        selectedItemColor: AppColors.accent,
         unselectedItemColor: AppColors.textSecondary,
         items: const [
           BottomNavigationBarItem(

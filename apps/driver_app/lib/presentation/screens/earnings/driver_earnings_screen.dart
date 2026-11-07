@@ -248,7 +248,7 @@ class DriverEarningsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     gradient: const LinearGradient(
-                      colors: [Color(0xFF1A1A2E), Color(0xFF16213E)],
+                      colors: [AppColors.primary, AppColors.primaryLight],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -257,7 +257,7 @@ class DriverEarningsScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('TODAYS EARNINGS', style: TextStyle(color: Color(0xFFADB5BD), fontSize: 11, letterSpacing: 1)),
+                      const Text('TODAYS EARNINGS', style: TextStyle(color: AppColors.textHint, fontSize: 11, letterSpacing: 1)),
                       const SizedBox(height: 6),
                       Text(earnings.todayEarningsDisplay, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 14),
@@ -281,46 +281,54 @@ class DriverEarningsScreen extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: Colors.amber.shade50,
+                    color: AppColors.surface,
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                    border: Border.all(color: Colors.amber.shade400),
+                    border: Border.all(color: AppColors.cardBorder),
+                    boxShadow: const [
+                      BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2)),
+                    ],
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        spacing: 12,
+                        runSpacing: 10,
                         children: [
                           Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.account_balance_wallet_rounded, color: Colors.amber.shade900, size: 28),
+                              const Icon(Icons.account_balance_wallet_rounded, color: AppColors.accent, size: 28),
                               const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('CASH IN HAND (TO REMIT)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF7A4F01))),
-                                  Text(codSummary.pendingCashDisplay, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.amber.shade900)),
+                                  const Text('CASH IN HAND (TO REMIT)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                                  Text(codSummary.pendingCashDisplay, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                                 ],
                               ),
                             ],
                           ),
-                          Row(
+                          Wrap(
+                            spacing: 6,
+                            runSpacing: 6,
                             children: [
                               ElevatedButton.icon(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
+                                  foregroundColor: AppColors.textOnDark,
                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                                 ),
                                 icon: const Icon(Icons.store_rounded, size: 16),
                                 label: const Text('Pay Cash at Hub (OTP)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                 onPressed: () => _showHubHandoverDialog(context, ref, codSummary),
                               ),
-                              const SizedBox(width: 6),
                               OutlinedButton.icon(
                                 style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.amber.shade900,
-                                  side: BorderSide(color: Colors.amber.shade800),
+                                  foregroundColor: AppColors.primary,
+                                  side: const BorderSide(color: AppColors.primary),
                                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                                 ),
                                 icon: const Icon(Icons.qr_code_rounded, size: 16),
@@ -332,32 +340,32 @@ class DriverEarningsScreen extends ConsumerWidget {
                         ],
                       ),
                       const SizedBox(height: 14),
-                      const Divider(color: Colors.amber),
+                      const Divider(color: AppColors.divider),
                       const SizedBox(height: 8),
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _codMiniStat('Total COD Collected', codSummary.collectedDisplay),
-                          _codMiniStat('COD Deliveries', '${codSummary.totalCodOrders} orders'),
-                          _codMiniStat('Prepaid UPI Deliveries', '${codSummary.totalOnlinePaidOrders} orders'),
-                          _codMiniStat('Remitted to Co.', codSummary.remittedDisplay),
+                          Expanded(child: _codMiniStat('Total COD', codSummary.collectedDisplay)),
+                          Expanded(child: _codMiniStat('COD Orders', '${codSummary.totalCodOrders}')),
+                          Expanded(child: _codMiniStat('Prepaid UPI', '${codSummary.totalOnlinePaidOrders}')),
+                          Expanded(child: _codMiniStat('Remitted', codSummary.remittedDisplay)),
                         ],
                       ),
                       const SizedBox(height: 10),
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.7),
+                          color: AppColors.surfaceWarm,
                           borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.cardBorder),
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.verified_outlined, size: 14, color: Color(0xFF7A4F01)),
+                            Icon(Icons.verified_outlined, size: 14, color: AppColors.accent),
                             SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 'Hub Handover: Select your hub (Kubernagar, Gandhinagar, etc.), share your email OTP with Hub Admin, and your balance will be settled instantly.',
-                                style: TextStyle(fontSize: 10, color: Color(0xFF7A4F01)),
+                                style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
                               ),
                             ),
                           ],
@@ -440,9 +448,19 @@ class DriverEarningsScreen extends ConsumerWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 10, color: Color(0xFF7A4F01))),
+        Text(
+          label,
+          style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
         const SizedBox(height: 2),
-        Text(value, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFF4A3000))),
+        Text(
+          value,
+          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ],
     );
   }
@@ -459,9 +477,12 @@ class _HubHandoverCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: handover.isVerified ? Colors.green.shade50 : Colors.amber.shade50,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: handover.isVerified ? Colors.green.shade400 : Colors.amber.shade500),
+        border: Border.all(color: handover.isVerified ? AppColors.success : AppColors.cardBorder),
+        boxShadow: const [
+          BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -469,30 +490,37 @@ class _HubHandoverCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                handover.hubLocation,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+              Expanded(
+                child: Text(
+                  handover.hubLocation,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: handover.isVerified ? Colors.green.shade100 : Colors.orange.shade100,
+                  color: handover.isVerified ? AppColors.success.withValues(alpha: 0.12) : AppColors.accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  handover.isVerified ? 'SETTLED & VERIFIED ✅' : 'WAITING FOR ADMIN OTP',
+                  handover.isVerified ? 'SETTLED & VERIFIED ✅' : 'WAITING FOR OTP',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: handover.isVerified ? Colors.green.shade900 : Colors.orange.shade900,
+                    color: handover.isVerified ? AppColors.success : AppColors.accent,
                   ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 12,
+            runSpacing: 10,
             children: [
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -501,7 +529,7 @@ class _HubHandoverCard extends StatelessWidget {
                   Text(handover.amountDisplay, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
                 ],
               ),
-              if (!handover.isVerified) ...[
+              if (!handover.isVerified)
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
@@ -510,6 +538,7 @@ class _HubHandoverCard extends StatelessWidget {
                     border: Border.all(color: Colors.amber.shade700, width: 1.5),
                   ),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -533,8 +562,8 @@ class _HubHandoverCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
-              ] else ...[
+                )
+              else
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
@@ -542,7 +571,6 @@ class _HubHandoverCard extends StatelessWidget {
                     Text(handover.receiptNumber ?? '#SETTLED', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace')),
                   ],
                 ),
-              ],
             ],
           ),
           const SizedBox(height: 8),
@@ -619,7 +647,7 @@ class _StatItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: Color(0xFFADB5BD), fontSize: 10)),
+        Text(title, style: const TextStyle(color: AppColors.textHint, fontSize: 10)),
         const SizedBox(height: 2),
         Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
       ],

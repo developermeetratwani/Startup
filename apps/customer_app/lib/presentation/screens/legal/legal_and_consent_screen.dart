@@ -496,7 +496,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
                 const Expanded(
                   child: Text(
                     'If your grievance is not resolved within 30 days, you retain the statutory right to escalate your appeal directly to the Data Protection Board of India (DPBI).',
-                    style: TextStyle(fontSize: 11, color: Color(0xFF7A4F01)),
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   ),
                 ),
               ],

@@ -78,7 +78,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           // Left Sidebar
           Container(
             width: 260,
-            color: const Color(0xFF1A1A2E),
+            color: AppColors.primary,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,7 +88,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFE94560),
+                        color: AppColors.accent,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Icon(Icons.shield_rounded, color: Colors.white, size: 24),
@@ -98,13 +98,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('XYZ STARTUP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('Admin Console', style: TextStyle(color: Color(0xFFADB5BD), fontSize: 11)),
+                        Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
                       ],
                     ),
                   ],
                 ),
                 const SizedBox(height: 36),
-                const Text('MAIN NAVIGATION', style: TextStyle(color: Color(0xFF6C757D), fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.bold)),
+                const Text('MAIN NAVIGATION', style: TextStyle(color: AppColors.textHint, fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 12),
                 Expanded(
                   child: ListView.builder(
@@ -126,13 +126,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         margin: const EdgeInsets.only(bottom: 6),
                         child: ListTile(
                           selected: isSelected,
-                          selectedTileColor: const Color(0xFF0F3460),
+                          selectedTileColor: AppColors.primaryLight,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          leading: Icon(icons[index], color: isSelected ? const Color(0xFFE94560) : const Color(0xFFADB5BD), size: 20),
+                          leading: Icon(icons[index], color: isSelected ? AppColors.accent : AppColors.textHint, size: 20),
                           title: Text(
                             _tabs[index],
                             style: TextStyle(
-                              color: isSelected ? Colors.white : const Color(0xFFADB5BD),
+                              color: isSelected ? Colors.white : AppColors.textHint,
                               fontSize: 13,
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                             ),
@@ -143,15 +143,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     },
                   ),
                 ),
-                const Divider(color: Color(0xFF2E3856)),
+                const Divider(color: Color(0xFF2C2C2C)),
                 const ListTile(
                   dense: true,
                   leading: CircleAvatar(
-                    backgroundColor: Color(0xFFE94560),
+                    backgroundColor: AppColors.accent,
                     child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 12)),
                   ),
                   title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                  subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: Color(0xFFADB5BD), fontSize: 11)),
+                  subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
                 ),
               ],
             ),
@@ -160,7 +160,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           // Main Content Area
           Expanded(
             child: Container(
-              color: const Color(0xFFF8F9FA),
+              color: AppColors.background,
               child: Column(
                 children: [
                   // Top App Bar
@@ -168,29 +168,29 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     height: 70,
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     decoration: const BoxDecoration(
-                      color: Colors.white,
-                      border: Border(bottom: BorderSide(color: Color(0xFFE9ECEF))),
+                      color: AppColors.surface,
+                      border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
                           _tabs[_selectedTab],
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF212529)),
+                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                         ),
                         Row(
                           children: [
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFD1E7DD),
+                                color: AppColors.success.withValues(alpha: 0.12),
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               child: const Row(
                                 children: [
-                                  Icon(Icons.cloud_done_rounded, color: Color(0xFF0F5132), size: 16),
+                                  Icon(Icons.cloud_done_rounded, color: AppColors.success, size: 16),
                                   SizedBox(width: 8),
-                                  Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: Color(0xFF0F5132), fontSize: 12, fontWeight: FontWeight.bold)),
+                                  Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.bold)),
                                 ],
                               ),
                             ),
@@ -245,13 +245,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       children: [
         Row(
           children: const [
-            Expanded(child: _KPICard(title: 'Gross Merchandise Value (GMV)', value: '₹1,84,520', subtitle: 'This Month (+18.4%)', color: Color(0xFF0D6EFD))),
+            Expanded(child: _KPICard(title: 'Gross Merchandise Value (GMV)', value: '₹1,84,520', subtitle: 'This Month (+18.4%)', color: AppColors.accent)),
             SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Active Stores (Kubernagar / Sindhu Bhavan)', value: '38 Stores', subtitle: '94% Onboarded & Verified', color: Color(0xFF198754))),
+            Expanded(child: _KPICard(title: 'Active Stores (Kubernagar / Sindhu Bhavan)', value: '38 Stores', subtitle: '94% Onboarded & Verified', color: AppColors.primary)),
             SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Platform Commission (10%)', value: '₹18,452', subtitle: 'Direct Net Margin', color: Color(0xFF6F42C1))),
+            Expanded(child: _KPICard(title: 'Platform Commission (10%)', value: '₹18,452', subtitle: 'Direct Net Margin', color: AppColors.purple)),
             SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Verified Riders Fleet', value: '42 Drivers', subtitle: 'Aadhaar & License KYC Verified', color: Color(0xFFFD7E14))),
+            Expanded(child: _KPICard(title: 'Verified Riders Fleet', value: '42 Drivers', subtitle: 'Aadhaar & License KYC Verified', color: AppColors.tomato)),
           ],
         ),
       ],
@@ -261,7 +261,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget _buildApprovalsTab() {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -304,7 +304,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget _buildStoresTab() {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: const Padding(
         padding: EdgeInsets.all(20),
         child: Text('Live Store Catalogs across Kubernagar, Sindhu Bhavan Road, Bodakdev, and Gandhinagar are healthy and operational.'),
@@ -317,7 +317,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -399,23 +399,23 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F3460).withOpacity(0.08),
+            color: AppColors.primary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF0F3460).withOpacity(0.3)),
+            border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),
           child: const Row(
             children: [
-              Icon(Icons.lock_person_rounded, color: Color(0xFF0F3460), size: 28),
+              Icon(Icons.lock_person_rounded, color: AppColors.primary, size: 28),
               SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Multi-Driver Mutual Exclusion Orchestrator Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0F3460))),
+                    Text('Multi-Driver Mutual Exclusion Orchestrator Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.primary)),
                     SizedBox(height: 2),
                     Text(
                       'When a driver accepts an assignment, atomic lock binds the delivery. Other fleet riders cannot claim or accept it, guaranteeing zero duplicate drivers at pickup locations.',
-                      style: TextStyle(fontSize: 12, color: Color(0xFF495057)),
+                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                     ),
                   ],
                 ),
@@ -429,13 +429,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         // COD Cash Reconciliation Snapshot
         Row(
           children: [
-            Expanded(child: _KPICard(title: 'Fleet Cash In Hand (To Collect)', value: sureshCod.pendingCashDisplay, subtitle: 'Due from Drivers', color: const Color(0xFFFD7E14))),
+            Expanded(child: _KPICard(title: 'Fleet Cash In Hand (To Collect)', value: sureshCod.pendingCashDisplay, subtitle: 'Due from Drivers', color: AppColors.tomato)),
             const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Total COD Orders Delivered', value: '${sureshCod.totalCodOrders} Trips', subtitle: sureshCod.collectedDisplay, color: const Color(0xFF198754))),
+            Expanded(child: _KPICard(title: 'Total COD Orders Delivered', value: '${sureshCod.totalCodOrders} Trips', subtitle: sureshCod.collectedDisplay, color: AppColors.accent)),
             const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Prepaid (UPI) Deliveries', value: '${sureshCod.totalOnlinePaidOrders} Trips', subtitle: 'Zero cash collected', color: const Color(0xFF0D6EFD))),
+            Expanded(child: _KPICard(title: 'Prepaid (UPI) Deliveries', value: '${sureshCod.totalOnlinePaidOrders} Trips', subtitle: 'Zero cash collected', color: AppColors.primary)),
             const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Cash Remitted to Co.', value: sureshCod.remittedDisplay, subtitle: '${remittances.length} Remittance batches', color: const Color(0xFF6F42C1))),
+            Expanded(child: _KPICard(title: 'Cash Remitted to Co.', value: sureshCod.remittedDisplay, subtitle: '${remittances.length} Remittance batches', color: AppColors.purple)),
           ],
         ),
 
@@ -444,7 +444,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         // Drivers Fleet & Cash Ledger Table
         Card(
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -511,7 +511,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         // Hub Counter Physical Cash Handover & OTP Settlement Desk
         Card(
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -522,7 +522,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   children: [
                     const Row(
                       children: [
-                        Icon(Icons.store_rounded, color: Color(0xFF0F3460), size: 24),
+                        Icon(Icons.store_rounded, color: AppColors.accent, size: 24),
                         SizedBox(width: 8),
                         Text('Hub Counter Cash Handover & OTP Verification Desk', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       ],
@@ -530,18 +530,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: Colors.amber.shade100,
+                        color: AppColors.purple.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
-                        border: Border.all(color: Colors.amber.shade700),
+                        border: Border.all(color: AppColors.purple),
                       ),
-                      child: const Text('PHYSICAL CASH SETTLEMENT WITH OTP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF7A4F01))),
+                      child: const Text('PHYSICAL CASH SETTLEMENT WITH OTP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 const Text(
                   'When a rider arrives at a hub (Kubernagar, Gandhinagar, etc.) to hand over cash, the rider generates an OTP sent to their email. Admin collects cash, inputs the rider OTP below, and verifies settlement.',
-                  style: TextStyle(fontSize: 12, color: Color(0xFF6C757D)),
+                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 16),
                 SingleChildScrollView(
@@ -561,13 +561,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         DataCell(Text(h.id, style: const TextStyle(fontWeight: FontWeight.bold))),
                         DataCell(Text(h.hubLocation)),
                         DataCell(Text('${h.driverName}\n${h.driverEmail}', style: const TextStyle(fontSize: 11))),
-                        DataCell(Text(h.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange, fontSize: 15))),
+                        DataCell(Text(h.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.tomato, fontSize: 15))),
                         DataCell(Chip(
                           label: Text(
                             h.isVerified ? 'VERIFIED ✅' : 'AWAITING OTP ENTRY',
-                            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: h.isVerified ? AppColors.success : AppColors.tomato),
                           ),
-                          backgroundColor: h.isVerified ? const Color(0xFFD1E7DD) : Colors.amber.shade100,
+                          backgroundColor: h.isVerified ? AppColors.success.withValues(alpha: 0.12) : AppColors.tomato.withValues(alpha: 0.12),
                         )),
                         DataCell(Text(
                           h.isVerified
@@ -579,13 +579,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                           h.isVerified
                               ? const Row(
                                   children: [
-                                    Icon(Icons.check_circle, size: 14, color: Colors.green),
+                                    Icon(Icons.check_circle, size: 14, color: AppColors.success),
                                     SizedBox(width: 4),
-                                    Text('Cash Settled', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                                    Text('Cash Settled', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
                                   ],
                                 )
                               : ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF0F3460)),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
                                   icon: const Icon(Icons.pin_rounded, size: 14, color: Colors.white),
                                   label: const Text('Verify Rider OTP', style: TextStyle(color: Colors.white, fontSize: 12)),
                                   onPressed: () => _showVerifyOtpDialog(context, h),
@@ -605,7 +605,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         // Cash Remittance Verifications
         Card(
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
@@ -637,14 +637,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         DataCell(Text(r.referenceNumber, style: const TextStyle(fontFamily: 'monospace'))),
                         DataCell(Text('${r.submittedAt.day}/${r.submittedAt.month} ${r.submittedAt.hour}:${r.submittedAt.minute.toString().padLeft(2, '0')}')),
                         DataCell(Chip(
-                          label: Text(r.isVerifiedByAdmin ? 'VERIFIED ✅' : 'PENDING APPROVAL', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                          backgroundColor: r.isVerifiedByAdmin ? const Color(0xFFD1E7DD) : const Color(0xFFFFF3CD),
+                          label: Text(
+                            r.isVerifiedByAdmin ? 'VERIFIED ✅' : 'PENDING APPROVAL',
+                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: r.isVerifiedByAdmin ? AppColors.success : AppColors.tomato),
+                          ),
+                          backgroundColor: r.isVerifiedByAdmin ? AppColors.success.withValues(alpha: 0.12) : AppColors.tomato.withValues(alpha: 0.12),
                         )),
                         DataCell(
                           r.isVerifiedByAdmin
-                              ? const Text('Settled', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold))
+                              ? const Text('Settled', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold))
                               : ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF198754)),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
                                   onPressed: () {
                                     OrderSyncService.verifyRemittanceByAdmin(r.id);
                                     ScaffoldMessenger.of(context).showSnackBar(
@@ -669,7 +672,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget _buildExchangeTab() {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
@@ -708,7 +711,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget _buildMultiRegionTab() {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: const Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -742,7 +745,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   Widget _buildCommissionsTab() {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: const Padding(
         padding: EdgeInsets.all(20),
         child: Column(
@@ -775,7 +778,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       builder: (ctx) => AlertDialog(
         title: const Row(
           children: [
-            Icon(Icons.verified_user_rounded, color: Color(0xFF0F3460)),
+            Icon(Icons.verified_user_rounded, color: AppColors.accent),
             SizedBox(width: 8),
             Text('Verify Rider COD Cash Handover'),
           ],
@@ -787,20 +790,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             children: [
               Text('Hub: ${handover.hubLocation}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
               const SizedBox(height: 4),
-              Text('Rider: ${handover.driverName} (${handover.driverEmail})', style: const TextStyle(fontSize: 12, color: Color(0xFF6C757D))),
+              Text('Rider: ${handover.driverName} (${handover.driverEmail})', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.amber.shade50,
+                  color: AppColors.surfaceWarm,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.amber.shade300),
+                  border: Border.all(color: AppColors.cardBorder),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Physical Cash to Collect:', style: TextStyle(fontWeight: FontWeight.bold)),
-                    Text(handover.amountDisplay, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.amber.shade900)),
+                    Text(handover.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: AppColors.textPrimary)),
                   ],
                 ),
               ),
@@ -837,7 +840,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
           ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF198754)),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
             icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
             label: const Text('Accept Cash & Verify OTP', style: TextStyle(color: Colors.white)),
             onPressed: () async {
@@ -849,11 +852,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               Navigator.pop(ctx);
               if (res.$1) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(backgroundColor: const Color(0xFF198754), content: Text('✅ ${res.$2}')),
+                  SnackBar(backgroundColor: AppColors.primary, content: Text('✅ ${res.$2}')),
                 );
               } else {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(backgroundColor: Colors.red, content: Text('❌ ${res.$2}')),
+                  SnackBar(backgroundColor: AppColors.tomato, content: Text('❌ ${res.$2}')),
                 );
               }
             },
@@ -876,17 +879,17 @@ class _KPICard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: Color(0xFFE9ECEF))),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
         padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(title, style: const TextStyle(fontSize: 12, color: Color(0xFF6C757D), fontWeight: FontWeight.w600)),
+            Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
             const SizedBox(height: 6),
             Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
             const SizedBox(height: 4),
-            Text(subtitle, style: const TextStyle(fontSize: 11, color: Color(0xFFADB5BD))),
+            Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
           ],
         ),
       ),

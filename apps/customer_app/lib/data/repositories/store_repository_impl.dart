@@ -4,10 +4,20 @@ import 'package:core/core.dart';
 import 'dart:math' as math;
 
 class StoreRepositoryImpl implements StoreRepository {
-  final FirebaseFirestore _firestore;
+  final FirebaseFirestore? _customFirestore;
+  FirebaseFirestore? _firestoreInstance;
 
   StoreRepositoryImpl({FirebaseFirestore? firestore})
-      : _firestore = firestore ?? FirebaseFirestore.instance;
+      : _customFirestore = firestore;
+
+  FirebaseFirestore? get _firestore {
+    if (_customFirestore != null) return _customFirestore;
+    try {
+      return _firestoreInstance ??= FirebaseFirestore.instance;
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   Future<(List<StoreEntity>?, Failure?)> getNearbyStores({
@@ -17,8 +27,12 @@ class StoreRepositoryImpl implements StoreRepository {
     String? categoryId,
     int limit = 20,
   }) async {
+    final fs = _firestore;
+    if (fs == null) {
+      return (_getMockStores(latitude, longitude, categoryId, radiusKm), null);
+    }
     try {
-      Query<Map<String, dynamic>> query = _firestore
+      Query<Map<String, dynamic>> query = fs
           .collection('stores')
           .where('isActive', isEqualTo: true)
           .where('isDeleted', isEqualTo: false);
@@ -57,8 +71,16 @@ class StoreRepositoryImpl implements StoreRepository {
 
   @override
   Future<(StoreEntity?, Failure?)> getStoreById(String storeId) async {
+    final fs = _firestore;
+    if (fs == null) {
+      final mock = _getMockStores(0, 0, null, 0).firstWhere(
+        (s) => s.id == storeId,
+        orElse: () => _getMockStores(0, 0, null, 0).first,
+      );
+      return (mock, null);
+    }
     try {
-      final doc = await _firestore.collection('stores').doc(storeId).get();
+      final doc = await fs.collection('stores').doc(storeId).get();
       if (!doc.exists) {
         final mock = _getMockStores(0, 0, null, 0).firstWhere(
           (s) => s.id == storeId,
@@ -86,8 +108,16 @@ class StoreRepositoryImpl implements StoreRepository {
 
   @override
   Future<(StoreEntity?, Failure?)> getStoreByVendorId(String vendorId) async {
+    final fs = _firestore;
+    if (fs == null) {
+      final mock = _getMockStores(0, 0, null, 0).firstWhere(
+        (s) => s.vendorId == vendorId,
+        orElse: () => _getMockStores(0, 0, null, 0).first,
+      );
+      return (mock, null);
+    }
     try {
-      final snap = await _firestore
+      final snap = await fs
           .collection('stores')
           .where('vendorId', isEqualTo: vendorId)
           .limit(1)
@@ -120,7 +150,15 @@ class StoreRepositoryImpl implements StoreRepository {
 
   @override
   Stream<StoreEntity?> watchStore(String storeId) {
-    return _firestore.collection('stores').doc(storeId).snapshots().map((doc) {
+    final fs = _firestore;
+    if (fs == null) {
+      final allMocks = _getMockStores(0, 0, null, 0);
+      return Stream.value(allMocks.firstWhere(
+        (s) => s.id == storeId,
+        orElse: () => allMocks.first,
+      ));
+    }
+    return fs.collection('stores').doc(storeId).snapshots().map((doc) {
       if (doc.exists && doc.data() != null) {
         final data = doc.data()!;
         final loc = data['location'] as Map<String, dynamic>? ?? {};
@@ -151,8 +189,10 @@ class StoreRepositoryImpl implements StoreRepository {
     required String storeId,
     required Map<String, dynamic> fields,
   }) async {
+    final fs = _firestore;
+    if (fs == null) return null;
     try {
-      await _firestore.collection('stores').doc(storeId).set({
+      await fs.collection('stores').doc(storeId).set({
         ...fields,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));

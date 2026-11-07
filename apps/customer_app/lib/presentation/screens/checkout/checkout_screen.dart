@@ -166,7 +166,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             // 1. Cash on Delivery (COD)
             _PaymentCard(
               title: 'Cash on Delivery (COD)',
-              subtitle: 'Pay cash to driver upon delivery â€¢ â‚¹21 handling surcharge',
+              subtitle: 'Pay cash to driver upon delivery • ₹21 handling surcharge',
               icon: Icons.money_rounded,
               color: AppColors.success,
               value: 'cod',
@@ -190,7 +190,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             // 3. Online Payment (Razorpay / Instant)
             _PaymentCard(
               title: 'Online Payment (Razorpay / Cards)',
-              subtitle: 'Cards, Netbanking & Wallets â€¢ Instant order confirmation',
+              subtitle: 'Cards, Netbanking & Wallets • Instant order confirmation',
               icon: Icons.credit_card_rounded,
               color: AppColors.accent,
               value: 'online',
