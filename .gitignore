@@ -37,3 +37,4 @@ pubspec_overrides.yaml
 # Logs
 *.log
 *-debug.log
+orders_state.json

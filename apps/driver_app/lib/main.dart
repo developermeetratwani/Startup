@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'package:core/core.dart';
 import 'firebase_options.dart';
 import 'presentation/router/driver_router.dart';
 
@@ -18,6 +19,9 @@ void main() async {
   } catch (e) {
     debugPrint('DriverApp Firebase init: $e');
   }
+
+  // Start real-time cross-app order synchronization bus
+  OrderSyncService.startBackgroundSync();
 
   runApp(
     const ProviderScope(

@@ -10,6 +10,7 @@ class VendorOrderRepository {
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Stream<List<OrderEntity>> watchVendorOrders(String storeId) {
+    OrderSyncService.startBackgroundSync();
     // 1. Listen to cross-app live sync bus
     final localStream = OrderSyncService.ordersStream.map((orders) {
       return OrderSyncService.getOrdersForStore(storeId);

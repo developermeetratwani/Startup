@@ -18,6 +18,9 @@ void main() async {
     debugPrint('AdminWeb Firebase init: $e');
   }
 
+  // Start real-time cross-app order synchronization bus
+  OrderSyncService.startBackgroundSync();
+
   runApp(const ProviderScope(child: AdminDashboardApp()));
 }
 

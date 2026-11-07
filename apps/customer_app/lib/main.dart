@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:ui_kit/ui_kit.dart';
+import 'package:core/core.dart';
 import 'core/constants/app_constants.dart';
 import 'presentation/router/app_router.dart';
 import 'firebase_options.dart';
@@ -18,6 +19,9 @@ void main() async {
   } catch (e) {
     debugPrint('Firebase init notice: $e');
   }
+
+  // Start real-time cross-app order synchronization bus
+  OrderSyncService.startBackgroundSync();
 
   runApp(
     const ProviderScope(

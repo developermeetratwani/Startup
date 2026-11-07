@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:domain/domain.dart';
+import 'package:http/http.dart' as http;
 import '../utils/app_logger.dart';
 import 'smtp_auth_service.dart';
 
@@ -191,6 +193,88 @@ class OrderSyncService {
   static List<DriverRemittanceRecord> get currentRemittances => List.unmodifiable(_remittances);
   static List<DriverHubHandoverRequest> get currentHandovers => List.unmodifiable(_handoverRequests);
 
+  // ── BRIDGE INTER-APP SYNC ──────────────────────────────────────────
+  static String? _resolvedBaseUrl;
+  static const List<String> _candidateUrls = [
+    'http://localhost:5055',
+    'http://127.0.0.1:5055',
+    'http://10.0.2.2:5055',
+  ];
+
+  static Future<String> _getBaseUrl() async {
+    if (_resolvedBaseUrl != null) return _resolvedBaseUrl!;
+    for (final url in _candidateUrls) {
+      try {
+        final res = await http.get(Uri.parse('$url/health')).timeout(const Duration(milliseconds: 600));
+        if (res.statusCode == 200) {
+          _resolvedBaseUrl = url;
+          return url;
+        }
+      } catch (_) {}
+    }
+    _resolvedBaseUrl = 'http://localhost:5055';
+    return _resolvedBaseUrl!;
+  }
+
+  static Timer? _syncTimer;
+  static bool _isSyncing = false;
+
+  /// Starts periodic polling to sync with all apps through the local bridge server
+  static void startBackgroundSync() {
+    if (_syncTimer != null) return;
+    syncFromBridgeServer();
+    _syncTimer = Timer.periodic(const Duration(milliseconds: 1500), (_) {
+      syncFromBridgeServer();
+    });
+  }
+
+  /// Manually synchronizes in-memory orders from the central bridge server
+  static Future<void> syncFromBridgeServer() async {
+    if (_isSyncing) return;
+    _isSyncing = true;
+    try {
+      final baseUrl = await _getBaseUrl();
+      final res = await http.get(Uri.parse('$baseUrl/api/orders')).timeout(const Duration(milliseconds: 1500));
+      if (res.statusCode == 200) {
+        final list = jsonDecode(res.body) as List;
+        final fetchedOrders = list.map((item) => _orderFromJson(item as Map<String, dynamic>)).toList();
+
+        bool hasChanges = false;
+        if (fetchedOrders.length != _orders.length) {
+          hasChanges = true;
+        } else {
+          for (int i = 0; i < fetchedOrders.length; i++) {
+            if (fetchedOrders[i].id != _orders[i].id ||
+                fetchedOrders[i].status != _orders[i].status ||
+                fetchedOrders[i].driverId != _orders[i].driverId) {
+              hasChanges = true;
+              break;
+            }
+          }
+        }
+
+        if (hasChanges) {
+          _orders.clear();
+          _orders.addAll(fetchedOrders);
+          for (final o in _orders) {
+            if (o.status == OrderStatus.readyForPickup) {
+              _deliveryStatuses.putIfAbsent(o.id, () => DeliveryStatus.assigned);
+            } else if (o.status == OrderStatus.pickedUp) {
+              _deliveryStatuses[o.id] = DeliveryStatus.pickedUp;
+            } else if (o.status == OrderStatus.delivered) {
+              _deliveryStatuses[o.id] = DeliveryStatus.delivered;
+            }
+          }
+          _streamController.add(List.unmodifiable(_orders));
+        }
+      }
+    } catch (_) {
+      // Ignore background transient network hiccups
+    } finally {
+      _isSyncing = false;
+    }
+  }
+
   /// Registers a newly placed customer order
   static void registerOrder(OrderEntity order) {
     final idx = _orders.indexWhere((o) => o.id == order.id);
@@ -202,6 +286,22 @@ class OrderSyncService {
     _deliveryStatuses[order.id] = DeliveryStatus.assigned;
     AppLogger.info('OrderSyncService', 'Dispatched order ${order.id} to Vendor & Driver pipeline');
     _streamController.add(List.unmodifiable(_orders));
+
+    // Push to central bridge server for cross-app broadcast
+    _pushOrderToBridge(order);
+  }
+
+  static Future<void> _pushOrderToBridge(OrderEntity order) async {
+    try {
+      final baseUrl = await _getBaseUrl();
+      await http.post(
+        Uri.parse('$baseUrl/api/orders'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(_orderToJson(order)),
+      ).timeout(const Duration(seconds: 3));
+    } catch (e) {
+      AppLogger.warning('OrderSyncService._pushOrderToBridge', e.toString());
+    }
   }
 
   /// Updates status (vendor confirmation, ready for pickup, etc.)
@@ -235,6 +335,22 @@ class OrderSyncService {
 
       AppLogger.info('OrderSyncService', 'Order $orderId status updated to $status');
       _streamController.add(List.unmodifiable(_orders));
+
+      // Push update to bridge server
+      _pushStatusToBridge(orderId, status.name);
+    }
+  }
+
+  static Future<void> _pushStatusToBridge(String orderId, String statusName) async {
+    try {
+      final baseUrl = await _getBaseUrl();
+      await http.post(
+        Uri.parse('$baseUrl/api/orders/update-status'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'orderId': orderId, 'status': statusName}),
+      ).timeout(const Duration(seconds: 3));
+    } catch (e) {
+      AppLogger.warning('OrderSyncService._pushStatusToBridge', e.toString());
     }
   }
 
@@ -277,7 +393,22 @@ class OrderSyncService {
     _deliveryStatuses[orderId] = DeliveryStatus.accepted;
     AppLogger.info('OrderSyncService', 'Order $orderId atomically locked to driver $driverName ($driverId)');
     _streamController.add(List.unmodifiable(_orders));
+
+    _pushDriverAcceptanceToBridge(orderId, driverId, driverName);
     return true;
+  }
+
+  static Future<void> _pushDriverAcceptanceToBridge(String orderId, String driverId, String driverName) async {
+    try {
+      final baseUrl = await _getBaseUrl();
+      await http.post(
+        Uri.parse('$baseUrl/api/orders/accept-driver'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'orderId': orderId, 'driverId': driverId, 'driverName': driverName}),
+      ).timeout(const Duration(seconds: 3));
+    } catch (e) {
+      AppLogger.warning('OrderSyncService._pushDriverAcceptanceToBridge', e.toString());
+    }
   }
 
   /// Decline delivery assignment by a driver:
@@ -556,5 +687,92 @@ class OrderSyncService {
   static List<OrderEntity> getOrdersForStore(String storeId) {
     if (_orders.isEmpty) return [];
     return _orders.where((o) => o.storeId == storeId || storeId == 'store-kubernagar-1').toList();
+  }
+
+  // ── JSON SERIALIZATION HELPERS ──────────────────────────────────────
+  static Map<String, dynamic> _orderToJson(OrderEntity order) {
+    return {
+      'id': order.id,
+      'customerId': order.customerId,
+      'storeId': order.storeId,
+      'vendorId': order.vendorId,
+      'driverId': order.driverId,
+      'deliveryAddressId': order.deliveryAddressId,
+      'deliveryAddressSnapshot': order.deliveryAddressSnapshot,
+      'status': order.status.name,
+      'paymentMethod': order.paymentMethod.name,
+      'paymentStatus': order.paymentStatus.name,
+      'razorpayOrderId': order.razorpayOrderId,
+      'razorpayPaymentId': order.razorpayPaymentId,
+      'pricing': {
+        'productTotal': order.pricing.productTotal,
+        'deliveryCharge': order.pricing.deliveryCharge,
+        'packagingCharge': order.pricing.packagingCharge,
+        'codCharge': order.pricing.codCharge,
+        'exchangeCharge': order.pricing.exchangeCharge,
+        'discount': order.pricing.discount,
+        'coinRedemption': order.pricing.coinRedemption,
+        'grandTotal': order.pricing.grandTotal,
+        'platformCommission': order.pricing.platformCommission,
+        'vendorEarning': order.pricing.vendorEarning,
+        'driverEarning': order.pricing.driverEarning,
+      },
+      'exchangeReason': order.exchangeReason,
+      'requestedExchangeSize': order.requestedExchangeSize,
+      'cancellationReason': order.cancellationReason,
+      'estimatedDeliveryMinutes': order.estimatedDeliveryMinutes,
+      'placedAt': order.placedAt.toIso8601String(),
+      'deliveredAt': order.deliveredAt?.toIso8601String(),
+    };
+  }
+
+  static OrderEntity _orderFromJson(Map<String, dynamic> json) {
+    final p = json['pricing'] is Map ? (json['pricing'] as Map).cast<String, dynamic>() : <String, dynamic>{};
+    return OrderEntity(
+      id: json['id'] as String? ?? 'ord-${DateTime.now().millisecondsSinceEpoch}',
+      customerId: json['customerId'] as String? ?? 'cust-ahmedabad-01',
+      storeId: json['storeId'] as String? ?? 'store-kubernagar-1',
+      vendorId: json['vendorId'] as String? ?? 'vendor-kubernagar-1',
+      driverId: json['driverId'] as String?,
+      deliveryAddressId: json['deliveryAddressId'] as String? ?? 'addr-ahmedabad-01',
+      deliveryAddressSnapshot: Map<String, dynamic>.from(json['deliveryAddressSnapshot'] as Map? ?? {}),
+      status: OrderStatus.values.firstWhere(
+        (e) => e.name == json['status'],
+        orElse: () => OrderStatus.pending,
+      ),
+      paymentMethod: PaymentMethod.values.firstWhere(
+        (e) => e.name == json['paymentMethod'],
+        orElse: () => PaymentMethod.cod,
+      ),
+      paymentStatus: PaymentStatus.values.firstWhere(
+        (e) => e.name == json['paymentStatus'],
+        orElse: () => PaymentStatus.pending,
+      ),
+      razorpayOrderId: json['razorpayOrderId'] as String?,
+      razorpayPaymentId: json['razorpayPaymentId'] as String?,
+      pricing: OrderPricing(
+        productTotal: (p['productTotal'] as num?)?.toInt() ?? 0,
+        deliveryCharge: (p['deliveryCharge'] as num?)?.toInt() ?? 0,
+        packagingCharge: (p['packagingCharge'] as num?)?.toInt() ?? 0,
+        codCharge: (p['codCharge'] as num?)?.toInt() ?? 0,
+        exchangeCharge: (p['exchangeCharge'] as num?)?.toInt() ?? 0,
+        discount: (p['discount'] as num?)?.toInt() ?? 0,
+        coinRedemption: (p['coinRedemption'] as num?)?.toInt() ?? 0,
+        grandTotal: (p['grandTotal'] as num?)?.toInt() ?? 0,
+        platformCommission: (p['platformCommission'] as num?)?.toInt() ?? 0,
+        vendorEarning: (p['vendorEarning'] as num?)?.toInt() ?? 0,
+        driverEarning: (p['driverEarning'] as num?)?.toInt() ?? 0,
+      ),
+      exchangeReason: json['exchangeReason'] as String?,
+      requestedExchangeSize: json['requestedExchangeSize'] as String?,
+      cancellationReason: json['cancellationReason'] as String?,
+      estimatedDeliveryMinutes: (json['estimatedDeliveryMinutes'] as num?)?.toInt() ?? 35,
+      placedAt: json['placedAt'] != null
+          ? DateTime.tryParse(json['placedAt'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      deliveredAt: json['deliveredAt'] != null
+          ? DateTime.tryParse(json['deliveredAt'].toString())
+          : null,
+    );
   }
 }

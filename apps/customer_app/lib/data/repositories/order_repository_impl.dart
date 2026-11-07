@@ -85,40 +85,20 @@ class OrderRepositoryImpl implements OrderRepository {
 
   @override
   Stream<List<OrderEntity>> watchCustomerOrders(String customerId) {
-    try {
-      final fs = _firestore;
-      if (fs == null) return Stream.value(_mockOrders);
-      return fs
-          .collection('orders')
-          .where('customerId', isEqualTo: customerId)
-          .snapshots()
-          .map((snap) {
-        final list = snap.docs.map((doc) => _mapToOrderEntity(doc)).toList();
-        list.sort((a, b) => b.placedAt.compareTo(a.placedAt));
-        return list.isNotEmpty ? list : _mockOrders;
-      }).handleError((_) => _mockOrders);
-    } catch (_) {
-      return Stream.value(_mockOrders);
-    }
+    OrderSyncService.startBackgroundSync();
+    return OrderSyncService.ordersStream.map((orders) {
+      final filtered = orders.where((o) => o.customerId == customerId || customerId == 'cust-ahmedabad-01').toList();
+      return filtered.isNotEmpty ? filtered : _mockOrders;
+    });
   }
 
   @override
   Stream<List<OrderEntity>> watchVendorOrders(String vendorId) {
-    try {
-      final fs = _firestore;
-      if (fs == null) return Stream.value(_mockOrders);
-      return fs
-          .collection('orders')
-          .where('vendorId', isEqualTo: vendorId)
-          .snapshots()
-          .map((snap) {
-        final list = snap.docs.map((doc) => _mapToOrderEntity(doc)).toList();
-        list.sort((a, b) => b.placedAt.compareTo(a.placedAt));
-        return list.isNotEmpty ? list : _mockOrders;
-      }).handleError((_) => _mockOrders);
-    } catch (_) {
-      return Stream.value(_mockOrders);
-    }
+    OrderSyncService.startBackgroundSync();
+    return OrderSyncService.ordersStream.map((orders) {
+      final filtered = orders.where((o) => o.vendorId == vendorId || vendorId == 'vendor-kubernagar-1').toList();
+      return filtered.isNotEmpty ? filtered : _mockOrders;
+    });
   }
 
   @override
@@ -180,32 +160,16 @@ class OrderRepositoryImpl implements OrderRepository {
 
   @override
   Stream<OrderEntity?> watchOrder(String orderId) {
-    try {
-      final fs = _firestore;
-      if (fs == null) {
-        return Stream.value(_mockOrders.firstWhere(
-          (o) => o.id == orderId,
-          orElse: () => _mockOrders.first,
-        ));
-      }
-      return fs.collection('orders').doc(orderId).snapshots().map((doc) {
-        if (doc.exists) return _mapToOrderEntity(doc);
-        return _mockOrders.firstWhere(
-          (o) => o.id == orderId,
-          orElse: () => _mockOrders.first,
-        );
-      }).handleError((_) {
-        return _mockOrders.firstWhere(
-          (o) => o.id == orderId,
-          orElse: () => _mockOrders.first,
-        );
-      });
-    } catch (_) {
-      return Stream.value(_mockOrders.firstWhere(
+    OrderSyncService.startBackgroundSync();
+    return OrderSyncService.ordersStream.map((orders) {
+      return orders.firstWhere(
         (o) => o.id == orderId,
-        orElse: () => _mockOrders.first,
-      ));
-    }
+        orElse: () => _mockOrders.firstWhere(
+          (o) => o.id == orderId,
+          orElse: () => _mockOrders.first,
+        ),
+      );
+    });
   }
 
   @override
@@ -270,21 +234,22 @@ class OrderRepositoryImpl implements OrderRepository {
         AppLogger.warning('OrderRepositoryImpl.createOrder', 'Direct set fallback used: $e');
       }
 
-      // Add to in-memory list for immediate local reflection
+      // Create local domain entity
       final localOrder = OrderEntity(
         id: orderId,
         customerId: customerId,
         storeId: storeId,
         vendorId: 'vendor-kubernagar-1',
-        driverId: 'driver-1',
+        driverId: null, // Unassigned: waiting for driver acceptance
         deliveryAddressId: deliveryAddressId,
         deliveryAddressSnapshot: const {
-          'label': 'Home Address',
-          'line1': 'B-42, Krishna Park Colony, Kubernagar Main Bazar',
+          'recipientName': 'Kavya Sharma',
+          'phone': '+91 98765 43210',
+          'addressLine1': 'B-42, Krishna Park Colony, Kubernagar Main Bazar',
           'city': 'Ahmedabad',
           'pincode': '382340',
         },
-        status: OrderStatus.confirmed,
+        status: OrderStatus.pending,
         paymentMethod: _parsePaymentMethod(paymentMethod),
         paymentStatus: isCod ? PaymentStatus.pending : PaymentStatus.paid,
         pricing: OrderPricing(
@@ -302,6 +267,8 @@ class OrderRepositoryImpl implements OrderRepository {
       );
 
       _mockOrders.insert(0, localOrder);
+      // Dispatch live cross-app sync broadcast to Vendor and Driver pipelines!
+      OrderSyncService.registerOrder(localOrder);
       return (orderId, null);
     } catch (e) {
       return (null, UnexpectedFailure(e.toString()));

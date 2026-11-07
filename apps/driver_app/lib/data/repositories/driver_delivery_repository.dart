@@ -87,6 +87,7 @@ class DriverDeliveryRepository {
   }
 
   Stream<List<DeliveryEntity>> watchDriverDeliveries(String driverId) {
+    OrderSyncService.startBackgroundSync();
     final controller = StreamController<List<DeliveryEntity>>.broadcast();
 
     void emitMerged(List<DeliveryEntity> firestoreList) {
