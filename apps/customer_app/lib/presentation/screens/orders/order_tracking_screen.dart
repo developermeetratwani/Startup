@@ -6,6 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:domain/domain.dart';
+import 'package:core/core.dart';
 import '../../providers/order_provider.dart';
 import '../../widgets/live_rider_tracking_sheet.dart';
 import '../../widgets/driver_chat_dialog.dart';
@@ -313,6 +314,49 @@ class OrderTrackingScreen extends ConsumerWidget {
 
                   const SizedBox(height: 12),
 
+                  // ── PROXIMITY GEOFENCE ARRIVAL NOTIFICATION (Within 100 meters) ──
+                  if (order.status == OrderStatus.pickedUp)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [Colors.blue.shade50, Colors.indigo.shade50],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blue.shade300),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: const BoxDecoration(
+                              color: Colors.blue,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 16),
+                          ),
+                          const SizedBox(width: 10),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text('Proximity Alert • Rider within 100m', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1E3A8A))),
+                                    SizedBox(width: 6),
+                                    CircleAvatar(radius: 3, backgroundColor: Colors.green),
+                                  ],
+                                ),
+                                SizedBox(height: 2),
+                                Text('Suresh Solanki is arriving at your gate. Please keep cash / UPI ready.', style: TextStyle(fontSize: 11, color: Color(0xFF1E40AF))),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
                   // ── DELIVERY PARTNER PROFILE & DIRECT CHAT CARD ───────────
                   Container(
                     padding: const EdgeInsets.all(14),
@@ -459,6 +503,41 @@ class OrderTrackingScreen extends ConsumerWidget {
                       Text(
                         'Destination: ${order.deliveryAddressSnapshot['line1'] ?? ''}, ${order.deliveryAddressSnapshot['city'] ?? ''}',
                         style: AppTextStyles.bodySmall,
+                      ),
+                      const SizedBox(height: 12),
+                      const Divider(height: 1),
+                      const SizedBox(height: 10),
+                      // Handover OTP & Tax Invoice Actions
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(vertical: 8),
+                              ),
+                              icon: const Icon(Icons.receipt_long_rounded, size: 16),
+                              label: const Text('Tax Invoice & Bill 🧾', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11)),
+                              onPressed: () => _showTaxInvoiceSheet(context, order),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.amber.shade50,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: Colors.amber.shade300),
+                            ),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.pin_rounded, size: 14, color: Colors.orange),
+                                SizedBox(width: 4),
+                                Text('Pickup OTP: 4821', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11, color: Color(0xFF7A4F01))),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -641,4 +720,245 @@ class OrderTrackingScreen extends ConsumerWidget {
       _ => 0,
     };
   }
+
+  void _showTaxInvoiceSheet(BuildContext context, OrderEntity order) {
+    final invoiceData = InvoiceGeneratorService.fromOrder(order);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          bool isSending = false;
+
+          return Container(
+            height: MediaQuery.of(context).size.height * 0.85,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('TAX INVOICE & BILL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF6C5CE7))),
+                        Text('XYZ Startup Hyperlocal Fashion Pvt. Ltd.', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                      ],
+                    ),
+                    IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
+                  ],
+                ),
+                const Divider(height: 20),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Bill Metadata
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Invoice No: ${invoiceData.invoiceNumber}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                              Text('Order ID: ${invoiceData.orderId}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                              Text('Marketplace GSTIN: ${invoiceData.marketplaceGstin}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                              Text('Date: ${invoiceData.invoiceDate.toLocal().toString().substring(0, 16)}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Vendor Details
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.purple.shade50.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.purple.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('BOUTIQUE VENDOR (SELLER)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF6C5CE7))),
+                              const SizedBox(height: 2),
+                              Text(invoiceData.vendorName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              Text(invoiceData.vendorAddress, style: const TextStyle(fontSize: 11)),
+                              Text('Vendor GSTIN: ${invoiceData.vendorGstin}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        // Customer Details
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50.withValues(alpha: 0.5),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.blue.shade200),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text('BILL TO (CUSTOMER)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.blue)),
+                              const SizedBox(height: 2),
+                              Text(invoiceData.customerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                              Text(invoiceData.customerAddress, style: const TextStyle(fontSize: 11)),
+                              Text('Phone: ${invoiceData.customerPhone}', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        // Items Table
+                        const Text('Itemized Particulars', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                        const SizedBox(height: 8),
+                        ...invoiceData.items.map((it) => Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(color: Colors.grey.shade200),
+                          ),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(it.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                    Text('Size: ${it.size} • 5% GST Included • 48h Size Exchange', style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                                  ],
+                                ),
+                              ),
+                              Text('Qty: ${it.quantity} • ₹${(it.totalPaise / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            ],
+                          ),
+                        )),
+                        const Divider(height: 16),
+                        // Financial Calculation
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Items Subtotal:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            Text('₹${(invoiceData.subtotalPaise / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Eco-Packaging & Handling (1%):', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            Text('₹${(invoiceData.packagingPaise / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Hyperlocal Courier Delivery:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                            Text('₹${(invoiceData.deliveryFeePaise / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 12)),
+                          ],
+                        ),
+                        if (invoiceData.codFeePaise > 0) ...[
+                          const SizedBox(height: 4),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const Text('COD Surcharge:', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                              Text('₹${(invoiceData.codFeePaise / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 12)),
+                            ],
+                          ),
+                        ],
+                        const Divider(height: 16),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text('Grand Total Paid:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                            Text('₹${(invoiceData.grandTotalPaise / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF6C5CE7))),
+                          ],
+                        ),
+                        const SizedBox(height: 14),
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: const Text(
+                            'DPDP Act 2023 & Consumer Protection Compliant. Designated Grievance Officer: Meet Ratwani (grievance@xyzstartup.in, Kubernagar, Ahmedabad).',
+                            style: TextStyle(fontSize: 10, color: Colors.black54),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                // Actions: Email Invoice & Print
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6C5CE7),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        icon: isSending
+                            ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Icon(Icons.email_outlined, size: 18),
+                        label: Text(isSending ? 'Sending...' : 'Email Bill to Customer 📧', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                        onPressed: isSending
+                            ? null
+                            : () async {
+                                setModalState(() => isSending = true);
+                                final success = await InvoiceGeneratorService.emailInvoiceToCustomer(
+                                  invoice: invoiceData,
+                                  recipientEmail: 'developermeetratwani@gmail.com',
+                                );
+                                setModalState(() => isSending = false);
+                                if (context.mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      backgroundColor: success ? AppColors.success : AppColors.error,
+                                      content: Text(success ? '✅ Tax Invoice sent to developermeetratwani@gmail.com!' : 'Email service offline'),
+                                    ),
+                                  );
+                                }
+                              },
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
 }

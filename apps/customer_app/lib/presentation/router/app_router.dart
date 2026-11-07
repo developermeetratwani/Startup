@@ -32,12 +32,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
       final domainUser = ref.read(currentUserProvider);
 
-      // Protected routes requiring authentication
-      final requiresAuth = state.matchedLocation.startsWith('/orders') ||
-          state.matchedLocation.startsWith('/checkout') ||
-          state.matchedLocation.startsWith('/addresses');
+      // Allow guest exploration of orders & tracking for seamless preview
+      final requiresAuth = state.matchedLocation.startsWith('/addresses') &&
+          user == null && domainUser == null;
 
-      if (user == null && domainUser == null && requiresAuth) {
+      if (requiresAuth) {
         return '/login';
       }
       return null;

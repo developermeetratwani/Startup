@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart';
 
 class SupportChatMessage {
   final String id;
@@ -16,12 +19,24 @@ class SupportChatMessage {
   });
 }
 
-/// Pre-Trained Support AI Engine for XYZ Hyperlocal Fashion Marketplace
+/// Pre-Trained & LLM-Enabled HelpBot AI Assistant for XYZ Hyperlocal Fashion Marketplace
 class SupportChatbotService {
+  static String? llmApiKey;
+  static String llmBaseUrl = 'https://integrate.api.nvidia.com/v1';
+  static String llmModel = 'meta/llama-3.1-70b-instruct';
+
+  static const String systemGuardrailPrompt = '''
+You are HelpBot, the official customer support AI assistant for XYZ Startup Hyperlocal Fashion Marketplace in Ahmedabad and Gandhinagar, Gujarat.
+STRICT DOMAIN GUARDRAILS:
+1. You only answer questions related to XYZ Startup: clothing orders, sizing, 48-Hour Doorstep Size Exchange, delivery timelines (25-35 mins local, ~65 mins cross-city), Cash on Delivery (COD), boutique partner stores in Kubernagar/Gandhinagar/Sindhu Bhavan Road, and DPDP Act 2023 compliance.
+2. If asked about programming, general knowledge, politics, sports, or anything outside XYZ Startup fashion shopping, politely decline: "I am HelpBot, dedicated exclusively to assisting you with XYZ Fashion Marketplace orders, sizing, 48-Hour exchanges, and delivery. How may I assist with your shopping today?"
+3. Tone: Warm, helpful, concise, professional.
+''';
+
   static final List<SupportChatMessage> _chatHistory = [
     SupportChatMessage(
       id: 'welcome',
-      text: 'Hello! I am FashionBot, your XYZ Startup AI Assistant. How can I help with your apparel orders, sizing, delivery, or returns today?',
+      text: 'Hello! I am HelpBot, your XYZ Startup Fashion Assistant. How can I help with your apparel orders, sizing, 48-Hour exchange, or delivery tracking today?',
       isUser: false,
       timestamp: DateTime.now(),
       actionSuggestions: [
@@ -47,8 +62,8 @@ class SupportChatbotService {
 
   static List<SupportChatMessage> get history => List.unmodifiable(_chatHistory);
 
-  /// Process user query through specialized fashion domain knowledge base
-  static void sendUserMessage(String userText) {
+  /// Process user query through specialized fashion domain knowledge base and LLM
+  static Future<void> sendUserMessage(String userText) async {
     final userMsg = SupportChatMessage(
       id: 'usr-${DateTime.now().millisecondsSinceEpoch}',
       text: userText,
@@ -58,8 +73,29 @@ class SupportChatbotService {
     _chatHistory.add(userMsg);
     _streamController.add(List.unmodifiable(_chatHistory));
 
-    // Simulate AI thinking and return trained contextual response
-    Timer(const Duration(milliseconds: 900), () {
+    // Check if an external LLM key is configured
+    if (llmApiKey != null && llmApiKey!.trim().isNotEmpty) {
+      try {
+        final llmResponse = await _callExternalLlm(userText);
+        if (llmResponse != null) {
+          final botMsg = SupportChatMessage(
+            id: 'bot-${DateTime.now().millisecondsSinceEpoch}',
+            text: llmResponse,
+            isUser: false,
+            timestamp: DateTime.now(),
+            actionSuggestions: ['Track My Order', '48h Size Exchange', 'Help Helpline'],
+          );
+          _chatHistory.add(botMsg);
+          _streamController.add(List.unmodifiable(_chatHistory));
+          return;
+        }
+      } catch (e) {
+        debugPrint('[HelpBot] External LLM error, using trained engine: $e');
+      }
+    }
+
+    // Default fast & resilient trained knowledge engine
+    Timer(const Duration(milliseconds: 700), () {
       final (replyText, suggestions) = _generateTrainedAiResponse(userText);
       final botMsg = SupportChatMessage(
         id: 'bot-${DateTime.now().millisecondsSinceEpoch}',
@@ -73,8 +109,44 @@ class SupportChatbotService {
     });
   }
 
+  /// External LLM call (NVIDIA / OpenAI / Gemini compatible endpoint)
+  static Future<String?> _callExternalLlm(String prompt) async {
+    final url = Uri.parse('$llmBaseUrl/chat/completions');
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $llmApiKey',
+      },
+      body: jsonEncode({
+        'model': llmModel,
+        'messages': [
+          {'role': 'system', 'content': systemGuardrailPrompt},
+          {'role': 'user', 'content': prompt},
+        ],
+        'temperature': 0.3,
+        'max_tokens': 350,
+      }),
+    ).timeout(const Duration(seconds: 8));
+
+    if (response.statusCode == 200) {
+      final json = jsonDecode(response.body);
+      return json['choices']?[0]?['message']?['content'] as String?;
+    }
+    return null;
+  }
+
   static (String text, List<String>? suggestions) _generateTrainedAiResponse(String input) {
     final q = input.toLowerCase();
+
+    // Guardrail: Filter completely unrelated off-topic queries
+    final offTopicKeywords = ['python', 'javascript', 'write code', 'movie', 'cricket match', 'president', 'weather', 'recipe', 'song'];
+    if (offTopicKeywords.any((k) => q.contains(k))) {
+      return (
+        'I am HelpBot, trained exclusively to assist you with XYZ Startup Fashion Marketplace orders, sizing, doorstep exchanges, and delivery logistics in Ahmedabad & Gandhinagar. How can I assist with your garment order today?',
+        ['Track My Order', '48-Hour Size Exchange', 'Payment Options', 'Contact Grievance Desk']
+      );
+    }
 
     if (q.contains('track') || q.contains('where is my order') || q.contains('delivery time') || q.contains('eta')) {
       return (
@@ -101,6 +173,13 @@ class SupportChatbotService {
       return (
         'Orders can be cancelled free of charge before the merchant marks them as "Preparing Item". Once packing begins or the courier is dispatched, cancellation is restricted to protect local boutique merchants. Online prepaid orders are refunded to the original payment source within 3-5 business days.',
         ['Cancellation Policy', 'Refund Status', 'Speak with Store']
+      );
+    }
+
+    if (q.contains('otp') || q.contains('handover') || q.contains('pickup')) {
+      return (
+        'For secure store pickups, multiple drivers reaching a boutique must share a unique 4-digit Pickup OTP (e.g. 4821) with the vendor. The boutique verifies this code before releasing the garment parcel to ensure zero mix-ups.',
+        ['Store Pickup OTP Details', 'Driver App Flow', 'Order Status']
       );
     }
 

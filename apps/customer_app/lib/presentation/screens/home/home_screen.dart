@@ -8,6 +8,7 @@ import '../../providers/store_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../widgets/live_rider_tracking_sheet.dart';
+import '../../widgets/support_chatbot_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -57,6 +58,31 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         actions: [
+          // HelpBot 24/7 AI Pill
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: InkWell(
+              onTap: () => SupportChatbotSheet.show(context),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.6)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.smart_toy_rounded, size: 15, color: AppColors.primary),
+                    SizedBox(width: 4),
+                    Text('HelpBot', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: InkWell(
@@ -422,11 +448,25 @@ class HomeScreen extends ConsumerWidget {
           BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFFE23744),
-        icon: const Icon(Icons.two_wheeler_rounded, color: Colors.white),
-        label: const Text('Live Radar (Zomato Map)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-        onPressed: () => LiveRiderTrackingSheet.show(context),
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'fab_helpbot',
+            backgroundColor: AppColors.primary,
+            icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+            label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            onPressed: () => SupportChatbotSheet.show(context),
+          ),
+          const SizedBox(width: 10),
+          FloatingActionButton.extended(
+            heroTag: 'fab_radar',
+            backgroundColor: const Color(0xFFE23744),
+            icon: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
+            label: const Text('Live Radar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            onPressed: () => LiveRiderTrackingSheet.show(context),
+          ),
+        ],
       ),
     );
   }
