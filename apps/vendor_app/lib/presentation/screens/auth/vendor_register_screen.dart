@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -31,7 +32,35 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
   void _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 800));
+
+    try {
+      final storeId = 'store-';
+      final vendorId = 'vendor-';
+      await FirebaseFirestore.instance.collection('stores').doc(storeId).set({
+        'id': storeId,
+        'vendorId': vendorId,
+        'name': _storeNameController.text.trim(),
+        'ownerName': _ownerNameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'city': _selectedCity,
+        'market': _selectedMarket,
+        'address': _addressController.text.trim(),
+        'isActive': false,
+        'isOpen': false,
+        'approvalStatus': 'pending',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+      await FirebaseFirestore.instance.collection('vendorProfiles').doc(vendorId).set({
+        'userId': vendorId,
+        'businessName': _storeNameController.text.trim(),
+        'ownerName': _ownerNameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'approvalStatus': 'pending',
+        'storeId': storeId,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {}
+
     if (mounted) {
       setState(() => _isLoading = false);
       context.go('/pending-approval');

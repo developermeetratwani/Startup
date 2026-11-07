@@ -117,7 +117,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.receipt_long_outlined),
+            tooltip: 'My Orders',
             onPressed: () => context.push('/orders'),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person_outline_rounded),
+            tooltip: 'Profile & Account',
+            onPressed: () => context.push('/profile'),
           ),
         ],
       ),

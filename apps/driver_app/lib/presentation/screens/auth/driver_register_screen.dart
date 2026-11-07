@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -27,7 +28,21 @@ class _DriverRegisterScreenState extends State<DriverRegisterScreen> {
 
   void _submit() async {
     setState(() => _isLoading = true);
-    await Future.delayed(const Duration(milliseconds: 700));
+
+    try {
+      final driverId = 'driver-';
+      await FirebaseFirestore.instance.collection('driverProfiles').doc(driverId).set({
+        'userId': driverId,
+        'fullName': _nameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'vehicleNumber': _vehicleController.text.trim(),
+        'licenseNumber': _licenseController.text.trim(),
+        'approvalStatus': 'pending',
+        'isOnline': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } catch (_) {}
+
     if (mounted) {
       setState(() => _isLoading = false);
       ScaffoldMessenger.of(context).showSnackBar(
