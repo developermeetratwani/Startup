@@ -6,6 +6,7 @@ import 'package:domain/domain.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/floating_cart_bar.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final String productId;
@@ -21,6 +22,12 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
   String? _selectedColor;
   int _quantity = 1;
   bool _isAdding = false;
+
+  @override
+  void dispose() {
+    ZomatoCartPopup.hide();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -290,7 +297,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   final cartRepo = ref.read(cartRepositoryProvider);
                                   await cartRepo.addToCart(
                                     CartItemEntity(
-                                      id: '${product.id}_${_selectedSize}_${_selectedColor}',
+                                      id: '${product.id}_${_selectedSize}_$_selectedColor',
                                       customerId: customerId,
                                       productId: product.id,
                                       variantId: matchingVariant.id,
@@ -306,7 +313,19 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                                   );
                                   setState(() => _isAdding = false);
                                   if (mounted) {
-                                    AppSnackbar.show(context, message: 'Added to cart!', type: SnackbarType.success);
+                                    final cartSummary = ref.read(cartSummaryProvider);
+                                    final currentCount = cartSummary.itemCount > 0 ? cartSummary.itemCount : _quantity;
+                                    final currentTotal = cartSummary.grandTotal > 0
+                                        ? cartSummary.grandTotalDisplay
+                                        : '₹${((product.effectivePrice * _quantity) / 100).toStringAsFixed(0)}';
+
+                                    ZomatoCartPopup.show(
+                                      context,
+                                      itemCount: currentCount,
+                                      totalDisplay: currentTotal,
+                                      productName: product.name,
+                                      bottomOffset: 92,
+                                    );
                                   }
                                 }
                               : null,

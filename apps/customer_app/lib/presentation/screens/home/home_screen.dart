@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -9,12 +10,20 @@ import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../widgets/live_rider_tracking_sheet.dart';
 import '../../widgets/support_chatbot_sheet.dart';
+import '../../widgets/floating_cart_bar.dart';
 
-class HomeScreen extends ConsumerWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool _isNavBarVisible = true;
+
+  @override
+  Widget build(BuildContext context) {
     final location = ref.watch(locationProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final storesAsync = ref.watch(nearbyStoresProvider);
@@ -112,9 +121,28 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: () async => ref.refresh(nearbyStoresProvider),
-        child: SingleChildScrollView(
+      body: NotificationListener<UserScrollNotification>(
+        onNotification: (notification) {
+          if (notification.metrics.pixels <= 10) {
+            if (!_isNavBarVisible) {
+              setState(() => _isNavBarVisible = true);
+            }
+          } else if (notification.direction == ScrollDirection.reverse) {
+            // User scrolled down -> hide navigation bar
+            if (_isNavBarVisible) {
+              setState(() => _isNavBarVisible = false);
+            }
+          } else if (notification.direction == ScrollDirection.forward) {
+            // User scrolled up / pulled up -> show navigation bar
+            if (!_isNavBarVisible) {
+              setState(() => _isNavBarVisible = true);
+            }
+          }
+          return true;
+        },
+        child: RefreshIndicator(
+          onRefresh: () async => ref.refresh(nearbyStoresProvider),
+          child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
           child: Column(
@@ -471,39 +499,70 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        onTap: (index) {
-          if (index == 1) context.push('/search');
-          if (index == 2) context.push('/cart');
-          if (index == 3) context.push('/profile');
-        },
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-          BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: 'Cart'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-        ],
+    ),
+    bottomNavigationBar: AnimatedSlide(
+        offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeInOutCubic,
+        child: AnimatedOpacity(
+          opacity: _isNavBarVisible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: IgnorePointer(
+            ignoring: !_isNavBarVisible,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const FloatingCartBar(),
+                BottomNavigationBar(
+                  currentIndex: 0,
+                  onTap: (index) {
+                    if (index == 1) context.push('/search');
+                    if (index == 2) context.push('/cart');
+                    if (index == 3) context.push('/profile');
+                  },
+                  items: const [
+                    BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+                    BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+                    BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: 'Cart'),
+                    BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
-      floatingActionButton: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          FloatingActionButton.extended(
-            heroTag: 'fab_helpbot',
-            backgroundColor: AppColors.primary,
-            icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
-            label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-            onPressed: () => SupportChatbotSheet.show(context),
+      floatingActionButton: AnimatedSlide(
+        offset: _isNavBarVisible ? Offset.zero : const Offset(0, 2.5),
+        duration: const Duration(milliseconds: 280),
+        curve: Curves.easeInOutCubic,
+        child: AnimatedOpacity(
+          opacity: _isNavBarVisible ? 1.0 : 0.0,
+          duration: const Duration(milliseconds: 200),
+          child: IgnorePointer(
+            ignoring: !_isNavBarVisible,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                FloatingActionButton.extended(
+                  heroTag: 'fab_helpbot',
+                  backgroundColor: AppColors.primary,
+                  icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+                  label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  onPressed: () => SupportChatbotSheet.show(context),
+                ),
+                const SizedBox(width: 10),
+                FloatingActionButton.extended(
+                  heroTag: 'fab_radar',
+                  backgroundColor: AppColors.accent,
+                  icon: const Icon(Icons.near_me_rounded, color: Colors.white, size: 20),
+                  label: const Text('Live Radar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                  onPressed: () => LiveRiderTrackingSheet.show(context),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(width: 10),
-          FloatingActionButton.extended(
-            heroTag: 'fab_radar',
-            backgroundColor: AppColors.accent,
-            icon: const Icon(Icons.near_me_rounded, color: Colors.white, size: 20),
-            label: const Text('Live Radar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-            onPressed: () => LiveRiderTrackingSheet.show(context),
-          ),
-        ],
+        ),
       ),
     );
   }

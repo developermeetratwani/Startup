@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -6,6 +7,7 @@ import 'package:domain/domain.dart';
 import '../../providers/store_provider.dart';
 import '../../providers/product_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../widgets/floating_cart_bar.dart';
 
 class StoreDetailScreen extends ConsumerStatefulWidget {
   final String storeId;
@@ -18,6 +20,7 @@ class StoreDetailScreen extends ConsumerStatefulWidget {
 
 class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
   String? _selectedCategory;
+  bool _isCartBarVisible = true;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +40,27 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
             );
           }
 
-          return CustomScrollView(
-            slivers: [
+          return NotificationListener<UserScrollNotification>(
+            onNotification: (notification) {
+              if (notification.metrics.pixels <= 10) {
+                if (!_isCartBarVisible) {
+                  setState(() => _isCartBarVisible = true);
+                }
+              } else if (notification.direction == ScrollDirection.reverse) {
+                // Scrolled down -> hide
+                if (_isCartBarVisible) {
+                  setState(() => _isCartBarVisible = false);
+                }
+              } else if (notification.direction == ScrollDirection.forward) {
+                // Pulled up -> show
+                if (!_isCartBarVisible) {
+                  setState(() => _isCartBarVisible = true);
+                }
+              }
+              return true;
+            },
+            child: CustomScrollView(
+              slivers: [
               // Store Header App Bar
               SliverAppBar(
                 expandedHeight: 220,
@@ -222,12 +244,26 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
 
               const SliverToBoxAdapter(child: SizedBox(height: 40)),
             ],
-          );
-        },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text('Error: $err')),
+          ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text('Error: $err')),
+    ),
+    bottomNavigationBar: AnimatedSlide(
+      offset: _isCartBarVisible ? Offset.zero : const Offset(0, 1.5),
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeInOutCubic,
+      child: AnimatedOpacity(
+        opacity: _isCartBarVisible ? 1.0 : 0.0,
+        duration: const Duration(milliseconds: 200),
+        child: IgnorePointer(
+          ignoring: !_isCartBarVisible,
+          child: const FloatingCartBar(),
+        ),
       ),
-    );
+    ),
+  );
   }
 }
 

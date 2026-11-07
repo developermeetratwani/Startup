@@ -145,7 +145,7 @@ class CartScreen extends ConsumerWidget {
                 ],
               ),
             ),
-      bottomSheet: cartSummary.items.isEmpty
+      bottomNavigationBar: cartSummary.items.isEmpty
           ? null
           : Container(
               padding: const EdgeInsets.all(AppSpacing.pagePadding),

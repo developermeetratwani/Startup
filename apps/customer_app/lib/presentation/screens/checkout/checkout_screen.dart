@@ -244,7 +244,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ],
         ),
       ),
-      bottomSheet: Container(
+      bottomNavigationBar: Container(
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         decoration: BoxDecoration(
           color: AppColors.surface,
