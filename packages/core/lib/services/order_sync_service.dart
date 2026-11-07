@@ -5,6 +5,7 @@ import 'package:domain/domain.dart';
 import 'package:http/http.dart' as http;
 import '../utils/app_logger.dart';
 import 'smtp_auth_service.dart';
+import 'notification_service.dart';
 
 /// Remittance Record when a driver deposits collected COD cash to the company
 class DriverRemittanceRecord {
@@ -325,12 +326,48 @@ class OrderSyncService {
         placedAt: existing.placedAt,
       );
 
-      if (status == OrderStatus.readyForPickup) {
+      if (status == OrderStatus.confirmed) {
+        NotificationService.dispatchStageChange(
+          orderId: orderId,
+          status: 'Confirmed',
+          message: 'Boutique accepted order #${orderId.substring(0, orderId.length > 6 ? 6 : orderId.length)} and started packing.',
+        );
+      } else if (status == OrderStatus.preparing) {
+        NotificationService.dispatchStageChange(
+          orderId: orderId,
+          status: 'Preparing',
+          message: 'Clothing boutique is packaging your fashion items with care.',
+        );
+      } else if (status == OrderStatus.readyForPickup) {
         _deliveryStatuses[orderId] = DeliveryStatus.assigned;
+        NotificationService.dispatchStageChange(
+          orderId: orderId,
+          status: 'Ready for Pickup',
+          message: 'Order packed! Driver Suresh Solanki assigned for pickup.',
+        );
+        NotificationService.dispatchHandoverOtp(
+          orderId: orderId,
+          driverName: 'Suresh Solanki',
+          otpCode: '4821',
+        );
       } else if (status == OrderStatus.pickedUp) {
         _deliveryStatuses[orderId] = DeliveryStatus.pickedUp;
+        NotificationService.dispatchStageChange(
+          orderId: orderId,
+          status: 'Out for Delivery',
+          message: 'Driver Suresh Solanki picked up your package. Live tracking active!',
+        );
+        NotificationService.dispatchProximityAlert(
+          orderId: orderId,
+          driverName: 'Suresh Solanki',
+          distanceMeters: 90,
+        );
       } else if (status == OrderStatus.delivered) {
         _deliveryStatuses[orderId] = DeliveryStatus.delivered;
+        NotificationService.dispatchDeliveryCompleted(
+          orderId: orderId,
+          customerName: 'Customer',
+        );
       }
 
       AppLogger.info('OrderSyncService', 'Order $orderId status updated to $status');

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -12,14 +13,86 @@ import '../../widgets/live_rider_tracking_sheet.dart';
 import '../../widgets/driver_chat_dialog.dart';
 import '../../widgets/support_chatbot_sheet.dart';
 
-class OrderTrackingScreen extends ConsumerWidget {
+class OrderTrackingScreen extends ConsumerStatefulWidget {
   final String orderId;
 
   const OrderTrackingScreen({super.key, required this.orderId});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final orderAsync = ref.watch(singleOrderStreamProvider(orderId));
+  ConsumerState<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
+}
+
+class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _radarPulseController;
+  late final Animation<double> _radarPulseAnimation;
+  late final MapController _mapController;
+  StreamSubscription<AppNotification>? _notificationSub;
+
+  @override
+  void initState() {
+    super.initState();
+    _mapController = MapController();
+
+    // Pulse animation controller for realistic Swiggy/Zomato radar waves
+    _radarPulseController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+    )..repeat(reverse: true);
+
+    _radarPulseAnimation = Tween<double>(begin: 0.85, end: 1.28).animate(
+      CurvedAnimation(parent: _radarPulseController, curve: Curves.easeInOut),
+    );
+
+    // Listen to real-time notification stream for in-app alert toasts
+    _notificationSub = NotificationService.notificationStream.listen((notification) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          behavior: SnackBarBehavior.floating,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          backgroundColor: const Color(0xFF1E293B),
+          elevation: 6,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          duration: const Duration(seconds: 4),
+          content: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: const BoxDecoration(
+                  color: Color(0xFFE23744),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 16),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(notification.title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
+                    Text(notification.body, style: const TextStyle(fontSize: 11, color: Colors.white70)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _radarPulseController.dispose();
+    _notificationSub?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final orderAsync = ref.watch(singleOrderStreamProvider(widget.orderId));
 
     return Scaffold(
       appBar: AppBar(
@@ -55,74 +128,91 @@ class OrderTrackingScreen extends ConsumerWidget {
           final bool isCancelled = order.status == OrderStatus.cancelled;
           final bool isExchange = order.status == OrderStatus.exchangeRequested || order.status == OrderStatus.exchanged;
 
-          // Coordinates for Store, Rider, and Customer
-          const storeLocation = LatLng(23.0768, 72.6346); // Kubernagar Store
-          const riderLocation = LatLng(23.0782, 72.6360); // Roaming Rider
-          const customerLocation = LatLng(23.0795, 72.6380); // Customer Dropoff
+          // Coordinates for Store, Rider, and Customer in Ahmedabad (Kubernagar)
+          const storeLocation = LatLng(23.0768, 72.6346); // Kubernagar Store Hub
+          const riderLocation = LatLng(23.0782, 72.6360); // Roaming Rider En Route
+          const customerLocation = LatLng(23.0795, 72.6380); // Customer Doorstep
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.pagePadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Estimated Time Header Banner (Zomato-style)
+                // ── ZOMATO / SWIGGY HEADER STATUS HERO ────────────────────
                 if (!isCancelled && order.status != OrderStatus.delivered) ...[
                   Container(
-                    margin: const EdgeInsets.only(bottom: 10),
-                    padding: const EdgeInsets.all(14),
+                    margin: const EdgeInsets.only(bottom: 12),
+                    padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       gradient: const LinearGradient(
-                        colors: [AppColors.accent, AppColors.accentLight],
+                        colors: [Color(0xFFE23744), Color(0xFFFF5252)],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.accent.withValues(alpha: 0.25),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                          color: const Color(0xFFE23744).withValues(alpha: 0.3),
+                          blurRadius: 14,
+                          offset: const Offset(0, 5),
                         ),
                       ],
                     ),
                     child: Row(
                       children: [
+                        Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 28),
+                        ),
+                        const SizedBox(width: 14),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 order.status == OrderStatus.pickedUp
-                                    ? 'On the Way • Arriving in ~${order.estimatedDeliveryMinutes} Mins'
+                                    ? 'Arriving in ~${order.estimatedDeliveryMinutes} Mins'
                                     : 'Preparing & Packing • ~${order.estimatedDeliveryMinutes} Mins',
-                                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 17, color: Colors.white, letterSpacing: -0.3),
                               ),
+                              const SizedBox(height: 2),
                               Text(
                                 order.status == OrderStatus.pickedUp
-                                    ? 'Driver Suresh Solanki picked up parcel from store'
-                                    : 'Clothing boutique preparing your order for handover',
-                                style: const TextStyle(fontSize: 11, color: Colors.white70),
+                                    ? 'Suresh Solanki is riding towards your address'
+                                    : 'Boutique is carefully packaging your fashion pieces',
+                                style: const TextStyle(fontSize: 12, color: Colors.white70),
                               ),
                             ],
                           ),
                         ),
                         InkWell(
                           onTap: () => LiveRiderTrackingSheet.show(context),
-                          borderRadius: BorderRadius.circular(16),
+                          borderRadius: BorderRadius.circular(20),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
                             decoration: BoxDecoration(
                               color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
                             ),
-                            child: const Text('Radar', style: TextStyle(color: AppColors.accent, fontSize: 11, fontWeight: FontWeight.bold)),
+                            child: const Row(
+                              children: [
+                                Icon(Icons.radar_rounded, size: 14, color: Color(0xFFE23744)),
+                                SizedBox(width: 4),
+                                Text('Radar', style: TextStyle(color: Color(0xFFE23744), fontSize: 11, fontWeight: FontWeight.bold)),
+                              ],
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
 
-                  // Dynamic Traffic & Delay Status Banner (Zomato-style Green/Orange/Red)
+                  // Dynamic Traffic & Delay Status Banner
                   Container(
                     margin: const EdgeInsets.only(bottom: 14),
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -194,109 +284,296 @@ class OrderTrackingScreen extends ConsumerWidget {
                     ),
                   ),
 
-                // ── ZOMATO-STYLE INTERACTIVE LIVE OPENSTREETMAP ─────────────
+                // ── AUTHENTIC SWIGGY & ZOMATO GRADE LIVE RADAR MAP ───────────
                 if (!isCancelled) ...[
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                    borderRadius: BorderRadius.circular(16),
                     child: Container(
-                      height: 220,
+                      height: 270,
                       decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.grey.shade200),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.08),
+                            blurRadius: 16,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: Stack(
                         children: [
                           FlutterMap(
+                            mapController: _mapController,
                             options: const MapOptions(
                               initialCenter: LatLng(23.0782, 72.6360),
-                              initialZoom: 15.0,
+                              initialZoom: 15.3,
                             ),
                             children: [
-                              // 100% Free OpenStreetMap Raster Tiles
+                              // High-DPI CartoDB Voyager Map Tiles (Clean Swiggy/Uber Look)
                               TileLayer(
                                 urlTemplate: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
                                 fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                 userAgentPackageName: 'in.xyzstartup.app',
                               ),
-                              // Route Polyline
-                              PolylineLayer(
-                                polylines: [
-                                  Polyline(
-                                    points: const [storeLocation, riderLocation, customerLocation],
-                                    color: AppColors.purple,
-                                    strokeWidth: 3.5,
+
+                              // Proximity Geofence Radius Ring (100m around destination)
+                              CircleLayer(
+                                circles: [
+                                  CircleMarker(
+                                    point: customerLocation,
+                                    radius: 75,
+                                    useRadiusInMeter: true,
+                                    color: const Color(0x1810B981),
+                                    borderColor: const Color(0x6610B981),
+                                    borderStrokeWidth: 1.5,
                                   ),
                                 ],
                               ),
-                              // Markers
+
+                              // Route Polylines: Two-Layer Glow + Solid Brand Path
+                              PolylineLayer(
+                                polylines: [
+                                  // Under-layer Soft Route Glow
+                                  Polyline(
+                                    points: const [storeLocation, riderLocation, customerLocation],
+                                    color: const Color(0xFFE23744).withValues(alpha: 0.22),
+                                    strokeWidth: 8.0,
+                                  ),
+                                  // Vibrant Forefront Courier Path
+                                  Polyline(
+                                    points: const [storeLocation, riderLocation, customerLocation],
+                                    color: const Color(0xFFE23744),
+                                    strokeWidth: 4.0,
+                                  ),
+                                ],
+                              ),
+
+                              // Custom Vector Markers Layer
                               MarkerLayer(
                                 markers: [
-                                  // Store Pin
+                                  // 1. Boutique Store Pin
                                   Marker(
                                     point: storeLocation,
-                                    width: 44,
-                                    height: 44,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2),
-                                        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4)],
-                                      ),
-                                      child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 18),
+                                    width: 80,
+                                    height: 60,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: Colors.blue.shade300),
+                                            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 3)],
+                                          ),
+                                          child: const Text('Store Hub', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF1E40AF))),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF1E40AF),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.white, width: 2),
+                                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                          ),
+                                          child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 16),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  // Live Moving Courier Scooter
+
+                                  // 2. Animated Live Delivery Scooter with Pulsing Radar Wave
                                   Marker(
                                     point: riderLocation,
-                                    width: 50,
-                                    height: 50,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: AppColors.accent,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2.5),
-                                        boxShadow: [BoxShadow(color: AppColors.accent.withValues(alpha: 0.4), blurRadius: 8, spreadRadius: 2)],
-                                      ),
-                                      child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 22),
+                                    width: 90,
+                                    height: 80,
+                                    child: AnimatedBuilder(
+                                      animation: _radarPulseAnimation,
+                                      builder: (context, child) {
+                                        return Column(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            // Floating Courier Pill
+                                            Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                              decoration: BoxDecoration(
+                                                color: Colors.black.withValues(alpha: 0.88),
+                                                borderRadius: BorderRadius.circular(10),
+                                                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                              ),
+                                              child: const Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  CircleAvatar(radius: 3, backgroundColor: Color(0xFF10B981)),
+                                                  SizedBox(width: 4),
+                                                  Text('Suresh • 12m', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                                                ],
+                                              ),
+                                            ),
+                                            const SizedBox(height: 3),
+                                            // Scooter with Animated Pulsing Halo
+                                            Stack(
+                                              alignment: Alignment.center,
+                                              children: [
+                                                // Outer Radar Pulse Wave
+                                                Container(
+                                                  width: 48 * _radarPulseAnimation.value,
+                                                  height: 48 * _radarPulseAnimation.value,
+                                                  decoration: BoxDecoration(
+                                                    shape: BoxShape.circle,
+                                                    color: const Color(0xFFE23744).withValues(
+                                                      alpha: (0.35 / _radarPulseAnimation.value).clamp(0.0, 1.0),
+                                                    ),
+                                                  ),
+                                                ),
+                                                // Elevated Scooter Core Badge
+                                                Container(
+                                                  width: 38,
+                                                  height: 38,
+                                                  decoration: BoxDecoration(
+                                                    color: const Color(0xFFE23744),
+                                                    shape: BoxShape.circle,
+                                                    border: Border.all(color: Colors.white, width: 2.5),
+                                                    boxShadow: [
+                                                      BoxShadow(
+                                                        color: const Color(0xFFE23744).withValues(alpha: 0.45),
+                                                        blurRadius: 8,
+                                                        offset: const Offset(0, 3),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  child: const Center(
+                                                    child: Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
+                                                  ),
+                                                ),
+                                                // Heading Indicator
+                                                Positioned(
+                                                  top: 0,
+                                                  right: 0,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(2),
+                                                    decoration: const BoxDecoration(
+                                                      color: Colors.white,
+                                                      shape: BoxShape.circle,
+                                                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 2)],
+                                                    ),
+                                                    child: const Icon(Icons.navigation_rounded, size: 9, color: Color(0xFFE23744)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        );
+                                      },
                                     ),
                                   ),
-                                  // Customer Doorstep
+
+                                  // 3. Customer Destination Pin
                                   Marker(
                                     point: customerLocation,
-                                    width: 44,
-                                    height: 44,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: AppColors.success,
-                                        shape: BoxShape.circle,
-                                        border: Border.all(color: Colors.white, width: 2),
-                                        boxShadow: const [BoxShadow(color: AppColors.shadow, blurRadius: 4)],
-                                      ),
-                                      child: const Icon(Icons.home_rounded, color: Colors.white, size: 20),
+                                    width: 80,
+                                    height: 60,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            borderRadius: BorderRadius.circular(6),
+                                            border: Border.all(color: Colors.green.shade400),
+                                            boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 3)],
+                                          ),
+                                          child: const Text('Your Doorstep', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Color(0xFF047857))),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Container(
+                                          width: 32,
+                                          height: 32,
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF059669),
+                                            shape: BoxShape.circle,
+                                            border: Border.all(color: Colors.white, width: 2),
+                                            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                          ),
+                                          child: const Icon(Icons.home_rounded, color: Colors.white, size: 16),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          // Live Tracking Badge
+
+                          // Top-Left Floating Live Status Pill (Frosted Glass)
                           Positioned(
-                            top: 8,
-                            left: 8,
+                            top: 10,
+                            left: 10,
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.95),
+                                color: Colors.white.withValues(alpha: 0.94),
                                 borderRadius: BorderRadius.circular(20),
+                                border: Border.all(color: Colors.white),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.1),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Container(
+                                    width: 8,
+                                    height: 8,
+                                    decoration: const BoxDecoration(
+                                      color: Color(0xFF10B981),
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    'LIVE GPS RADAR',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.w900, color: Color(0xFF0F172A), letterSpacing: 0.3),
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Container(width: 1, height: 12, color: Colors.grey.shade300),
+                                  const SizedBox(width: 6),
+                                  const Text(
+                                    '26 km/h',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF64748B)),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                          // Top-Right Recenter Button
+                          Positioned(
+                            top: 10,
+                            right: 10,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.94),
+                                shape: BoxShape.circle,
                                 boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
                               ),
-                              child: const Row(
-                                children: [
-                                  CircleAvatar(radius: 3, backgroundColor: Colors.green),
-                                  SizedBox(width: 5),
-                                  Text('LIVE RIDER GPS • FREE MAP (NO API KEY REQUIRED)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black87)),
-                                ],
+                              child: IconButton(
+                                icon: const Icon(Icons.my_location_rounded, size: 18, color: Color(0xFF1E293B)),
+                                constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+                                padding: EdgeInsets.zero,
+                                tooltip: 'Recenter on Courier',
+                                onPressed: () {
+                                  _mapController.move(riderLocation, 15.3);
+                                },
                               ),
                             ),
                           ),
@@ -316,29 +593,36 @@ class OrderTrackingScreen extends ConsumerWidget {
                         gradient: LinearGradient(
                           colors: [Colors.blue.shade50, Colors.indigo.shade50],
                         ),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(10),
                         border: Border.all(color: Colors.blue.shade300),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.blue.shade100.withValues(alpha: 0.4),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.all(6),
+                            padding: const EdgeInsets.all(8),
                             decoration: const BoxDecoration(
-                              color: Colors.blue,
+                              color: Color(0xFF2563EB),
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 16),
+                            child: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 18),
                           ),
-                          const SizedBox(width: 10),
+                          const SizedBox(width: 12),
                           const Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Row(
                                   children: [
-                                    Text('Proximity Alert • Rider within 100m', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF1E3A8A))),
+                                    Text('Proximity Alert • Rider within 100m', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E3A8A))),
                                     SizedBox(width: 6),
-                                    CircleAvatar(radius: 3, backgroundColor: Colors.green),
+                                    CircleAvatar(radius: 3, backgroundColor: Color(0xFF10B981)),
                                   ],
                                 ),
                                 SizedBox(height: 2),
@@ -350,15 +634,15 @@ class OrderTrackingScreen extends ConsumerWidget {
                       ),
                     ),
 
-                  // ── DELIVERY PARTNER PROFILE & DIRECT CHAT CARD ───────────
+                  // ── SWIGGY / ZOMATO DELIVERY PARTNER PROFILE & ACTION CARD ───
                   Container(
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
                       color: Colors.white,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(color: Colors.grey.shade200),
                       boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8, offset: const Offset(0, 2)),
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 10, offset: const Offset(0, 2)),
                       ],
                     ),
                     child: Column(
@@ -367,8 +651,8 @@ class OrderTrackingScreen extends ConsumerWidget {
                           children: [
                             CircleAvatar(
                               radius: 22,
-                              backgroundColor: AppColors.accent.withValues(alpha: 0.12),
-                              child: const Icon(Icons.person_rounded, color: AppColors.accent, size: 24),
+                              backgroundColor: const Color(0xFFE23744).withValues(alpha: 0.12),
+                              child: const Icon(Icons.person_rounded, color: Color(0xFFE23744), size: 24),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -397,6 +681,25 @@ class OrderTrackingScreen extends ConsumerWidget {
                             ),
                           ],
                         ),
+                        const SizedBox(height: 10),
+                        // Hygiene & Safety Badges
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: Colors.green.shade200),
+                          ),
+                          child: const Row(
+                            children: [
+                              Icon(Icons.health_and_safety_rounded, size: 14, color: Color(0xFF047857)),
+                              SizedBox(width: 6),
+                              Expanded(
+                                child: Text('🛡️ Vaccinated • Temperature Normal • Sanitized Packaging', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF047857))),
+                              ),
+                            ],
+                          ),
+                        ),
                         const SizedBox(height: 12),
                         const Divider(height: 1),
                         const SizedBox(height: 10),
@@ -409,6 +712,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                                   foregroundColor: AppColors.primary,
                                   side: const BorderSide(color: AppColors.primary),
                                   padding: const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                                 icon: const Icon(Icons.chat_bubble_outline_rounded, size: 16),
                                 label: const Text('Chat with Driver', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
@@ -428,6 +732,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                                   backgroundColor: AppColors.success,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(vertical: 10),
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                 ),
                                 icon: const Icon(Icons.phone_rounded, size: 16),
                                 label: const Text('Call Partner', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),

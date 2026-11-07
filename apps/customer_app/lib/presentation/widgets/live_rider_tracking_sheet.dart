@@ -285,41 +285,48 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                           final isSelected = displayedRider.id == r.id;
                           return Marker(
                             point: r.position,
-                            width: 70,
-                            height: 70,
+                            width: 80,
+                            height: 75,
                             child: GestureDetector(
                               onTap: () {
                                 setState(() => _selectedRider = r);
                               },
                               child: Column(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.all(7),
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? AppColors.accent : AppColors.purple,
-                                      shape: BoxShape.circle,
-                                      border: Border.all(color: Colors.white, width: isSelected ? 3 : 2),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: isSelected ? AppColors.accent.withValues(alpha: 0.5) : AppColors.shadow,
-                                          blurRadius: isSelected ? 10 : 4,
-                                          spreadRadius: isSelected ? 2 : 0,
-                                        ),
-                                      ],
-                                    ),
-                                    child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 2),
-                                    padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                                    decoration: BoxDecoration(
-                                      color: isSelected ? AppColors.accent : Colors.black87,
-                                      borderRadius: BorderRadius.circular(4),
+                                      color: isSelected ? const Color(0xFFE23744) : Colors.black.withValues(alpha: 0.85),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 3)],
                                     ),
                                     child: Text(
-                                      '${_calculateEtaMinutes(_calculateDistanceKm(_currentLocation, r.position))}m',
+                                      '${r.name.split(" ").first} • ${_calculateEtaMinutes(_calculateDistanceKm(_currentLocation, r.position))}m',
                                       style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.white),
                                     ),
+                                  ),
+                                  const SizedBox(height: 3),
+                                  Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.all(7),
+                                        decoration: BoxDecoration(
+                                          color: isSelected ? const Color(0xFFE23744) : const Color(0xFF2563EB),
+                                          shape: BoxShape.circle,
+                                          border: Border.all(color: Colors.white, width: isSelected ? 3 : 2),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: isSelected ? const Color(0xFFE23744).withValues(alpha: 0.5) : Colors.black26,
+                                              blurRadius: isSelected ? 12 : 4,
+                                              spreadRadius: isSelected ? 2 : 0,
+                                            ),
+                                          ],
+                                        ),
+                                        child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),
@@ -331,18 +338,27 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                   ],
                 ),
 
-                // Free Map Badge
+                // Live Fleet Radar Badge
                 Positioned(
                   top: 10,
                   right: 12,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      borderRadius: BorderRadius.circular(6),
-                      boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 4)],
+                      color: Colors.white.withValues(alpha: 0.95),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.08), blurRadius: 6),
+                      ],
                     ),
-                    child: const Text('© OpenStreetMap • Free Tier', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(radius: 3, backgroundColor: Color(0xFF10B981)),
+                        SizedBox(width: 5),
+                        Text('LIVE FLEET RADAR', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                      ],
+                    ),
                   ),
                 ),
               ],
@@ -369,8 +385,8 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                   children: [
                     CircleAvatar(
                       radius: 24,
-                      backgroundColor: AppColors.purple.withValues(alpha: 0.15),
-                      child: const Icon(Icons.person_rounded, color: AppColors.purple, size: 26),
+                      backgroundColor: const Color(0xFF6C5CE7).withValues(alpha: 0.15),
+                      child: const Icon(Icons.two_wheeler_rounded, color: Color(0xFF6C5CE7), size: 26),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
