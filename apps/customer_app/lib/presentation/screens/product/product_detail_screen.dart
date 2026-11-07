@@ -212,6 +212,39 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             : 'High quality clothing crafted for style and everyday comfort. Available for hyperlocal delivery.',
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
+                      const SizedBox(height: 16),
+
+                      // ── STATUTORY LEGAL METROLOGY & CONSUMER PROTECTION (INDIA) ──
+                      Container(
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade50,
+                          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                          border: Border.all(color: Colors.grey.shade300),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Row(
+                              children: [
+                                Icon(Icons.verified_outlined, size: 16, color: AppColors.primary),
+                                SizedBox(width: 6),
+                                Text(
+                                  'Statutory Legal Metrology Declarations',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            _metrologyRow('Country of Origin', 'India 🇮🇳 (Mandatory under Rule 6(10))'),
+                            _metrologyRow('Net Quantity', '1 Unit Garment / Apparel'),
+                            _metrologyRow('Maximum Retail Price (MRP)', '₹${(product.basePrice / 100).toStringAsFixed(0)} (Incl. of all taxes)'),
+                            _metrologyRow('Manufactured & Packed By', 'Authorized Boutique Merchant, Kubernagar / Ahmedabad, Gujarat'),
+                            _metrologyRow('48-Hour Size Exchange', 'Guaranteed doorstep replacement under Consumer Protection Rules'),
+                            _metrologyRow('Grievance Redressal Desk', 'Meet Ratwani (grievance@xyzstartup.in, Kubernagar, Ahmedabad)'),
+                          ],
+                        ),
+                      ),
                       const SizedBox(height: 32),
                     ],
                   ),
@@ -291,5 +324,24 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       ),
     );
   }
-}
 
+  Widget _metrologyRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87)),
+          ),
+        ],
+      ),
+    );
+  }
+
+}

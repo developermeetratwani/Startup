@@ -214,8 +214,8 @@ class OrderTrackingScreen extends ConsumerWidget {
                             children: [
                               // 100% Free OpenStreetMap Raster Tiles
                               TileLayer(
-                                urlTemplate: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                                subdomains: const ['a', 'b', 'c', 'd'],
+                                urlTemplate: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
+                                fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                                 userAgentPackageName: 'in.xyzstartup.app',
                               ),
                               // Route Polyline
@@ -295,7 +295,7 @@ class OrderTrackingScreen extends ConsumerWidget {
                                 children: [
                                   CircleAvatar(radius: 3, backgroundColor: Colors.green),
                                   SizedBox(width: 5),
-                                  Text('LIVE RIDER GPS', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.black87)),
+                                  Text('LIVE RIDER GPS • FREE MAP (NO API KEY REQUIRED)', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.black87)),
                                 ],
                               ),
                             ),
