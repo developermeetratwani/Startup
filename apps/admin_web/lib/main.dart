@@ -343,7 +343,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
                       onPressed: () => setState(() => _selectedTab = 1),
-                      child: const Text('Review Vendor KYC (1 Pending)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      child: const Text('Review Vendor KYC (1 Pending)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -352,7 +352,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
                       onPressed: () => setState(() => _selectedTab = 3),
-                      child: Text('Live Orders Pool (${orders.length} Active)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      child: Text('Live Orders Pool (${orders.length} Active)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -361,7 +361,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
                       onPressed: () => setState(() => _selectedTab = 4),
-                      child: const Text('Hub Cash Handover & OTP Desk', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                      child: const Text('Hub Cash Handover & OTP Desk', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ],
                 ),
@@ -497,7 +497,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               const SnackBar(content: Text('Navkar Menswear approved and onboarded to SBR cluster!')),
                             );
                           },
-                          child: const Text('Approve', style: TextStyle(fontSize: 11)),
+                          child: const Text('Approve', style: TextStyle(fontSize: 11, color: Colors.white)),
                         ),
                         const SizedBox(width: 8),
                         OutlinedButton(
@@ -784,7 +784,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                               : ElevatedButton(
                                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
                                   onPressed: () => _showVerifyOtpDialog(context, h),
-                                  child: const Text('Verify Rider OTP', style: TextStyle(fontSize: 11)),
+                                  child: const Text('Verify Rider OTP', style: TextStyle(fontSize: 11, color: Colors.white)),
                                 ),
                         ),
                       ]);
@@ -852,7 +852,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                       SnackBar(content: Text('Remittance ${r.id} verified and settled!')),
                                     );
                                   },
-                                  child: const Text('Verify & Settle', style: TextStyle(fontSize: 11)),
+                                  child: const Text('Verify & Settle', style: TextStyle(fontSize: 11, color: Colors.white)),
                                 ),
                         ),
                       ]);

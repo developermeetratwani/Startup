@@ -37,68 +37,47 @@ class HomeScreen extends ConsumerWidget {
           onTap: () => _showLocationSelector(context, ref),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Icon(Icons.location_on, color: AppColors.accent, size: 16),
                   const SizedBox(width: 4),
-                  Text(
-                    location.areaName,
-                    style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                  Flexible(
+                    child: Text(
+                      location.areaName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                    ),
                   ),
                   const Icon(Icons.keyboard_arrow_down, size: 18),
                 ],
               ),
               Text(
-                '${location.cityName} • Hyperlocal Delivery',
+                '${location.cityName} • Hyperlocal',
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
                 style: AppTextStyles.bodySmall,
               ),
             ],
           ),
         ),
         actions: [
-          // HelpBot 24/7 AI Pill
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            child: InkWell(
-              onTap: () => SupportChatbotSheet.show(context),
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.6)),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.smart_toy_rounded, size: 15, color: AppColors.primary),
-                    SizedBox(width: 4),
-                    Text('HelpBot', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 6),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            padding: const EdgeInsets.symmetric(vertical: 12),
             child: InkWell(
               onTap: () => LiveRiderTrackingSheet.show(context),
               borderRadius: BorderRadius.circular(16),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 3),
                 decoration: BoxDecoration(
                   color: AppColors.accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.accent.withValues(alpha: 0.6)),
                 ),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: Text('Radar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
-                ),
+                child: const Text('Radar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
               ),
             ),
           ),
@@ -148,46 +127,47 @@ class HomeScreen extends ConsumerWidget {
                   onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                   child: Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFE23744).withValues(alpha: 0.08),
+                      color: AppColors.accent.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      border: Border.all(color: const Color(0xFFE23744).withValues(alpha: 0.5)),
+                      border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(7),
                           decoration: const BoxDecoration(
-                            color: Color(0xFFE23744),
+                            color: AppColors.accent,
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
+                          child: const Icon(Icons.near_me_rounded, color: Colors.white, size: 16),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: 10),
                         const Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
                                 children: [
-                                  Text('Active Delivery: En Route 🛵', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFFE23744))),
+                                  Text('Active Delivery: En Route', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.accent)),
                                   SizedBox(width: 6),
                                   CircleAvatar(radius: 3, backgroundColor: Colors.green),
                                 ],
                               ),
                               SizedBox(height: 2),
-                              Text('Suresh Solanki is delivering (~18 Mins) • Tap to view', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                              Text('Suresh Solanki (~18 Mins) • Tap to view', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
                             ],
                           ),
                         ),
+                        const SizedBox(width: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFE23744),
+                            color: AppColors.accent,
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: const Text('Track Map 🗺️', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                          child: const Text('Track', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
