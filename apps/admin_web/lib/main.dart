@@ -74,10 +74,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   ];
 
   Widget _buildSidebar({bool isDrawer = false}) {
-    return Container(
-      width: 260,
+    final content = Container(
+      width: 270,
       color: AppColors.primary,
-      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -89,21 +89,21 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   color: AppColors.accent,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.shield_rounded, color: Colors.white, size: 24),
+                child: const Icon(Icons.shield_rounded, color: Colors.white, size: 22),
               ),
               const SizedBox(width: 12),
               const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('XYZ STARTUP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text('XYZ STARTUP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
                   Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 28),
+          const SizedBox(height: 24),
           const Text('MAIN NAVIGATION', style: TextStyle(color: AppColors.textHint, fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
+          const SizedBox(height: 10),
           Expanded(
             child: ListView.builder(
               itemCount: _tabs.length,
@@ -114,19 +114,20 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   Icons.verified_user_rounded,
                   Icons.storefront_rounded,
                   Icons.shopping_bag_rounded,
-                  Icons.two_wheeler_rounded,
+                  Icons.near_me_rounded,
                   Icons.change_circle_rounded,
                   Icons.map_rounded,
                   Icons.account_balance_wallet_rounded,
                 ];
 
                 return Container(
-                  margin: const EdgeInsets.only(bottom: 6),
+                  margin: const EdgeInsets.only(bottom: 4),
                   child: ListTile(
+                    dense: true,
                     selected: isSelected,
                     selectedTileColor: AppColors.primaryLight,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    leading: Icon(icons[index], color: isSelected ? AppColors.accent : AppColors.textHint, size: 20),
+                    leading: Icon(icons[index], color: isSelected ? AppColors.accent : AppColors.textHint, size: 18),
                     title: Text(
                       _tabs[index],
                       style: TextStyle(
@@ -148,27 +149,43 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           const ListTile(
             dense: true,
             leading: CircleAvatar(
+              radius: 16,
               backgroundColor: AppColors.accent,
-              child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 12)),
+              child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
             ),
-            title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-            subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
+            title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+            subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: AppColors.textHint, fontSize: 10)),
           ),
         ],
       ),
     );
+
+    return isDrawer ? SafeArea(child: content) : content;
   }
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = MediaQuery.of(context).size.width < 800;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isMobile = screenWidth < 850;
 
     return Scaffold(
       appBar: isMobile
           ? AppBar(
-              title: Text(_tabs[_selectedTab], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              title: Text(_tabs[_selectedTab], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
               backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
+              iconTheme: const IconThemeData(color: Colors.white),
+              actions: [
+                IconButton(
+                  tooltip: 'Sync Status',
+                  icon: const Icon(Icons.sync_rounded, color: Colors.white, size: 20),
+                  onPressed: () {
+                    setState(() {});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Real-time sync active across all applications.')),
+                    );
+                  },
+                ),
+              ],
             )
           : null,
       drawer: isMobile ? Drawer(child: _buildSidebar(isDrawer: true)) : null,
@@ -176,8 +193,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ? Container(
               color: AppColors.background,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: _buildBodyContent(),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
+                child: _buildBodyContent(isMobile: true),
               ),
             )
           : Row(
@@ -190,8 +207,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       children: [
                         // Top App Bar
                         Container(
-                          height: 70,
-                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          height: 64,
+                          padding: const EdgeInsets.symmetric(horizontal: 24),
                           decoration: const BoxDecoration(
                             color: AppColors.surface,
                             border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
@@ -201,21 +218,22 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                             children: [
                               Text(
                                 _tabs[_selectedTab],
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
                               ),
                               Row(
                                 children: [
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                                     decoration: BoxDecoration(
                                       color: AppColors.success.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(20),
                                     ),
                                     child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
                                         Icon(Icons.cloud_done_rounded, color: AppColors.success, size: 16),
-                                        SizedBox(width: 8),
-                                        Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.bold)),
+                                        SizedBox(width: 6),
+                                        Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: AppColors.success, fontSize: 11, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
@@ -228,8 +246,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         // Dashboard Body Content
                         Expanded(
                           child: SingleChildScrollView(
-                            padding: const EdgeInsets.all(32),
-                            child: _buildBodyContent(),
+                            padding: const EdgeInsets.all(24),
+                            child: _buildBodyContent(isMobile: false),
                           ),
                         ),
                       ],
@@ -241,124 +259,212 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  Widget _buildBodyContent() {
+  Widget _buildBodyContent({required bool isMobile}) {
     switch (_selectedTab) {
       case 0:
-        return _buildOverviewTab();
+        return _buildOverviewTab(isMobile);
       case 1:
-        return _buildApprovalsTab();
+        return _buildApprovalsTab(isMobile);
       case 2:
-        return _buildStoresTab();
+        return _buildStoresTab(isMobile);
       case 3:
-        return _buildOrdersTab();
+        return _buildOrdersTab(isMobile);
       case 4:
-        return _buildDriversTab();
+        return _buildDriversTab(isMobile);
       case 5:
-        return _buildExchangeTab();
+        return _buildExchangeTab(isMobile);
       case 6:
-        return _buildMultiRegionTab();
+        return _buildMultiRegionTab(isMobile);
       case 7:
-        return _buildCommissionsTab();
+        return _buildCommissionsTab(isMobile);
       default:
-        return _buildOverviewTab();
+        return _buildOverviewTab(isMobile);
     }
   }
 
-  Widget _buildOverviewTab() {
+  Widget _buildKPIGrid(List<_KPICardData> cards, {required bool isMobile}) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final int crossAxisCount = width < 450 ? 1 : (width < 800 ? 2 : 4);
+        final double childAspectRatio = width < 450 ? 2.8 : (width < 800 ? 1.6 : 1.7);
+
+        return GridView.builder(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: crossAxisCount,
+            crossAxisSpacing: 12,
+            mainAxisSpacing: 12,
+            childAspectRatio: childAspectRatio,
+          ),
+          itemCount: cards.length,
+          itemBuilder: (ctx, i) => _KPICard(data: cards[i]),
+        );
+      },
+    );
+  }
+
+  Widget _buildOverviewTab(bool isMobile) {
+    final orders = OrderSyncService.currentOrders;
+
+    final cards = [
+      const _KPICardData(title: 'Gross Merchandise Value', value: '₹1,84,520', subtitle: 'This Month (+18.4%)', color: AppColors.accent),
+      const _KPICardData(title: 'Active Stores', value: '38 Stores', subtitle: 'Kubernagar & SBR Cluster', color: AppColors.primary),
+      const _KPICardData(title: 'Platform Commission (10%)', value: '₹18,452', subtitle: 'Direct Net Margin', color: AppColors.purple),
+      const _KPICardData(title: 'Verified Riders Fleet', value: '42 Drivers', subtitle: 'KYC Verified Active', color: AppColors.tomato),
+    ];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          children: const [
-            Expanded(child: _KPICard(title: 'Gross Merchandise Value (GMV)', value: '₹1,84,520', subtitle: 'This Month (+18.4%)', color: AppColors.accent)),
-            SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Active Stores (Kubernagar / Sindhu Bhavan)', value: '38 Stores', subtitle: '94% Onboarded & Verified', color: AppColors.primary)),
-            SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Platform Commission (10%)', value: '₹18,452', subtitle: 'Direct Net Margin', color: AppColors.purple)),
-            SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Verified Riders Fleet', value: '42 Drivers', subtitle: 'Aadhaar & License KYC Verified', color: AppColors.tomato)),
-          ],
+        _buildKPIGrid(cards, isMobile: isMobile),
+        const SizedBox(height: 20),
+
+        // Quick Navigation Actions
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Quick Action Shortcuts', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 12),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      onPressed: () => setState(() => _selectedTab = 1),
+                      child: const Text('Review Vendor KYC (1 Pending)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.accent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      onPressed: () => setState(() => _selectedTab = 3),
+                      child: Text('Live Orders Pool (${orders.length} Active)', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.purple,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      ),
+                      onPressed: () => setState(() => _selectedTab = 4),
+                      child: const Text('Hub Cash Handover & OTP Desk', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 20),
+
+        // Live Order Snapshot
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    const Text('Real-Time Order Feed', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('CROSS-APP SYNC: LIVE', style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                if (orders.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: Text('No active orders in pool currently.')),
+                  )
+                else
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columnSpacing: 20,
+                      columns: const [
+                        DataColumn(label: Text('Order ID')),
+                        DataColumn(label: Text('Store')),
+                        DataColumn(label: Text('Amount')),
+                        DataColumn(label: Text('Payment')),
+                        DataColumn(label: Text('Status')),
+                        DataColumn(label: Text('Assigned Rider')),
+                      ],
+                      rows: orders.take(5).map((o) {
+                        final isCod = o.paymentMethod == PaymentMethod.cod;
+                        return DataRow(cells: [
+                          DataCell(Text(o.id, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          DataCell(Text(o.storeId, style: const TextStyle(fontSize: 12))),
+                          DataCell(Text('₹${(o.pricing.grandTotal / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12))),
+                          DataCell(Text(isCod ? 'Cash on Delivery' : 'Prepaid (Online)', style: const TextStyle(fontSize: 12))),
+                          DataCell(Chip(
+                            label: Text(o.status.name.toUpperCase(), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+                            backgroundColor: o.status == OrderStatus.delivered ? const Color(0xFFD1E7DD) : const Color(0xFFFFF3CD),
+                            padding: EdgeInsets.zero,
+                          )),
+                          DataCell(Text(o.driverId ?? 'In Open Pool', style: TextStyle(fontSize: 12, color: o.driverId != null ? AppColors.textPrimary : AppColors.accent))),
+                        ]);
+                      }).toList(),
+                    ),
+                  ),
+              ],
+            ),
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildApprovalsTab() {
+  Widget _buildApprovalsTab(bool isMobile) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Merchant KYC & Store Onboarding Requests', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            DataTable(
-              columns: const [
-                DataColumn(label: Text('Store Name')),
-                DataColumn(label: Text('Owner')),
-                DataColumn(label: Text('Cluster / City')),
-                DataColumn(label: Text('Phone')),
-                DataColumn(label: Text('Status')),
-                DataColumn(label: Text('Actions')),
-              ],
-              rows: [
-                DataRow(cells: [
-                  const DataCell(Text('Navkar Menswear & Suits')),
-                  const DataCell(Text('Prakash Jain')),
-                  const DataCell(Text('Sindhu Bhavan Road (SBR)')),
-                  const DataCell(Text('+91 98251 44556')),
-                  const DataCell(Chip(label: Text('PENDING KYC'), backgroundColor: Color(0xFFFFF3CD))),
-                  DataCell(Row(
-                    children: [
-                      ElevatedButton(onPressed: () {}, child: const Text('Approve')),
-                      const SizedBox(width: 8),
-                      OutlinedButton(onPressed: () {}, child: const Text('Reject')),
-                    ],
-                  )),
-                ]),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStoresTab() {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
-      child: const Padding(
-        padding: EdgeInsets.all(20),
-        child: Text('Live Store Catalogs across Kubernagar, Sindhu Bhavan Road, Bodakdev, and Gandhinagar are healthy and operational.'),
-      ),
-    );
-  }
-
-  Widget _buildOrdersTab() {
-    final orders = OrderSyncService.currentOrders;
-
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
               children: [
-                const Text('Live Orders & Concurrency Dispatch Tracking', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Merchant KYC & Store Onboarding Requests', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFD1E7DD),
+                    color: const Color(0xFFFFF3CD),
                     borderRadius: BorderRadius.circular(4),
                   ),
-                  child: const Text('DISPATCH LOCK: ACTIVE', style: TextStyle(color: Color(0xFF0F5132), fontSize: 11, fontWeight: FontWeight.bold)),
+                  child: const Text('1 PENDING VERIFICATION', style: TextStyle(color: Color(0xFF856404), fontSize: 10, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -366,6 +472,161 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: DataTable(
+                columnSpacing: 18,
+                columns: const [
+                  DataColumn(label: Text('Store Name')),
+                  DataColumn(label: Text('Owner')),
+                  DataColumn(label: Text('Cluster / City')),
+                  DataColumn(label: Text('Phone')),
+                  DataColumn(label: Text('Status')),
+                  DataColumn(label: Text('Actions')),
+                ],
+                rows: [
+                  DataRow(cells: [
+                    const DataCell(Text('Navkar Menswear & Suits', style: TextStyle(fontWeight: FontWeight.bold))),
+                    const DataCell(Text('Prakash Jain')),
+                    const DataCell(Text('Sindhu Bhavan Road (SBR)')),
+                    const DataCell(Text('+91 98251 44556')),
+                    const DataCell(Chip(label: Text('PENDING KYC', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)), backgroundColor: Color(0xFFFFF3CD))),
+                    DataCell(Row(
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Navkar Menswear approved and onboarded to SBR cluster!')),
+                            );
+                          },
+                          child: const Text('Approve', style: TextStyle(fontSize: 11)),
+                        ),
+                        const SizedBox(width: 8),
+                        OutlinedButton(
+                          style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6)),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Onboarding request rejected.')),
+                            );
+                          },
+                          child: const Text('Reject', style: TextStyle(fontSize: 11)),
+                        ),
+                      ],
+                    )),
+                  ]),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStoresTab(bool isMobile) {
+    final stores = [
+      {'name': 'Navkar Menswear & Suits', 'cluster': 'Sindhu Bhavan Road (SBR)', 'items': '142 Items', 'status': 'ACTIVE', 'orders': '18 Today'},
+      {'name': 'Rajwadi Ethnic & Bridal', 'cluster': 'Kubernagar Main Bazar', 'items': '380 Items', 'status': 'ACTIVE', 'orders': '34 Today'},
+      {'name': 'Kubernagar Denim Hub', 'cluster': 'Kubernagar Cluster', 'items': '95 Items', 'status': 'ACTIVE', 'orders': '12 Today'},
+      {'name': 'Metro Vogue Boutique', 'cluster': 'Gandhinagar Sector 11', 'items': '210 Items', 'status': 'ACTIVE', 'orders': '22 Today'},
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    const Text('Registered Clothing Retailers & Outlets', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.success.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('4 ACTIVE STORES', style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Text('All stores are synced with catalog images, real-time inventory, and 45-minute delivery radiuses.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                const SizedBox(height: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 22,
+                    columns: const [
+                      DataColumn(label: Text('Store Name')),
+                      DataColumn(label: Text('Cluster Location')),
+                      DataColumn(label: Text('Inventory Size')),
+                      DataColumn(label: Text('Dispatches')),
+                      DataColumn(label: Text('Operational Status')),
+                    ],
+                    rows: stores.map((s) {
+                      return DataRow(cells: [
+                        DataCell(Text(s['name']!, style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text(s['cluster']!)),
+                        DataCell(Text(s['items']!)),
+                        DataCell(Text(s['orders']!, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        DataCell(Chip(
+                          label: Text(s['status']!, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.success)),
+                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                      ]);
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildOrdersTab(bool isMobile) {
+    final orders = OrderSyncService.currentOrders;
+
+    return Card(
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                const Text('Live Orders & Concurrency Dispatch Tracking', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFD1E7DD),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: const Text('DISPATCH LOCK: ACTIVE', style: TextStyle(color: Color(0xFF0F5132), fontSize: 10, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 20,
                 columns: const [
                   DataColumn(label: Text('Order ID')),
                   DataColumn(label: Text('Store')),
@@ -386,22 +647,18 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                     DataCell(Text(o.id, style: const TextStyle(fontWeight: FontWeight.bold))),
                     DataCell(Text(o.storeId)),
                     DataCell(Text(o.deliveryAddressSnapshot['recipientName'] ?? 'Customer')),
-                    DataCell(Row(
-                      children: [
-                        Icon(isCod ? Icons.payments_rounded : Icons.credit_card_rounded, size: 16, color: isCod ? Colors.amber.shade800 : Colors.green.shade800),
-                        const SizedBox(width: 4),
-                        Text(isCod ? 'Cash on Delivery' : 'Prepaid (Online)'),
-                      ],
-                    )),
+                    DataCell(Text(isCod ? 'Cash on Delivery' : 'Prepaid (Online)')),
                     DataCell(Text('₹${(o.pricing.grandTotal / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold))),
                     DataCell(Text(o.driverId ?? 'Unassigned')),
                     DataCell(Chip(
                       label: Text(lockText, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                       backgroundColor: o.driverId != null ? const Color(0xFFE2E3E5) : const Color(0xFFD1E7DD),
+                      padding: EdgeInsets.zero,
                     )),
                     DataCell(Chip(
                       label: Text(o.status.name.toUpperCase(), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                       backgroundColor: o.status == OrderStatus.delivered ? const Color(0xFFD1E7DD) : const Color(0xFFFFF3CD),
+                      padding: EdgeInsets.zero,
                     )),
                   ]);
                 }).toList(),
@@ -413,165 +670,85 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  Widget _buildDriversTab() {
+  Widget _buildDriversTab(bool isMobile) {
     final sureshCod = OrderSyncService.getDriverCodSummary('driver-1', 'Suresh Solanki');
     final remittances = OrderSyncService.currentRemittances;
+
+    final cards = [
+      _KPICardData(title: 'Fleet Cash In Hand', value: sureshCod.pendingCashDisplay, subtitle: 'Due from Drivers', color: AppColors.tomato),
+      _KPICardData(title: 'COD Orders Delivered', value: '${sureshCod.totalCodOrders} Trips', subtitle: sureshCod.collectedDisplay, color: AppColors.accent),
+      _KPICardData(title: 'Prepaid (UPI) Deliveries', value: '${sureshCod.totalOnlinePaidOrders} Trips', subtitle: 'Zero cash collected', color: AppColors.primary),
+      _KPICardData(title: 'Cash Remitted to Co.', value: sureshCod.remittedDisplay, subtitle: '${remittances.length} Remittance batches', color: AppColors.purple),
+    ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Orchestration & Multi-Driver Concurrency Guard Banner
         Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
             color: AppColors.primary.withValues(alpha: 0.05),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
           ),
-          child: const Row(
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.lock_person_rounded, color: AppColors.primary, size: 28),
-              SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Multi-Driver Mutual Exclusion Orchestrator Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.primary)),
-                    SizedBox(height: 2),
-                    Text(
-                      'When a driver accepts an assignment, atomic lock binds the delivery. Other fleet riders cannot claim or accept it, guaranteeing zero duplicate drivers at pickup locations.',
-                      style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                    ),
-                  ],
-                ),
+              Text('Multi-Driver Mutual Exclusion Orchestrator Active', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primary)),
+              SizedBox(height: 4),
+              Text(
+                'When a driver accepts an assignment, atomic lock binds the delivery. Other fleet riders cannot claim or accept it, guaranteeing zero duplicate drivers at pickup locations.',
+                style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
               ),
             ],
           ),
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
         // COD Cash Reconciliation Snapshot
-        Row(
-          children: [
-            Expanded(child: _KPICard(title: 'Fleet Cash In Hand (To Collect)', value: sureshCod.pendingCashDisplay, subtitle: 'Due from Drivers', color: AppColors.tomato)),
-            const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Total COD Orders Delivered', value: '${sureshCod.totalCodOrders} Trips', subtitle: sureshCod.collectedDisplay, color: AppColors.accent)),
-            const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Prepaid (UPI) Deliveries', value: '${sureshCod.totalOnlinePaidOrders} Trips', subtitle: 'Zero cash collected', color: AppColors.primary)),
-            const SizedBox(width: 16),
-            Expanded(child: _KPICard(title: 'Cash Remitted to Co.', value: sureshCod.remittedDisplay, subtitle: '${remittances.length} Remittance batches', color: AppColors.purple)),
-          ],
-        ),
+        _buildKPIGrid(cards, isMobile: isMobile),
 
-        const SizedBox(height: 20),
-
-        // Drivers Fleet & Cash Ledger Table
-        Card(
-          elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('Rider Fleet, Cash Reconciliation & Concurrency Locks', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 16),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: DataTable(
-                    columns: const [
-                      DataColumn(label: Text('Rider Name')),
-                      DataColumn(label: Text('Vehicle & Reg')),
-                      DataColumn(label: Text('Cluster')),
-                      DataColumn(label: Text('COD Cash Collected')),
-                      DataColumn(label: Text('Prepaid UPI Drops')),
-                      DataColumn(label: Text('Pending Cash Remittance')),
-                      DataColumn(label: Text('Active Concurrency Lock')),
-                      DataColumn(label: Text('Duty Status')),
-                    ],
-                    rows: [
-                      DataRow(cells: [
-                        const DataCell(Row(
-                          children: [
-                            CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100')),
-                            SizedBox(width: 8),
-                            Text('Suresh Solanki', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ],
-                        )),
-                        const DataCell(Text('Honda Activa\nGJ-01-AB-1234')),
-                        const DataCell(Text('Kubernagar Cluster')),
-                        DataCell(Text(sureshCod.collectedDisplay, style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text('${sureshCod.totalOnlinePaidOrders} Drops')),
-                        DataCell(Text(sureshCod.pendingCashDisplay, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.deepOrange))),
-                        const DataCell(Chip(label: Text('🔒 ORD-8920 Locked', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)), backgroundColor: Color(0xFFD1E7DD))),
-                        const DataCell(Chip(label: Text('ONLINE'), backgroundColor: Color(0xFFD1E7DD))),
-                      ]),
-                      const DataRow(cells: [
-                        DataCell(Row(
-                          children: [
-                            CircleAvatar(backgroundImage: NetworkImage('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100')),
-                            SizedBox(width: 8),
-                            Text('Manish Vaghela', style: TextStyle(fontWeight: FontWeight.bold)),
-                          ],
-                        )),
-                        DataCell(Text('Hero Splendor\nGJ-18-CD-5678')),
-                        DataCell(Text('Sindhu Bhavan & Bodakdev')),
-                        DataCell(Text('₹2,400', style: TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text('4 Drops')),
-                        DataCell(Text('₹0 (Settled)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green))),
-                        DataCell(Chip(label: Text('🟢 Idle / Radar', style: TextStyle(fontSize: 10)), backgroundColor: Color(0xFFE2E3E5))),
-                        DataCell(Chip(label: Text('ONLINE'), backgroundColor: Color(0xFFD1E7DD))),
-                      ]),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
         // Hub Counter Physical Cash Handover & OTP Settlement Desk
         Card(
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
                   children: [
-                    const Row(
-                      children: [
-                        Icon(Icons.store_rounded, color: AppColors.accent, size: 24),
-                        SizedBox(width: 8),
-                        Text('Hub Counter Cash Handover & OTP Verification Desk', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      ],
-                    ),
+                    const Text('Hub Counter Cash Handover & OTP Verification Desk', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: AppColors.purple.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
                         border: Border.all(color: AppColors.purple),
                       ),
-                      child: const Text('PHYSICAL CASH SETTLEMENT WITH OTP', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                      child: const Text('PHYSICAL CASH SETTLEMENT WITH OTP', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
                 const Text(
                   'When a rider arrives at a hub (Kubernagar, Gandhinagar, etc.) to hand over cash, the rider generates an OTP sent to their email. Admin collects cash, inputs the rider OTP below, and verifies settlement.',
-                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: 14),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
+                    columnSpacing: 18,
                     columns: const [
                       DataColumn(label: Text('Handover ID')),
                       DataColumn(label: Text('Hub Collection Location')),
@@ -586,13 +763,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         DataCell(Text(h.id, style: const TextStyle(fontWeight: FontWeight.bold))),
                         DataCell(Text(h.hubLocation)),
                         DataCell(Text('${h.driverName}\n${h.driverEmail}', style: const TextStyle(fontSize: 11))),
-                        DataCell(Text(h.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.tomato, fontSize: 15))),
+                        DataCell(Text(h.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.tomato, fontSize: 14))),
                         DataCell(Chip(
                           label: Text(
                             h.isVerified ? 'VERIFIED ✅' : 'AWAITING OTP ENTRY',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: h.isVerified ? AppColors.success : AppColors.tomato),
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: h.isVerified ? AppColors.success : AppColors.tomato),
                           ),
                           backgroundColor: h.isVerified ? AppColors.success.withValues(alpha: 0.12) : AppColors.tomato.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
                         )),
                         DataCell(Text(
                           h.isVerified
@@ -602,18 +780,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         )),
                         DataCell(
                           h.isVerified
-                              ? const Row(
-                                  children: [
-                                    Icon(Icons.check_circle, size: 14, color: AppColors.success),
-                                    SizedBox(width: 4),
-                                    Text('Cash Settled', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
-                                  ],
-                                )
-                              : ElevatedButton.icon(
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-                                  icon: const Icon(Icons.pin_rounded, size: 14, color: Colors.white),
-                                  label: const Text('Verify Rider OTP', style: TextStyle(color: Colors.white, fontSize: 12)),
+                              ? const Text('Cash Settled', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 11))
+                              : ElevatedButton(
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
                                   onPressed: () => _showVerifyOtpDialog(context, h),
+                                  child: const Text('Verify Rider OTP', style: TextStyle(fontSize: 11)),
                                 ),
                         ),
                       ]);
@@ -625,24 +796,25 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
           ),
         ),
 
-        const SizedBox(height: 20),
+        const SizedBox(height: 16),
 
         // Cash Remittance Verifications
         Card(
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
           child: Padding(
-            padding: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Cash Remittance Submissions & Admin Settlement Ledger', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                const Text('Cash Remittance Submissions & Admin Settlement Ledger', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 4),
-                const Text('Verify driver deposits received via Company UPI or physical hub collection.', style: TextStyle(fontSize: 12, color: Color(0xFF6C757D))),
-                const SizedBox(height: 16),
+                const Text('Verify driver deposits received via Company UPI or physical hub collection.', style: TextStyle(fontSize: 11, color: Color(0xFF6C757D))),
+                const SizedBox(height: 14),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
+                    columnSpacing: 18,
                     columns: const [
                       DataColumn(label: Text('Remittance ID')),
                       DataColumn(label: Text('Driver Name')),
@@ -659,27 +831,28 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         DataCell(Text(r.driverName)),
                         DataCell(Text(r.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold))),
                         DataCell(Text(r.paymentMode)),
-                        DataCell(Text(r.referenceNumber, style: const TextStyle(fontFamily: 'monospace'))),
+                        DataCell(Text(r.referenceNumber, style: const TextStyle(fontFamily: 'monospace', fontSize: 11))),
                         DataCell(Text('${r.submittedAt.day}/${r.submittedAt.month} ${r.submittedAt.hour}:${r.submittedAt.minute.toString().padLeft(2, '0')}')),
                         DataCell(Chip(
                           label: Text(
                             r.isVerifiedByAdmin ? 'VERIFIED ✅' : 'PENDING APPROVAL',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: r.isVerifiedByAdmin ? AppColors.success : AppColors.tomato),
+                            style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: r.isVerifiedByAdmin ? AppColors.success : AppColors.tomato),
                           ),
                           backgroundColor: r.isVerifiedByAdmin ? AppColors.success.withValues(alpha: 0.12) : AppColors.tomato.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
                         )),
                         DataCell(
                           r.isVerifiedByAdmin
-                              ? const Text('Settled', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold))
+                              ? const Text('Settled', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 11))
                               : ElevatedButton(
-                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
                                   onPressed: () {
                                     OrderSyncService.verifyRemittanceByAdmin(r.id);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text('Remittance ${r.id} verified and settled!')),
                                     );
                                   },
-                                  child: const Text('Verify & Settle', style: TextStyle(color: Colors.white, fontSize: 12)),
+                                  child: const Text('Verify & Settle', style: TextStyle(fontSize: 11)),
                                 ),
                         ),
                       ]);
@@ -694,38 +867,42 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  Widget _buildExchangeTab() {
+  Widget _buildExchangeTab(bool isMobile) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Size Exchange Portal & Reverse Logistics', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 8),
-            const Text('Customers can request size exchanges within 48 hours of delivery. Reverse pickup is auto-assigned to nearest cluster rider.', style: TextStyle(color: Color(0xFF6C757D))),
+            const Text('Size Exchange Portal & Reverse Logistics', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 6),
+            const Text('Customers can request size exchanges within 48 hours of delivery. Reverse pickup is auto-assigned to nearest cluster rider.', style: TextStyle(fontSize: 12, color: Color(0xFF6C757D))),
             const SizedBox(height: 16),
-            DataTable(
-              columns: const [
-                DataColumn(label: Text('Exchange ID')),
-                DataColumn(label: Text('Original Order')),
-                DataColumn(label: Text('Item & From Size')),
-                DataColumn(label: Text('Requested Size')),
-                DataColumn(label: Text('Exchange Fee')),
-                DataColumn(label: Text('Reverse Status')),
-              ],
-              rows: const [
-                DataRow(cells: [
-                  DataCell(Text('EXC-101')),
-                  DataCell(Text('ORD-8920')),
-                  DataCell(Text('Royal Velvet Kurti (Size M)')),
-                  DataCell(Text('Size L')),
-                  DataCell(Text('₹49 (Exchange Surcharge)')),
-                  DataCell(Chip(label: Text('RIDER ASSIGNED'), backgroundColor: Color(0xFFD1E7DD))),
-                ]),
-              ],
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: DataTable(
+                columnSpacing: 20,
+                columns: const [
+                  DataColumn(label: Text('Exchange ID')),
+                  DataColumn(label: Text('Original Order')),
+                  DataColumn(label: Text('Item & From Size')),
+                  DataColumn(label: Text('Requested Size')),
+                  DataColumn(label: Text('Exchange Fee')),
+                  DataColumn(label: Text('Reverse Status')),
+                ],
+                rows: const [
+                  DataRow(cells: [
+                    DataCell(Text('EXC-101', style: TextStyle(fontWeight: FontWeight.bold))),
+                    DataCell(Text('ORD-8920')),
+                    DataCell(Text('Royal Velvet Kurti (Size M)')),
+                    DataCell(Text('Size L')),
+                    DataCell(Text('₹49 (Exchange Surcharge)')),
+                    DataCell(Chip(label: Text('RIDER ASSIGNED', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold)), backgroundColor: Color(0xFFD1E7DD), padding: EdgeInsets.zero)),
+                  ]),
+                ],
+              ),
             ),
           ],
         ),
@@ -733,32 +910,32 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  Widget _buildMultiRegionTab() {
+  Widget _buildMultiRegionTab(bool isMobile) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: const Padding(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Multi-Region Geofencing & Delivery Radius Orchestrator', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16),
+            Text('Multi-Region Geofencing & Delivery Radius Orchestrator', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            SizedBox(height: 14),
             ListTile(
-              leading: Icon(Icons.location_on, color: AppColors.primary),
-              title: Text('Cluster 1: Kubernagar & East Ahmedabad'),
+              dense: true,
+              title: Text('Cluster 1: Kubernagar & East Ahmedabad', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Max Delivery Radius: 12 km • Max Promised Time: 45 Minutes'),
             ),
             Divider(),
             ListTile(
-              leading: Icon(Icons.location_on, color: AppColors.accent),
-              title: Text('Cluster 2: Gandhinagar Capital Region'),
+              dense: true,
+              title: Text('Cluster 2: Gandhinagar Capital Region', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Max Delivery Radius: 15 km • Max Promised Time: 50 Minutes'),
             ),
             Divider(),
             ListTile(
-              leading: Icon(Icons.location_on, color: AppColors.success),
-              title: Text('Cluster 3: Sindhu Bhavan Road & Bodakdev (West Ahmedabad)'),
+              dense: true,
+              title: Text('Cluster 3: Sindhu Bhavan Road & Bodakdev (West Ahmedabad)', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Cross-City Radius: 20+ km • Dynamic ETA (No 45-min lock) • Distance matrix automated'),
             ),
           ],
@@ -767,26 +944,26 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     );
   }
 
-  Widget _buildCommissionsTab() {
+  Widget _buildCommissionsTab(bool isMobile) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: const Padding(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Commissions, Settlements & Store Coins Policy', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            SizedBox(height: 16),
+            Text('Commissions, Settlements & Store Coins Policy', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            SizedBox(height: 14),
             ListTile(
-              leading: Icon(Icons.tune_rounded, color: AppColors.primary),
-              title: Text('Platform Commission Rate'),
+              dense: true,
+              title: Text('Platform Commission Rate', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('Default: 10% on delivered order subtotal'),
             ),
             Divider(),
             ListTile(
-              leading: Icon(Icons.monetization_on_rounded, color: AppColors.accent),
-              title: Text('Store Coins Referral Ratio'),
+              dense: true,
+              title: Text('Store Coins Referral Ratio', style: TextStyle(fontWeight: FontWeight.bold)),
               subtitle: Text('1 Coin earned per ₹100 of referral order value • Direct shareable affiliate referral link supported'),
             ),
           ],
@@ -801,13 +978,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.verified_user_rounded, color: AppColors.accent),
-            SizedBox(width: 8),
-            Text('Verify Rider COD Cash Handover'),
-          ],
-        ),
+        title: const Text('Verify Rider COD Cash Handover'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -840,7 +1011,6 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 style: const TextStyle(letterSpacing: 8, fontSize: 20, fontWeight: FontWeight.bold),
                 decoration: InputDecoration(
                   labelText: 'Enter 6-Digit OTP Provided by Rider',
-                  prefixIcon: const Icon(Icons.key_rounded),
                   border: const OutlineInputBorder(),
                   helperText: 'OTP sent to rider (${handover.driverEmail})',
                 ),
@@ -850,12 +1020,11 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  TextButton.icon(
-                    icon: const Icon(Icons.auto_fix_high_rounded, size: 14),
-                    label: Text('Autofill Rider OTP: ${handover.otp} (Test Mode)', style: const TextStyle(fontSize: 11)),
+                  TextButton(
                     onPressed: () {
                       otpCtrl.text = handover.otp;
                     },
+                    child: Text('Autofill Rider OTP: ${handover.otp} (Test Mode)', style: const TextStyle(fontSize: 11)),
                   ),
                 ],
               ),
@@ -864,27 +1033,27 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-            icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
-            label: const Text('Accept Cash & Verify OTP', style: TextStyle(color: Colors.white)),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
             onPressed: () async {
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
               final res = await OrderSyncService.verifyHubCashHandoverWithOtp(
                 handoverId: handover.id,
                 enteredOtp: otpCtrl.text.trim(),
                 adminId: 'ADMIN-KUBERNAGAR-01',
               );
-              Navigator.pop(ctx);
+              if (ctx.mounted) Navigator.pop(ctx);
               if (res.$1) {
-                ScaffoldMessenger.of(context).showSnackBar(
+                scaffoldMessenger.showSnackBar(
                   SnackBar(backgroundColor: AppColors.primary, content: Text('✅ ${res.$2}')),
                 );
               } else {
-                ScaffoldMessenger.of(context).showSnackBar(
+                scaffoldMessenger.showSnackBar(
                   SnackBar(backgroundColor: AppColors.tomato, content: Text('❌ ${res.$2}')),
                 );
               }
             },
+            child: const Text('Accept Cash & Verify OTP'),
           ),
         ],
       ),
@@ -892,13 +1061,19 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 }
 
-class _KPICard extends StatelessWidget {
+class _KPICardData {
   final String title;
   final String value;
   final String subtitle;
   final Color color;
 
-  const _KPICard({required this.title, required this.value, required this.subtitle, required this.color});
+  const _KPICardData({required this.title, required this.value, required this.subtitle, required this.color});
+}
+
+class _KPICard extends StatelessWidget {
+  final _KPICardData data;
+
+  const _KPICard({required this.data});
 
   @override
   Widget build(BuildContext context) {
@@ -906,15 +1081,31 @@ class _KPICard extends StatelessWidget {
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
       child: Padding(
-        padding: const EdgeInsets.all(18),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(title, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
-            const SizedBox(height: 6),
-            Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+            Text(
+              data.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
+            ),
             const SizedBox(height: 4),
-            Text(subtitle, style: const TextStyle(fontSize: 11, color: AppColors.textHint)),
+            Text(
+              data.value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: data.color),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              data.subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontSize: 10, color: AppColors.textHint),
+            ),
           ],
         ),
       ),

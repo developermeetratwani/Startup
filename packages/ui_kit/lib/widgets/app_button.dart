@@ -25,28 +25,56 @@ class AppButton extends StatelessWidget {
     this.width,
   });
 
+  Color _getTextColor() {
+    switch (variant) {
+      case AppButtonVariant.primary:
+      case AppButtonVariant.secondary:
+      case AppButtonVariant.danger:
+        return Colors.white;
+      case AppButtonVariant.outline:
+      case AppButtonVariant.text:
+        return AppColors.primary;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final textColor = _getTextColor();
     final child = isLoading
-        ? const SizedBox(
-            width: 20, height: 20,
-            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+        ? SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(strokeWidth: 2, color: textColor),
           )
         : Row(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (leadingIcon != null) ...[
-                Icon(leadingIcon, size: 18),
+                Icon(leadingIcon, size: 18, color: textColor),
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Text(label, style: AppTextStyles.labelLarge),
+              Text(
+                label,
+                style: AppTextStyles.labelLarge.copyWith(
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           );
 
     Widget button;
     switch (variant) {
       case AppButtonVariant.primary:
-        button = ElevatedButton(onPressed: isLoading ? null : onPressed, child: child);
+        button = ElevatedButton(
+          onPressed: isLoading ? null : onPressed,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+          ),
+          child: child,
+        );
       case AppButtonVariant.secondary:
         button = ElevatedButton(
           onPressed: isLoading ? null : onPressed,
@@ -57,9 +85,22 @@ class AppButton extends StatelessWidget {
           child: child,
         );
       case AppButtonVariant.outline:
-        button = OutlinedButton(onPressed: isLoading ? null : onPressed, child: child);
+        button = OutlinedButton(
+          onPressed: isLoading ? null : onPressed,
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            side: const BorderSide(color: AppColors.primary, width: 1.5),
+          ),
+          child: child,
+        );
       case AppButtonVariant.text:
-        button = TextButton(onPressed: isLoading ? null : onPressed, child: child);
+        button = TextButton(
+          onPressed: isLoading ? null : onPressed,
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primary,
+          ),
+          child: child,
+        );
       case AppButtonVariant.danger:
         button = ElevatedButton(
           onPressed: isLoading ? null : onPressed,

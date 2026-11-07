@@ -43,7 +43,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
-          foregroundColor: AppColors.textOnDark,
+          foregroundColor: Colors.white,
           elevation: 0,
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.lg,
@@ -56,6 +56,7 @@ class AppTheme {
             fontSize: 15,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.2,
+            color: Colors.white,
           ),
         ),
       ),
@@ -142,6 +143,10 @@ class AppTheme {
         unselectedLabelStyle: TextStyle(fontSize: 11, fontWeight: FontWeight.w500),
         type: BottomNavigationBarType.fixed,
         elevation: 8,
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
       ),
     );
   }
