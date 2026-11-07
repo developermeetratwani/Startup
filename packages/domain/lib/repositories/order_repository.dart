@@ -18,6 +18,8 @@ abstract class OrderRepository {
     required String paymentMethod,
     String? promoCode,
     int coinRedemptionAmount,
+    String? razorpayPaymentId,
+    String? razorpayOrderId,
   });
   Future<Failure?> cancelOrder({
     required String orderId,

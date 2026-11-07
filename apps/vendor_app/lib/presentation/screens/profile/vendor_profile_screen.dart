@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:core/core.dart';
 import 'package:ui_kit/ui_kit.dart';
 import '../../providers/vendor_providers.dart';
 
@@ -153,6 +155,39 @@ class VendorProfileScreen extends ConsumerWidget {
     final bannerCtrl = TextEditingController(text: store.bannerImageUrl ?? '');
     final cardCtrl = TextEditingController(text: store.logoImageUrl ?? '');
 
+    Future<void> pickPhoto(ImageSource source, TextEditingController target, String folder) async {
+      final picker = ImagePicker();
+      final XFile? file = await picker.pickImage(source: source, maxWidth: 1600, imageQuality: 85);
+      if (file == null) return;
+      try {
+        final bytes = await file.readAsBytes();
+        const cloudinary = CloudinaryService();
+        final (url, failure) = await cloudinary.uploadImageBytes(
+          bytes: bytes,
+          fileName: '${folder}_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          folder: folder,
+        );
+        if (url != null) {
+          target.text = url;
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(backgroundColor: AppColors.success, content: Text('✅ Photo uploaded directly to Cloudinary!')),
+            );
+          }
+        } else {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(backgroundColor: AppColors.error, content: Text('Upload failed: ${failure?.message}')),
+            );
+          }
+        }
+      } catch (e) {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Upload error: $e')));
+        }
+      }
+    }
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -160,6 +195,7 @@ class VendorProfileScreen extends ConsumerWidget {
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               TextField(
                 controller: nameCtrl,
@@ -171,21 +207,70 @@ class VendorProfileScreen extends ConsumerWidget {
                 decoration: const InputDecoration(labelText: 'Store Description / Bio'),
                 maxLines: 2,
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
+
+              // Shop Banner Field + Camera / Gallery Buttons
+              const Text('Shop Main Banner / Front Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.camera_alt_outlined, size: 16),
+                      label: const Text('Camera', style: TextStyle(fontSize: 12)),
+                      onPressed: () => pickPhoto(ImageSource.camera, bannerCtrl, 'stores'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.photo_library_outlined, size: 16),
+                      label: const Text('Gallery', style: TextStyle(fontSize: 12)),
+                      onPressed: () => pickPhoto(ImageSource.gallery, bannerCtrl, 'stores'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
               TextField(
                 controller: bannerCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Shop Main Banner / Photo URL',
-                  hintText: 'https://images.unsplash.com/... or image link',
+                  labelText: 'Banner URL (Auto-filled on upload)',
+                  hintText: 'https://res.cloudinary.com/...',
                   prefixIcon: Icon(Icons.add_photo_alternate_outlined),
                 ),
               ),
-              const SizedBox(height: 12),
+
+              const SizedBox(height: 16),
+
+              // Visiting Card / Logo Field + Camera / Gallery Buttons
+              const Text('Visiting Card / Logo Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              const SizedBox(height: 6),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.camera_alt_outlined, size: 16),
+                      label: const Text('Camera', style: TextStyle(fontSize: 12)),
+                      onPressed: () => pickPhoto(ImageSource.camera, cardCtrl, 'cards'),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      icon: const Icon(Icons.photo_library_outlined, size: 16),
+                      label: const Text('Gallery', style: TextStyle(fontSize: 12)),
+                      onPressed: () => pickPhoto(ImageSource.gallery, cardCtrl, 'cards'),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
               TextField(
                 controller: cardCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Visiting Card / Logo Photo URL',
-                  hintText: 'Upload or paste visiting card image link',
+                  labelText: 'Visiting Card URL (Auto-filled on upload)',
+                  hintText: 'https://res.cloudinary.com/...',
                   prefixIcon: Icon(Icons.badge_outlined),
                 ),
               ),

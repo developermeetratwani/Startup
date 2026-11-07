@@ -280,38 +280,71 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 label: _getButtonLabel(cartSummary.grandTotalDisplay),
                 isLoading: _isPlacingOrder,
                 onPressed: () async {
-              setState(() => _isPlacingOrder = true);
+                  setState(() => _isPlacingOrder = true);
 
-              final effectiveUserId = user?.uid ?? 'cust-ahmedabad-01';
-              final effectiveStoreId = cartSummary.activeStoreId ?? 'store-kubernagar-1';
-              final effectiveAddressId = selectedAddress?.id ?? 'addr-ahmedabad-01';
+                  final effectiveUserId = user?.uid ?? 'cust-ahmedabad-01';
+                  final effectiveStoreId = cartSummary.activeStoreId ?? 'store-kubernagar-1';
+                  final effectiveAddressId = selectedAddress?.id ?? 'addr-ahmedabad-01';
 
-              final orderRepo = ref.read(orderRepositoryProvider);
-              final (orderId, failure) = await orderRepo.createOrder(
-                customerId: effectiveUserId,
-                storeId: effectiveStoreId,
-                deliveryAddressId: effectiveAddressId,
-                paymentMethod: _paymentMethod,
-              );
+                  String? razorpayPaymentId;
+                  String? razorpayOrderId;
 
-              setState(() => _isPlacingOrder = false);
+                  // ── RAZORPAY GATEWAY MODAL IF ONLINE PAYMENT SELECTED ───
+                  if (_paymentMethod == 'online') {
+                    const razorpay = RazorpayService();
+                    final paymentResult = await razorpay.openCheckout(
+                      amountInPaise: cartSummary.grandTotal,
+                      orderId: 'ord_${DateTime.now().millisecondsSinceEpoch}',
+                      customerName: user?.displayName ?? 'Meet Ratwani',
+                      customerPhone: user?.phone ?? '9898012345',
+                      customerEmail: user?.email ?? 'developermeetratwani@gmail.com',
+                      storeName: 'XYZ Fashion Ahmedabad',
+                      description: 'Hyperlocal Fashion Order (${cartSummary.itemCount} items)',
+                    );
 
-              if (failure != null) {
-                if (mounted) {
-                  AppSnackbar.show(context, message: failure.message, type: SnackbarType.error);
-                }
-                return;
-              }
+                    if (paymentResult == null) {
+                      setState(() => _isPlacingOrder = false);
+                      if (mounted) {
+                        AppSnackbar.show(context, message: 'Razorpay payment was cancelled', type: SnackbarType.warning);
+                      }
+                      return;
+                    }
 
-              // Clear cart after successful order
-              await ref.read(cartRepositoryProvider).clearCart(effectiveUserId);
+                    razorpayPaymentId = paymentResult.paymentId;
+                    razorpayOrderId = paymentResult.orderId;
+                  }
 
-              if (mounted) {
-                AppSnackbar.show(context, message: 'Order placed successfully! Assigned to driver partner.', type: SnackbarType.success);
-                context.go('/orders/track/${orderId ?? 'ord-kubernagar-8920'}');
-              }
-            },
-          ),
+                  final orderRepo = ref.read(orderRepositoryProvider);
+                  final (orderId, failure) = await orderRepo.createOrder(
+                    customerId: effectiveUserId,
+                    storeId: effectiveStoreId,
+                    deliveryAddressId: effectiveAddressId,
+                    paymentMethod: _paymentMethod,
+                    razorpayPaymentId: razorpayPaymentId,
+                    razorpayOrderId: razorpayOrderId,
+                  );
+
+                  setState(() => _isPlacingOrder = false);
+
+                  if (failure != null) {
+                    if (mounted) {
+                      AppSnackbar.show(context, message: failure.message, type: SnackbarType.error);
+                    }
+                    return;
+                  }
+
+                  // Clear cart after successful order
+                  await ref.read(cartRepositoryProvider).clearCart(effectiveUserId);
+
+                  if (mounted) {
+                    final msg = _paymentMethod == 'online'
+                        ? 'Payment verified via Razorpay! Assigned to driver partner.'
+                        : 'Order placed successfully! Assigned to driver partner.';
+                    AppSnackbar.show(context, message: msg, type: SnackbarType.success);
+                    context.go('/orders/track/${orderId ?? 'ord-kubernagar-8920'}');
+                  }
+                },
+              ),
             ],
           ),
         ),

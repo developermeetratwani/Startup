@@ -571,20 +571,49 @@ class _ActiveDeliveryCard extends ConsumerWidget {
         );
 
       case DeliveryStatus.atPickup:
-        return SizedBox(
-          width: double.infinity,
-          child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.warning),
-            icon: const Icon(Icons.inventory_rounded, color: Colors.white),
-            label: const Text('Parcel Picked Up & In Hand', style: TextStyle(color: Colors.white)),
-            onPressed: () {
-              ref.read(driverDeliveryRepoProvider).updateDeliveryStatus(
-                    delivery.id,
-                    DeliveryStatus.pickedUp,
-                    delivery.orderId,
-                  );
-            },
-          ),
+        return Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.shade400),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.pin_rounded, color: Colors.orange, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Show Pickup OTP to Boutique Vendor:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.black87)),
+                        Text('OTP: 4821', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w900, color: Color(0xFF7A4F01))),
+                        Text('Vendor verifies this 4-digit code to release the correct garment.', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(backgroundColor: AppColors.warning),
+                icon: const Icon(Icons.inventory_rounded, color: Colors.white),
+                label: const Text('OTP Verified • Parcel Picked Up & In Hand', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  ref.read(driverDeliveryRepoProvider).updateDeliveryStatus(
+                        delivery.id,
+                        DeliveryStatus.pickedUp,
+                        delivery.orderId,
+                      );
+                },
+              ),
+            ),
+          ],
         );
 
       case DeliveryStatus.pickedUp:

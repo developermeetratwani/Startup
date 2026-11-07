@@ -6,7 +6,9 @@ import 'package:domain/domain.dart';
 import '../../providers/location_provider.dart';
 import '../../providers/store_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/product_provider.dart';
 import '../../widgets/live_rider_tracking_sheet.dart';
+import '../../widgets/support_chatbot_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -17,6 +19,7 @@ class HomeScreen extends ConsumerWidget {
     final selectedCategory = ref.watch(selectedCategoryProvider);
     final storesAsync = ref.watch(nearbyStoresProvider);
     final cartSummary = ref.watch(cartSummaryProvider);
+    final productsAsync = ref.watch(homeProductsProvider(selectedCategory));
 
     final categories = [
       {'id': 'all', 'label': 'All Fashion', 'icon': Icons.grid_view_rounded},
@@ -55,6 +58,31 @@ class HomeScreen extends ConsumerWidget {
           ),
         ),
         actions: [
+          // HelpBot 24/7 AI Pill
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: InkWell(
+              onTap: () => SupportChatbotSheet.show(context),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.6)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.smart_toy_rounded, size: 15, color: AppColors.primary),
+                    SizedBox(width: 4),
+                    Text('HelpBot', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 6),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: InkWell(
@@ -113,6 +141,60 @@ class HomeScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Active Order Live Tracking Quick Banner (Zomato style)
+              Padding(
+                padding: const EdgeInsets.only(left: AppSpacing.pagePadding, right: AppSpacing.pagePadding, bottom: 12),
+                child: InkWell(
+                  onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE23744).withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                      border: Border.all(color: const Color(0xFFE23744).withValues(alpha: 0.5)),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFFE23744),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text('Active Delivery: En Route 🛵', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFFE23744))),
+                                  SizedBox(width: 6),
+                                  CircleAvatar(radius: 3, backgroundColor: Colors.green),
+                                ],
+                              ),
+                              SizedBox(height: 2),
+                              Text('Suresh Solanki is delivering (~18 Mins) • Tap to view', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE23744),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Text('Track Map 🗺️', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+
               // Search Bar
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
@@ -307,6 +389,44 @@ class HomeScreen extends ConsumerWidget {
 
               const SizedBox(height: AppSpacing.xl),
 
+              // Fresh & Trending Apparel Arrivals (Direct from Local Boutiques)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Fresh Apparel Arrivals', style: AppTextStyles.titleLarge),
+                    Text(
+                      '48h Size Exchange ⚡',
+                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              productsAsync.when(
+                data: (products) {
+                  if (products.isEmpty) return const SizedBox.shrink();
+                  return SizedBox(
+                    height: 215,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                      itemCount: products.length,
+                      separatorBuilder: (_, __) => const SizedBox(width: 12),
+                      itemBuilder: (context, index) => _HomeProductCard(product: products[index]),
+                    ),
+                  );
+                },
+                loading: () => const SizedBox(
+                  height: 200,
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (_, __) => const SizedBox.shrink(),
+              ),
+
+              const SizedBox(height: AppSpacing.xl),
+
               // Nearby Stores Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
@@ -385,20 +505,25 @@ class HomeScreen extends ConsumerWidget {
           BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: AppColors.primary,
-        foregroundColor: AppColors.textOnDark,
-        elevation: 4,
-        icon: const Icon(Icons.near_me_rounded, color: AppColors.accent, size: 20),
-        label: const Text(
-          'Live Delivery Radar',
-          style: TextStyle(
-            color: AppColors.textOnDark,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 0.3,
+      floatingActionButton: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: 'fab_helpbot',
+            backgroundColor: AppColors.primary,
+            icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+            label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            onPressed: () => SupportChatbotSheet.show(context),
           ),
-        ),
-        onPressed: () => LiveRiderTrackingSheet.show(context),
+          const SizedBox(width: 10),
+          FloatingActionButton.extended(
+            heroTag: 'fab_radar',
+            backgroundColor: AppColors.accent,
+            icon: const Icon(Icons.near_me_rounded, color: Colors.white, size: 20),
+            label: const Text('Live Radar', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+            onPressed: () => LiveRiderTrackingSheet.show(context),
+          ),
+        ],
       ),
     );
   }
@@ -869,3 +994,110 @@ class _LocationSelectorSheet extends ConsumerWidget {
   }
 }
 
+
+class _HomeProductCard extends StatelessWidget {
+  final ProductEntity product;
+
+  const _HomeProductCard({required this.product});
+
+  @override
+  Widget build(BuildContext context) {
+    final image = product.imageUrls.isNotEmpty ? product.imageUrls.first : null;
+    final hasDiscount = product.discountedPrice > 0 && product.discountedPrice < product.basePrice;
+
+    return InkWell(
+      onTap: () => context.push('/product/${product.id}'),
+      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+      child: Container(
+        width: 150,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+          border: Border.all(color: Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 6,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  ProductImage(
+                    imageUrl: image,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusMd)),
+                  ),
+                  if (hasDiscount)
+                    Positioned(
+                      top: 6,
+                      left: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Text('OFFER', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                  Positioned(
+                    bottom: 4,
+                    right: 4,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.65),
+                        borderRadius: BorderRadius.circular(3),
+                      ),
+                      child: const Text('48h Exch', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w600)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  ),
+                  const SizedBox(height: 2),
+                  Row(
+                    children: [
+                      Text(
+                        '₹${((product.discountedPrice > 0 ? product.discountedPrice : product.basePrice) / 100).toStringAsFixed(0)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primary),
+                      ),
+                      if (hasDiscount) ...[
+                        const SizedBox(width: 4),
+                        Text(
+                          '₹${(product.basePrice / 100).toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: AppColors.textHint,
+                            decoration: TextDecoration.lineThrough,
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

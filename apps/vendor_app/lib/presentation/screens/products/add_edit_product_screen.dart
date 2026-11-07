@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:core/core.dart';
 import 'package:ui_kit/ui_kit.dart';
 import '../../providers/vendor_providers.dart';
 
@@ -67,6 +69,57 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
     setState(() => _imageUrls.add(url));
   }
 
+  Future<void> _pickAndUploadImage(ImageSource source) async {
+    final picker = ImagePicker();
+    final XFile? file = await picker.pickImage(
+      source: source,
+      maxWidth: 1600,
+      imageQuality: 85,
+    );
+    if (file == null) return;
+
+    setState(() => _isLoading = true);
+    try {
+      final bytes = await file.readAsBytes();
+      const cloudinary = CloudinaryService();
+      final (url, failure) = await cloudinary.uploadImageBytes(
+        bytes: bytes,
+        fileName: 'prod_${DateTime.now().millisecondsSinceEpoch}.jpg',
+        folder: 'products',
+      );
+      if (url != null) {
+        _addImage(url);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              backgroundColor: AppColors.success,
+              content: Text('✅ Image uploaded directly to Cloudinary!'),
+            ),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              backgroundColor: AppColors.error,
+              content: Text('Upload failed: ${failure?.message ?? "Error"}'),
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Upload error: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
   void _showAddPhotoSheet() {
     final customUrlCtrl = TextEditingController();
 
@@ -88,16 +141,66 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Add High-Res Product Image', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                const Text('Add Product Photo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
             const Text(
-              'Integrated with Cloudinary for lossless compression and high-DPI zoom.',
+              'Click a fresh photo or select from gallery to upload directly to Cloudinary.',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
             const SizedBox(height: 16),
+
+            // Direct Camera & Gallery Buttons
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    icon: const Icon(Icons.camera_alt_rounded, size: 18),
+                    label: const Text('Camera', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _pickAndUploadImage(ImageSource.camera);
+                    },
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.accent,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    icon: const Icon(Icons.photo_library_rounded, size: 18),
+                    label: const Text('Gallery', style: TextStyle(fontWeight: FontWeight.bold)),
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      _pickAndUploadImage(ImageSource.gallery);
+                    },
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            const Row(
+              children: [
+                Expanded(child: Divider()),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8),
+                  child: Text('OR ENTER LINK', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                ),
+                Expanded(child: Divider()),
+              ],
+            ),
+            const SizedBox(height: 12),
 
             // URL Input
             TextField(

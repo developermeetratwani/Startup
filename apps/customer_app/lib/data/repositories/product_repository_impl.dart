@@ -30,30 +30,28 @@ class ProductRepositoryImpl implements ProductRepository {
       return (_getMockProducts(storeId: storeId, categoryId: categoryId), null);
     }
     try {
+      // Query without compound order-by to avoid Firestore unbuilt index blocks
       Query<Map<String, dynamic>> query = fs
           .collection('products')
           .where('storeId', isEqualTo: storeId)
-          .where('isPublished', isEqualTo: true)
           .where('isDeleted', isEqualTo: false);
 
-      if (categoryId != null && categoryId.isNotEmpty) {
+      if (categoryId != null && categoryId.isNotEmpty && categoryId != 'all') {
         query = query.where('categoryId', isEqualTo: categoryId);
       }
 
-      query = query.orderBy('createdAt', descending: true).limit(limit);
-
-      if (lastDocument is DocumentSnapshot) {
-        query = query.startAfterDocument(lastDocument);
-      }
-
-      final snapshot = await query.get();
-      final products = await Future.wait(
+      final snapshot = await query.limit(50).get();
+      final realProducts = await Future.wait(
         snapshot.docs.map((doc) => _mapToProductEntity(doc)),
       );
-      if (products.isEmpty) {
-        return (_getMockProducts(storeId: storeId, categoryId: categoryId), null);
-      }
-      return (products, null);
+
+      // Sort real products newest first in memory
+      realProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      final mockList = _getMockProducts(storeId: storeId, categoryId: categoryId);
+      final combined = [...realProducts, ...mockList];
+
+      return (combined.take(limit).toList(), null);
     } catch (e) {
       AppLogger.error('ProductRepositoryImpl.getProductsByStore', e.toString());
       return (_getMockProducts(storeId: storeId, categoryId: categoryId), null);
@@ -71,26 +69,27 @@ class ProductRepositoryImpl implements ProductRepository {
       return (_getMockProducts(categoryId: categoryId), null);
     }
     try {
+      // Query without compound order-by to avoid Firestore unbuilt index blocks
       Query<Map<String, dynamic>> query = fs
           .collection('products')
-          .where('categoryId', isEqualTo: categoryId)
-          .where('isPublished', isEqualTo: true)
-          .where('isDeleted', isEqualTo: false)
-          .orderBy('createdAt', descending: true)
-          .limit(limit);
+          .where('isDeleted', isEqualTo: false);
 
-      if (lastDocument is DocumentSnapshot) {
-        query = query.startAfterDocument(lastDocument);
+      if (categoryId.isNotEmpty && categoryId != 'all') {
+        query = query.where('categoryId', isEqualTo: categoryId);
       }
 
-      final snapshot = await query.get();
-      final products = await Future.wait(
+      final snapshot = await query.limit(50).get();
+      final realProducts = await Future.wait(
         snapshot.docs.map((doc) => _mapToProductEntity(doc)),
       );
-      if (products.isEmpty) {
-        return (_getMockProducts(categoryId: categoryId), null);
-      }
-      return (products, null);
+
+      // Sort real products newest first in memory
+      realProducts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+      final mockList = _getMockProducts(categoryId: categoryId);
+      final combined = [...realProducts, ...mockList];
+
+      return (combined.take(limit).toList(), null);
     } catch (e) {
       return (_getMockProducts(categoryId: categoryId), null);
     }

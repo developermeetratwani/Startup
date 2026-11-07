@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 import '../../providers/auth_provider.dart';
+import '../../widgets/support_chatbot_sheet.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -107,13 +108,17 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const Divider(height: 1),
                   ListTile(
-                    leading: const Icon(Icons.support_agent_outlined, color: AppColors.primary),
-                    title: const Text('Help & Support'),
-                    subtitle: const Text('Disputes, cancellation, FAQs'),
+                    leading: const Icon(Icons.smart_toy_rounded, color: AppColors.accent),
+                    title: const Row(
+                      children: [
+                        Text('HelpBot AI Assistant', style: TextStyle(fontWeight: FontWeight.bold)),
+                        SizedBox(width: 6),
+                        CircleAvatar(radius: 3, backgroundColor: Colors.green),
+                      ],
+                    ),
+                    subtitle: const Text('24/7 AI chat for sizing, 48h exchange, COD & orders'),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                    onTap: () {
-                      AppSnackbar.show(context, message: 'Support helpline: support@hyperlocalfashion.in');
-                    },
+                    onTap: () => SupportChatbotSheet.show(context),
                   ),
                   const Divider(height: 1),
                   ListTile(

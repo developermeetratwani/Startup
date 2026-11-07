@@ -23,6 +23,16 @@ final singleProductProvider = FutureProvider.family<ProductEntity?, String>((ref
   return product;
 });
 
+final homeProductsProvider = FutureProvider.family<List<ProductEntity>, String?>((ref, categoryId) async {
+  final repo = ref.watch(productRepositoryProvider);
+  final (products, failure) = await repo.getProductsByCategory(
+    categoryId: categoryId ?? 'all',
+    limit: 20,
+  );
+  if (failure != null) throw Exception(failure.message);
+  return products ?? [];
+});
+
 final productSearchQueryProvider = StateProvider<String>((ref) => '');
 
 final searchResultsProvider = FutureProvider<List<ProductEntity>>((ref) async {

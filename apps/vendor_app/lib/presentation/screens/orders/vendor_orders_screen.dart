@@ -215,9 +215,60 @@ class _OrderCard extends ConsumerWidget {
                 onPressed: () {
                   ref.read(vendorOrderRepoProvider).markReadyForPickup(order.id);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Order marked ready! Driver dispatched.')),
+                    const SnackBar(content: Text('Order marked ready! Driver dispatched with Pickup OTP.')),
                   );
                 },
+              ),
+            )
+          else if (order.status == OrderStatus.readyForPickup)
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.amber.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.amber.shade400),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Row(
+                    children: [
+                      Icon(Icons.pin_rounded, color: Colors.orange, size: 18),
+                      SizedBox(width: 6),
+                      Text('Driver Handover Verification OTP', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  const Text('Ask arriving driver partner for the 4-digit Pickup OTP before handing over the garment package.', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.orange.shade300),
+                        ),
+                        child: const Text('Required OTP: 4821', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 13, color: Color(0xFF7A4F01))),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
+                          icon: const Icon(Icons.check_circle_rounded, size: 16, color: Colors.white),
+                          label: const Text('Confirm Handover', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                          onPressed: () {
+                            OrderSyncService.updateOrderStatus(order.id, OrderStatus.pickedUp);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('✅ Handover verified! Parcel in transit to customer.')),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ),
         ],
