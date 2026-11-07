@@ -8,9 +8,12 @@ import '../../providers/driver_providers.dart';
 class DriverEarningsScreen extends ConsumerWidget {
   const DriverEarningsScreen({super.key});
 
-  void _showHubHandoverDialog(BuildContext context, WidgetRef ref, DriverCodSummary codSummary) {
-    final amountCtrl = TextEditingController(text: (codSummary.pendingCashInHand / 100).toStringAsFixed(0));
-    final emailCtrl = TextEditingController(text: 'developermeetratwani@gmail.com');
+  void _showHubHandoverDialog(
+      BuildContext context, WidgetRef ref, DriverCodSummary codSummary) {
+    final amountCtrl = TextEditingController(
+        text: (codSummary.pendingCashInHand / 100).toStringAsFixed(0));
+    final emailCtrl =
+        TextEditingController(text: 'developermeetratwani@gmail.com');
     String selectedHub = OrderSyncService.hubLocations.first;
 
     showDialog(
@@ -25,36 +28,47 @@ class DriverEarningsScreen extends ConsumerWidget {
               children: [
                 const Text(
                   'Physical cash handover with OTP verification by Hub Admin / Cashier:',
-                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style:
+                      TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 14),
-                const Text('Select Hub Location:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const Text('Select Hub Location:',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<String>(
                   value: selectedHub,
                   isExpanded: true,
-                  decoration: const InputDecoration(border: OutlineInputBorder()),
+                  decoration:
+                      const InputDecoration(border: OutlineInputBorder()),
                   items: OrderSyncService.hubLocations
-                      .map((h) => DropdownMenuItem(value: h, child: Text(h, style: const TextStyle(fontSize: 12))))
+                      .map((h) => DropdownMenuItem(
+                          value: h,
+                          child: Text(h, style: const TextStyle(fontSize: 12))))
                       .toList(),
                   onChanged: (val) {
                     if (val != null) setState(() => selectedHub = val);
                   },
                 ),
                 const SizedBox(height: 12),
-                const Text('Quick Select Amount:', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                const Text('Quick Select Amount:',
+                    style:
+                        TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 6),
                 Wrap(
                   spacing: 6,
                   children: [
                     ActionChip(
-                      label: Text('Full (${codSummary.pendingCashDisplay})', style: const TextStyle(fontSize: 11)),
+                      label: Text('Full (${codSummary.pendingCashDisplay})',
+                          style: const TextStyle(fontSize: 11)),
                       onPressed: () {
-                        amountCtrl.text = (codSummary.pendingCashInHand / 100).toStringAsFixed(0);
+                        amountCtrl.text = (codSummary.pendingCashInHand / 100)
+                            .toStringAsFixed(0);
                       },
                     ),
                     ActionChip(
-                      label: const Text('₹1,000', style: TextStyle(fontSize: 11)),
+                      label:
+                          const Text('₹1,000', style: TextStyle(fontSize: 11)),
                       onPressed: () => amountCtrl.text = '1000',
                     ),
                     ActionChip(
@@ -85,10 +99,14 @@ class DriverEarningsScreen extends ConsumerWidget {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel')),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              child: const Text('Generate & Send OTP', style: TextStyle(color: Colors.white)),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+              child: const Text('Generate & Send OTP',
+                  style: TextStyle(color: Colors.white)),
               onPressed: () async {
                 final amountRupees = int.tryParse(amountCtrl.text.trim()) ?? 0;
                 final email = emailCtrl.text.trim();
@@ -120,9 +138,13 @@ class DriverEarningsScreen extends ConsumerWidget {
     );
   }
 
-  void _showRemitCashDialog(BuildContext context, WidgetRef ref, DriverCodSummary codSummary) {
-    final amountCtrl = TextEditingController(text: (codSummary.pendingCashInHand / 100).toStringAsFixed(0));
-    final refCtrl = TextEditingController(text: 'UPI/${DateTime.now().millisecondsSinceEpoch.toString().substring(4)}/XYZ-REMIT');
+  void _showRemitCashDialog(
+      BuildContext context, WidgetRef ref, DriverCodSummary codSummary) {
+    final amountCtrl = TextEditingController(
+        text: (codSummary.pendingCashInHand / 100).toStringAsFixed(0));
+    final refCtrl = TextEditingController(
+        text:
+            'UPI/${DateTime.now().millisecondsSinceEpoch.toString().substring(4)}/XYZ-REMIT');
     String selectedMode = 'COMPANY_UPI';
 
     showDialog(
@@ -143,7 +165,8 @@ class DriverEarningsScreen extends ConsumerWidget {
               children: [
                 const Text(
                   'Remit collected customer COD cash to XYZ Startup finance desk via UPI:',
-                  style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                  style:
+                      TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 14),
                 Container(
@@ -156,15 +179,28 @@ class DriverEarningsScreen extends ConsumerWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Total Cash In Hand:', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
-                      Text(codSummary.pendingCashDisplay, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.amber.shade900)),
+                      const Text('Total Cash In Hand:',
+                          style: TextStyle(
+                              fontSize: 12, fontWeight: FontWeight.w600)),
+                      Text(codSummary.pendingCashDisplay,
+                          style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.amber.shade900)),
                     ],
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Text('Company UPI Destination:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                const Text('Company UPI Destination:',
+                    style:
+                        TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 const SizedBox(height: 4),
-                const Text('xyzstartup@icici (XYZ Startup Logistics Settlement)', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold, fontSize: 12)),
+                const Text(
+                    'xyzstartup@icici (XYZ Startup Logistics Settlement)',
+                    style: TextStyle(
+                        color: AppColors.primary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12)),
                 const SizedBox(height: 12),
                 TextField(
                   controller: amountCtrl,
@@ -188,9 +224,12 @@ class DriverEarningsScreen extends ConsumerWidget {
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Cancel')),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: AppColors.success),
               onPressed: () {
                 final amountRupees = int.tryParse(amountCtrl.text.trim()) ?? 0;
                 if (amountRupees <= 0) return;
@@ -207,11 +246,13 @@ class DriverEarningsScreen extends ConsumerWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     backgroundColor: AppColors.success,
-                    content: Text('✅ Remittance of ₹$amountRupees submitted! Awaiting Admin verification.'),
+                    content: Text(
+                        '✅ Remittance of ₹$amountRupees submitted! Awaiting Admin verification.'),
                   ),
                 );
               },
-              child: const Text('Submit UPI Remittance', style: TextStyle(color: Colors.white)),
+              child: const Text('Submit UPI Remittance',
+                  style: TextStyle(color: Colors.white)),
             ),
           ],
         ),
@@ -248,16 +289,30 @@ class DriverEarningsScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('TODAYS EARNINGS', style: TextStyle(color: AppColors.textHint, fontSize: 11, letterSpacing: 1)),
+                      const Text('TODAYS EARNINGS',
+                          style: TextStyle(
+                              color: AppColors.textHint,
+                              fontSize: 11,
+                              letterSpacing: 1)),
                       const SizedBox(height: 6),
-                      Text(earnings.todayEarningsDisplay, style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                      Text(earnings.todayEarningsDisplay,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 32,
+                              fontWeight: FontWeight.bold)),
                       const SizedBox(height: 14),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          _StatItem(title: 'This Week', value: earnings.weeklyEarningsDisplay),
-                          _StatItem(title: 'Deliveries Done', value: '${earnings.totalDeliveries} drops'),
-                          _StatItem(title: 'Partner Rating', value: '${earnings.rating} ★'),
+                          _StatItem(
+                              title: 'This Week',
+                              value: earnings.weeklyEarningsDisplay),
+                          _StatItem(
+                              title: 'Deliveries Done',
+                              value: '${earnings.totalDeliveries} drops'),
+                          _StatItem(
+                              title: 'Partner Rating',
+                              value: '${earnings.rating} ★'),
                         ],
                       ),
                     ],
@@ -267,7 +322,8 @@ class DriverEarningsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.lg),
 
                 // COD Cash Collection & Remittance Section
-                Text('COD Cash In Hand & Hub Settlement', style: AppTextStyles.titleMedium),
+                Text('COD Cash In Hand & Hub Settlement',
+                    style: AppTextStyles.titleMedium),
                 const SizedBox(height: 10),
                 Container(
                   padding: const EdgeInsets.all(18),
@@ -276,7 +332,10 @@ class DriverEarningsScreen extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     border: Border.all(color: AppColors.cardBorder),
                     boxShadow: const [
-                      BoxShadow(color: AppColors.shadow, blurRadius: 8, offset: Offset(0, 2)),
+                      BoxShadow(
+                          color: AppColors.shadow,
+                          blurRadius: 8,
+                          offset: Offset(0, 2)),
                     ],
                   ),
                   child: Column(
@@ -291,13 +350,22 @@ class DriverEarningsScreen extends ConsumerWidget {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.account_balance_wallet_rounded, color: AppColors.accent, size: 28),
+                              const Icon(Icons.account_balance_wallet_rounded,
+                                  color: AppColors.accent, size: 28),
                               const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  const Text('CASH IN HAND (TO REMIT)', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
-                                  Text(codSummary.pendingCashDisplay, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                                  const Text('CASH IN HAND (TO REMIT)',
+                                      style: TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textSecondary)),
+                                  Text(codSummary.pendingCashDisplay,
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppColors.textPrimary)),
                                 ],
                               ),
                             ],
@@ -310,19 +378,28 @@ class DriverEarningsScreen extends ConsumerWidget {
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: AppColors.textOnDark,
-                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 14, vertical: 8),
                                 ),
-                                onPressed: () => _showHubHandoverDialog(context, ref, codSummary),
-                                child: const Text('Pay Cash at Hub (OTP)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
+                                onPressed: () => _showHubHandoverDialog(
+                                    context, ref, codSummary),
+                                child: const Text('Pay Cash at Hub (OTP)',
+                                    style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold)),
                               ),
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: AppColors.primary,
-                                  side: const BorderSide(color: AppColors.primary),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                  side: const BorderSide(
+                                      color: AppColors.primary),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 8),
                                 ),
-                                onPressed: () => _showRemitCashDialog(context, ref, codSummary),
-                                child: const Text('UPI', style: TextStyle(fontSize: 11)),
+                                onPressed: () => _showRemitCashDialog(
+                                    context, ref, codSummary),
+                                child: const Text('UPI',
+                                    style: TextStyle(fontSize: 11)),
                               ),
                             ],
                           ),
@@ -333,10 +410,18 @@ class DriverEarningsScreen extends ConsumerWidget {
                       const SizedBox(height: 8),
                       Row(
                         children: [
-                          Expanded(child: _codMiniStat('Total COD', codSummary.collectedDisplay)),
-                          Expanded(child: _codMiniStat('COD Orders', '${codSummary.totalCodOrders}')),
-                          Expanded(child: _codMiniStat('Prepaid UPI', '${codSummary.totalOnlinePaidOrders}')),
-                          Expanded(child: _codMiniStat('Remitted', codSummary.remittedDisplay)),
+                          Expanded(
+                              child: _codMiniStat(
+                                  'Total COD', codSummary.collectedDisplay)),
+                          Expanded(
+                              child: _codMiniStat('COD Orders',
+                                  '${codSummary.totalCodOrders}')),
+                          Expanded(
+                              child: _codMiniStat('Prepaid UPI',
+                                  '${codSummary.totalOnlinePaidOrders}')),
+                          Expanded(
+                              child: _codMiniStat(
+                                  'Remitted', codSummary.remittedDisplay)),
                         ],
                       ),
                       const SizedBox(height: 10),
@@ -349,12 +434,15 @@ class DriverEarningsScreen extends ConsumerWidget {
                         ),
                         child: const Row(
                           children: [
-                            Icon(Icons.verified_outlined, size: 14, color: AppColors.accent),
+                            Icon(Icons.verified_outlined,
+                                size: 14, color: AppColors.accent),
                             SizedBox(width: 6),
                             Expanded(
                               child: Text(
                                 'Hub Handover: Select your hub (Kubernagar, Gandhinagar, etc.), share your email OTP with Hub Admin, and your balance will be settled instantly.',
-                                style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.textSecondary),
                               ),
                             ),
                           ],
@@ -367,7 +455,8 @@ class DriverEarningsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xl),
 
                 // Active Hub Cash Handover Requests & OTP Cards
-                Text('Hub Cash Handovers & Verification OTPs', style: AppTextStyles.titleMedium),
+                Text('Hub Cash Handovers & Verification OTPs',
+                    style: AppTextStyles.titleMedium),
                 const SizedBox(height: 10),
                 Column(
                   children: [
@@ -379,7 +468,8 @@ class DriverEarningsScreen extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xl),
 
                 // Remittance History
-                Text('Settled Remittance Receipts', style: AppTextStyles.titleMedium),
+                Text('Settled Remittance Receipts',
+                    style: AppTextStyles.titleMedium),
                 const SizedBox(height: 10),
                 AppCard(
                   child: Column(
@@ -394,7 +484,8 @@ class DriverEarningsScreen extends ConsumerWidget {
 
                 const SizedBox(height: AppSpacing.xl),
 
-                Text('Recent Deliveries History', style: AppTextStyles.titleMedium),
+                Text('Recent Deliveries History',
+                    style: AppTextStyles.titleMedium),
                 const SizedBox(height: 12),
 
                 AppCard(
@@ -446,7 +537,10 @@ class DriverEarningsScreen extends ConsumerWidget {
         const SizedBox(height: 2),
         Text(
           value,
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+          style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: AppColors.textPrimary),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -468,9 +562,12 @@ class _HubHandoverCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: handover.isVerified ? AppColors.success : AppColors.cardBorder),
+        border: Border.all(
+            color:
+                handover.isVerified ? AppColors.success : AppColors.cardBorder),
         boxShadow: const [
-          BoxShadow(color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2)),
+          BoxShadow(
+              color: AppColors.shadow, blurRadius: 6, offset: Offset(0, 2)),
         ],
       ),
       child: Column(
@@ -482,7 +579,8 @@ class _HubHandoverCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   handover.hubLocation,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 13),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -490,15 +588,21 @@ class _HubHandoverCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: handover.isVerified ? AppColors.success.withValues(alpha: 0.12) : AppColors.accent.withValues(alpha: 0.12),
+                  color: handover.isVerified
+                      ? AppColors.success.withValues(alpha: 0.12)
+                      : AppColors.accent.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  handover.isVerified ? 'SETTLED & VERIFIED ✅' : 'WAITING FOR OTP',
+                  handover.isVerified
+                      ? 'SETTLED & VERIFIED ✅'
+                      : 'WAITING FOR OTP',
                   style: TextStyle(
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
-                    color: handover.isVerified ? AppColors.success : AppColors.accent,
+                    color: handover.isVerified
+                        ? AppColors.success
+                        : AppColors.accent,
                   ),
                 ),
               ),
@@ -514,17 +618,25 @@ class _HubHandoverCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Amount to Handover', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
-                  Text(handover.amountDisplay, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                  const Text('Amount to Handover',
+                      style: TextStyle(
+                          fontSize: 11, color: AppColors.textSecondary)),
+                  Text(handover.amountDisplay,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary)),
                 ],
               ),
               if (!handover.isVerified)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.amber.shade700, width: 1.5),
+                    border:
+                        Border.all(color: Colors.amber.shade700, width: 1.5),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -532,20 +644,30 @@ class _HubHandoverCard extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('YOUR OTP CODE', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.grey)),
+                          const Text('YOUR OTP CODE',
+                              style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey)),
                           Text(
                             handover.otp,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, letterSpacing: 3, fontFamily: 'monospace'),
+                            style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 3,
+                                fontFamily: 'monospace'),
                           ),
                         ],
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        icon: const Icon(Icons.copy_rounded, size: 18, color: AppColors.primary),
+                        icon: const Icon(Icons.copy_rounded,
+                            size: 18, color: AppColors.primary),
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: handover.otp));
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('OTP copied to clipboard!')),
+                            const SnackBar(
+                                content: Text('OTP copied to clipboard!')),
                           );
                         },
                       ),
@@ -556,8 +678,13 @@ class _HubHandoverCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text('Receipt No.', style: TextStyle(fontSize: 10, color: Colors.green)),
-                    Text(handover.receiptNumber ?? '#SETTLED', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, fontFamily: 'monospace')),
+                    const Text('Receipt No.',
+                        style: TextStyle(fontSize: 10, color: Colors.green)),
+                    Text(handover.receiptNumber ?? '#SETTLED',
+                        style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            fontFamily: 'monospace')),
                   ],
                 ),
             ],
@@ -567,7 +694,8 @@ class _HubHandoverCard extends StatelessWidget {
             handover.isVerified
                 ? 'Cash received by Admin (${handover.adminId}) at ${handover.verifiedAt?.hour}:${handover.verifiedAt?.minute.toString().padLeft(2, '0')}.'
                 : 'Give physical cash of ${handover.amountDisplay} to Admin. Admin will enter this OTP to clear balance.',
-            style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+            style:
+                const TextStyle(fontSize: 11, color: AppColors.textSecondary),
           ),
         ],
       ),
@@ -591,29 +719,44 @@ class _RemittanceTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(record.referenceNumber, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, fontFamily: 'monospace')),
+                Text(record.referenceNumber,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        fontFamily: 'monospace')),
                 const SizedBox(height: 2),
-                Text('${record.paymentMode} • ${record.submittedAt.day}/${record.submittedAt.month} ${record.submittedAt.hour}:${record.submittedAt.minute.toString().padLeft(2, '0')}', style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                Text(
+                    '${record.paymentMode} • ${record.submittedAt.day}/${record.submittedAt.month} ${record.submittedAt.hour}:${record.submittedAt.minute.toString().padLeft(2, '0')}',
+                    style: const TextStyle(
+                        fontSize: 10, color: AppColors.textSecondary)),
               ],
             ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text(record.amountDisplay, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              Text(record.amountDisplay,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 2),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: record.isVerifiedByAdmin ? Colors.green.shade50 : Colors.orange.shade50,
+                  color: record.isVerifiedByAdmin
+                      ? Colors.green.shade50
+                      : Colors.orange.shade50,
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
-                  record.isVerifiedByAdmin ? 'VERIFIED BY ADMIN' : 'AWAITING ADMIN',
+                  record.isVerifiedByAdmin
+                      ? 'VERIFIED BY ADMIN'
+                      : 'AWAITING ADMIN',
                   style: TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.bold,
-                    color: record.isVerifiedByAdmin ? Colors.green.shade800 : Colors.orange.shade800,
+                    color: record.isVerifiedByAdmin
+                        ? Colors.green.shade800
+                        : Colors.orange.shade800,
                   ),
                 ),
               ),
@@ -636,9 +779,14 @@ class _StatItem extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(color: AppColors.textHint, fontSize: 10)),
+        Text(title,
+            style: const TextStyle(color: AppColors.textHint, fontSize: 10)),
         const SizedBox(height: 2),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+        Text(value,
+            style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 13)),
       ],
     );
   }
@@ -650,7 +798,11 @@ class _TripTile extends StatelessWidget {
   final String payout;
   final String time;
 
-  const _TripTile({required this.store, required this.customer, required this.payout, required this.time});
+  const _TripTile(
+      {required this.store,
+      required this.customer,
+      required this.payout,
+      required this.time});
 
   @override
   Widget build(BuildContext context) {
@@ -663,12 +815,20 @@ class _TripTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(store, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                Text('Drop to: $customer • $time', style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                Text(store,
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 13)),
+                Text('Drop to: $customer • $time',
+                    style: const TextStyle(
+                        fontSize: 11, color: AppColors.textSecondary)),
               ],
             ),
           ),
-          Text(payout, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 15)),
+          Text(payout,
+              style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.success,
+                  fontSize: 15)),
         ],
       ),
     );
