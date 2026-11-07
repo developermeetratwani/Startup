@@ -17,13 +17,7 @@ class DriverEarningsScreen extends ConsumerWidget {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.store_rounded, color: AppColors.primary),
-              SizedBox(width: 8),
-              Text('Handover Cash at Hub (OTP)'),
-            ],
-          ),
+          title: const Text('Handover Cash at Hub (OTP)'),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -75,7 +69,6 @@ class DriverEarningsScreen extends ConsumerWidget {
                   keyboardType: TextInputType.number,
                   decoration: const InputDecoration(
                     labelText: 'Cash Amount to Handover (₹)',
-                    prefixIcon: Icon(Icons.currency_rupee),
                     border: OutlineInputBorder(),
                   ),
                 ),
@@ -84,7 +77,6 @@ class DriverEarningsScreen extends ConsumerWidget {
                   controller: emailCtrl,
                   decoration: const InputDecoration(
                     labelText: 'Rider Email (for OTP Receipt)',
-                    prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                     helperText: 'OTP will be sent to this email address',
                   ),
@@ -94,10 +86,9 @@ class DriverEarningsScreen extends ConsumerWidget {
           ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            ElevatedButton.icon(
+            ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
-              icon: const Icon(Icons.send_rounded, size: 16, color: Colors.white),
-              label: const Text('Generate & Send OTP', style: TextStyle(color: Colors.white)),
+              child: const Text('Generate & Send OTP', style: TextStyle(color: Colors.white)),
               onPressed: () async {
                 final amountRupees = int.tryParse(amountCtrl.text.trim()) ?? 0;
                 final email = emailCtrl.text.trim();
@@ -315,25 +306,23 @@ class DriverEarningsScreen extends ConsumerWidget {
                             spacing: 6,
                             runSpacing: 6,
                             children: [
-                              ElevatedButton.icon(
+                              ElevatedButton(
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: AppColors.primary,
                                   foregroundColor: AppColors.textOnDark,
-                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                                 ),
-                                icon: const Icon(Icons.store_rounded, size: 16),
-                                label: const Text('Pay Cash at Hub (OTP)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                                 onPressed: () => _showHubHandoverDialog(context, ref, codSummary),
+                                child: const Text('Pay Cash at Hub (OTP)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold)),
                               ),
-                              OutlinedButton.icon(
+                              OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: AppColors.primary,
                                   side: const BorderSide(color: AppColors.primary),
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                                 ),
-                                icon: const Icon(Icons.qr_code_rounded, size: 16),
-                                label: const Text('UPI', style: TextStyle(fontSize: 11)),
                                 onPressed: () => _showRemitCashDialog(context, ref, codSummary),
+                                child: const Text('UPI', style: TextStyle(fontSize: 11)),
                               ),
                             ],
                           ),

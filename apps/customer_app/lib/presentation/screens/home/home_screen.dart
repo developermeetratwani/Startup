@@ -67,13 +67,9 @@ class HomeScreen extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(color: AppColors.accent.withValues(alpha: 0.6)),
                 ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.two_wheeler_rounded, size: 16, color: AppColors.accent),
-                    SizedBox(width: 4),
-                    Text('Radar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
-                  ],
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: Text('Radar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
                 ),
               ),
             ),
@@ -253,13 +249,9 @@ class HomeScreen extends ConsumerWidget {
                             color: AppColors.accent,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 14),
-                              SizedBox(width: 6),
-                              Text('Track Nearby Riders on Map 🗺️', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                            ],
+                          child: const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 4),
+                            child: Text('Track Nearby Riders on Map', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
                           ),
                         ),
                       ),
@@ -289,11 +281,6 @@ class HomeScreen extends ConsumerWidget {
                     final isSelected = selectedCategory == catId;
 
                     return ChoiceChip(
-                      avatar: Icon(
-                        cat['icon'] as IconData,
-                        size: 16,
-                        color: isSelected ? Colors.white : AppColors.purple,
-                      ),
                       label: Text(cat['label'] as String),
                       selected: isSelected,
                       selectedColor: AppColors.primary,

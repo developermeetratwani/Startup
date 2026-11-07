@@ -86,8 +86,6 @@ class OrderTrackingScreen extends ConsumerWidget {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 32),
-                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,18 +102,12 @@ class OrderTrackingScreen extends ConsumerWidget {
                           onTap: () => LiveRiderTrackingSheet.show(context),
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
                             ),
-                            child: const Row(
-                              children: [
-                                Icon(Icons.map_rounded, size: 14, color: AppColors.accent),
-                                SizedBox(width: 4),
-                                Text('Radar', style: TextStyle(color: AppColors.accent, fontSize: 11, fontWeight: FontWeight.bold)),
-                              ],
-                            ),
+                            child: const Text('Radar', style: TextStyle(color: AppColors.accent, fontSize: 11, fontWeight: FontWeight.bold)),
                           ),
                         ),
                       ],

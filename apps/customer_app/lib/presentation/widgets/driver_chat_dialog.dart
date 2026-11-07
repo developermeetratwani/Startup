@@ -101,7 +101,7 @@ class _DriverChatDialogState extends State<DriverChatDialog> {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-                  child: const Icon(Icons.two_wheeler_rounded, color: AppColors.primary, size: 22),
+                  child: const Icon(Icons.person_rounded, color: AppColors.primary, size: 22),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

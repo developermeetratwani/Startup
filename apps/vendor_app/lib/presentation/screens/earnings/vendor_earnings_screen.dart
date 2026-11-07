@@ -75,13 +75,7 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.account_balance_wallet_rounded, color: AppColors.primary),
-            SizedBox(width: 8),
-            Text('Company Settlement Payout'),
-          ],
-        ),
+        title: const Text('Company Settlement Payout'),
         content: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -129,10 +123,9 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-          ElevatedButton.icon(
+          ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
-            icon: const Icon(Icons.check_circle_outline, color: Colors.white),
-            label: const Text('Confirm Paid by Company', style: TextStyle(color: Colors.white)),
+            child: const Text('Confirm Paid by Company', style: TextStyle(color: Colors.white)),
             onPressed: () {
               final finalUtr = utrController.text.trim();
               if (finalUtr.isEmpty) return;
@@ -446,15 +439,14 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                   ),
                 )
               else
-                ElevatedButton.icon(
+                ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                     visualDensity: VisualDensity.compact,
                   ),
-                  icon: const Icon(Icons.payments_outlined, size: 14, color: Colors.white),
-                  label: const Text('Pay Vendor', style: TextStyle(fontSize: 11, color: Colors.white)),
                   onPressed: () => _recordCompanyPayout(batch),
+                  child: const Text('Pay Vendor', style: TextStyle(fontSize: 11, color: Colors.white)),
                 ),
             ],
           ),

@@ -306,7 +306,7 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                                         ),
                                       ],
                                     ),
-                                    child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
+                                    child: const Icon(Icons.navigation_rounded, color: Colors.white, size: 18),
                                   ),
                                   Container(
                                     margin: const EdgeInsets.only(top: 2),
@@ -369,7 +369,7 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                     CircleAvatar(
                       radius: 24,
                       backgroundColor: AppColors.purple.withValues(alpha: 0.15),
-                      child: const Icon(Icons.two_wheeler_rounded, color: AppColors.purple, size: 26),
+                      child: const Icon(Icons.person_rounded, color: AppColors.purple, size: 26),
                     ),
                     const SizedBox(width: 12),
                     Expanded(

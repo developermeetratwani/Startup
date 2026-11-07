@@ -73,149 +73,171 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     'Commissions & Coins',
   ];
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
+  Widget _buildSidebar({bool isDrawer = false}) {
+    return Container(
+      width: 260,
+      color: AppColors.primary,
+      padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Left Sidebar
-          Container(
-            width: 260,
-            color: AppColors.primary,
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.accent,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Icon(Icons.shield_rounded, color: Colors.white, size: 24),
-                    ),
-                    const SizedBox(width: 12),
-                    const Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('XYZ STARTUP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-                        Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
-                      ],
-                    ),
-                  ],
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.accent,
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(height: 36),
-                const Text('MAIN NAVIGATION', style: TextStyle(color: AppColors.textHint, fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 12),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: _tabs.length,
-                    itemBuilder: (context, index) {
-                      final isSelected = _selectedTab == index;
-                      final icons = [
-                        Icons.dashboard_rounded,
-                        Icons.verified_user_rounded,
-                        Icons.storefront_rounded,
-                        Icons.shopping_bag_rounded,
-                        Icons.two_wheeler_rounded,
-                        Icons.change_circle_rounded,
-                        Icons.map_rounded,
-                        Icons.account_balance_wallet_rounded,
-                      ];
-
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 6),
-                        child: ListTile(
-                          selected: isSelected,
-                          selectedTileColor: AppColors.primaryLight,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          leading: Icon(icons[index], color: isSelected ? AppColors.accent : AppColors.textHint, size: 20),
-                          title: Text(
-                            _tabs[index],
-                            style: TextStyle(
-                              color: isSelected ? Colors.white : AppColors.textHint,
-                              fontSize: 13,
-                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                            ),
-                          ),
-                          onTap: () => setState(() => _selectedTab = index),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                const Divider(color: Color(0xFF2C2C2C)),
-                const ListTile(
-                  dense: true,
-                  leading: CircleAvatar(
-                    backgroundColor: AppColors.accent,
-                    child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 12)),
-                  ),
-                  title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
-                  subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
-                ),
-              ],
-            ),
-          ),
-
-          // Main Content Area
-          Expanded(
-            child: Container(
-              color: AppColors.background,
-              child: Column(
+                child: const Icon(Icons.shield_rounded, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 12),
+              const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Top App Bar
-                  Container(
-                    height: 70,
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    decoration: const BoxDecoration(
-                      color: AppColors.surface,
-                      border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _tabs[_selectedTab],
-                          style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
-                        ),
-                        Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: AppColors.success.withValues(alpha: 0.12),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Row(
-                                children: [
-                                  Icon(Icons.cloud_done_rounded, color: AppColors.success, size: 16),
-                                  SizedBox(width: 8),
-                                  Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.bold)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  // Dashboard Body Content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(32),
-                      child: _buildBodyContent(),
-                    ),
-                  ),
+                  Text('XYZ STARTUP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                  Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
                 ],
               ),
+            ],
+          ),
+          const SizedBox(height: 28),
+          const Text('MAIN NAVIGATION', style: TextStyle(color: AppColors.textHint, fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 12),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _tabs.length,
+              itemBuilder: (context, index) {
+                final isSelected = _selectedTab == index;
+                final icons = [
+                  Icons.dashboard_rounded,
+                  Icons.verified_user_rounded,
+                  Icons.storefront_rounded,
+                  Icons.shopping_bag_rounded,
+                  Icons.two_wheeler_rounded,
+                  Icons.change_circle_rounded,
+                  Icons.map_rounded,
+                  Icons.account_balance_wallet_rounded,
+                ];
+
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 6),
+                  child: ListTile(
+                    selected: isSelected,
+                    selectedTileColor: AppColors.primaryLight,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    leading: Icon(icons[index], color: isSelected ? AppColors.accent : AppColors.textHint, size: 20),
+                    title: Text(
+                      _tabs[index],
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : AppColors.textHint,
+                        fontSize: 13,
+                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                      ),
+                    ),
+                    onTap: () {
+                      setState(() => _selectedTab = index);
+                      if (isDrawer) Navigator.pop(context);
+                    },
+                  ),
+                );
+              },
             ),
+          ),
+          const Divider(color: Color(0xFF2C2C2C)),
+          const ListTile(
+            dense: true,
+            leading: CircleAvatar(
+              backgroundColor: AppColors.accent,
+              child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 12)),
+            ),
+            title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold)),
+            subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
           ),
         ],
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 800;
+
+    return Scaffold(
+      appBar: isMobile
+          ? AppBar(
+              title: Text(_tabs[_selectedTab], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            )
+          : null,
+      drawer: isMobile ? Drawer(child: _buildSidebar(isDrawer: true)) : null,
+      body: isMobile
+          ? Container(
+              color: AppColors.background,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: _buildBodyContent(),
+              ),
+            )
+          : Row(
+              children: [
+                _buildSidebar(isDrawer: false),
+                Expanded(
+                  child: Container(
+                    color: AppColors.background,
+                    child: Column(
+                      children: [
+                        // Top App Bar
+                        Container(
+                          height: 70,
+                          padding: const EdgeInsets.symmetric(horizontal: 32),
+                          decoration: const BoxDecoration(
+                            color: AppColors.surface,
+                            border: Border(bottom: BorderSide(color: AppColors.cardBorder)),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _tabs[_selectedTab],
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
+                              ),
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      color: AppColors.success.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: const Row(
+                                      children: [
+                                        Icon(Icons.cloud_done_rounded, color: AppColors.success, size: 16),
+                                        SizedBox(width: 8),
+                                        Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: AppColors.success, fontSize: 12, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Dashboard Body Content
+                        Expanded(
+                          child: SingleChildScrollView(
+                            padding: const EdgeInsets.all(32),
+                            child: _buildBodyContent(),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 

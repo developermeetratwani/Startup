@@ -167,8 +167,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             _PaymentCard(
               title: 'Cash on Delivery (COD)',
               subtitle: 'Pay cash to driver upon delivery • ₹21 handling surcharge',
-              icon: Icons.money_rounded,
-              color: AppColors.success,
               value: 'cod',
               groupValue: _paymentMethod,
               onChanged: _onMethodChanged,
@@ -179,8 +177,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             _PaymentCard(
               title: 'Pay on Delivery (UPI / QR to Driver)',
               subtitle: 'Scan driver QR via PhonePe, GPay, Paytm on doorstep',
-              icon: Icons.qr_code_scanner_rounded,
-              color: AppColors.primary,
               value: 'payOnDelivery',
               groupValue: _paymentMethod,
               onChanged: _onMethodChanged,
@@ -191,8 +187,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             _PaymentCard(
               title: 'Online Payment (Razorpay / Cards)',
               subtitle: 'Cards, Netbanking & Wallets • Instant order confirmation',
-              icon: Icons.credit_card_rounded,
-              color: AppColors.accent,
               value: 'online',
               groupValue: _paymentMethod,
               onChanged: _onMethodChanged,
@@ -203,8 +197,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             _PaymentCard(
               title: 'Direct Store Pay',
               subtitle: 'Instant direct settlement to retail store counter',
-              icon: Icons.account_balance_rounded,
-              color: AppColors.warning,
               value: 'directPay',
               groupValue: _paymentMethod,
               onChanged: _onMethodChanged,
@@ -340,8 +332,6 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 class _PaymentCard extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData icon;
-  final Color color;
   final String value;
   final String groupValue;
   final ValueChanged<String> onChanged;
@@ -349,8 +339,6 @@ class _PaymentCard extends StatelessWidget {
   const _PaymentCard({
     required this.title,
     required this.subtitle,
-    required this.icon,
-    required this.color,
     required this.value,
     required this.groupValue,
     required this.onChanged,
@@ -381,9 +369,7 @@ class _PaymentCard extends StatelessWidget {
               activeColor: AppColors.primary,
               onChanged: (val) => onChanged(val!),
             ),
-            const SizedBox(width: 4),
-            Icon(icon, color: color, size: 22),
-            const SizedBox(width: 12),
+            const SizedBox(width: 8),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
