@@ -94,7 +94,7 @@ class VendorProfileScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.access_time_rounded, color: AppColors.textPrimary),
                   title: const Text('Operating Hours'),
-                  subtitle: const Text('09:30 AM – 10:00 PM (Monday – Sunday)'),
+                  subtitle: const Text('09:30 AM â€“ 10:00 PM (Monday â€“ Sunday)'),
                   trailing: const Icon(Icons.chevron_right_rounded),
                   onTap: () => _showOperatingHoursDialog(context),
                 ),
@@ -104,7 +104,7 @@ class VendorProfileScreen extends ConsumerWidget {
                 ListTile(
                   leading: const Icon(Icons.receipt_long_rounded, color: AppColors.warning),
                   title: const Text('Platform Terms & Commissions'),
-                  subtitle: const Text('10% Flat commission • 1% Packaging • 48h size exchange'),
+                  subtitle: const Text('10% Flat commission â€¢ 1% Packaging â€¢ 48h size exchange'),
                   trailing: const Icon(Icons.info_outline, size: 18),
                   onTap: () => _showPlatformTermsSheet(context),
                 ),
@@ -147,28 +147,50 @@ class VendorProfileScreen extends ConsumerWidget {
     );
   }
 
-  void _showEditStoreDialog(BuildContext context, WidgetRef ref, dynamic store) {
+    void _showEditStoreDialog(BuildContext context, WidgetRef ref, dynamic store) {
     final nameCtrl = TextEditingController(text: store.name);
     final descCtrl = TextEditingController(text: store.description);
+    final bannerCtrl = TextEditingController(text: store.bannerImageUrl ?? '');
+    final cardCtrl = TextEditingController(text: store.logoImageUrl ?? '');
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Edit Store Details'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Store Name'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: descCtrl,
-              decoration: const InputDecoration(labelText: 'Store Description'),
-              maxLines: 2,
-            ),
-          ],
+        title: const Text('Edit Store & Visiting Card'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(labelText: 'Store Name', hintText: 'e.g. Shreeji Ethnic Studio'),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: descCtrl,
+                decoration: const InputDecoration(labelText: 'Store Description / Bio'),
+                maxLines: 2,
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: bannerCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Shop Main Banner / Photo URL',
+                  hintText: 'https://images.unsplash.com/... or image link',
+                  prefixIcon: Icon(Icons.add_photo_alternate_outlined),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: cardCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Visiting Card / Logo Photo URL',
+                  hintText: 'Upload or paste visiting card image link',
+                  prefixIcon: Icon(Icons.badge_outlined),
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
@@ -180,77 +202,17 @@ class VendorProfileScreen extends ConsumerWidget {
                     description: descCtrl.text.trim(),
                     address: store.location.address,
                     city: store.location.city,
+                    bannerImageUrl: bannerCtrl.text.trim(),
+                    logoImageUrl: cardCtrl.text.trim(),
                   );
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Store profile updated!')),
+                const SnackBar(content: Text('Store photos & profile updated!')),
               );
             },
-            child: const Text('Save'),
+            child: const Text('Save Changes'),
           ),
         ],
-      ),
-    );
-  }
-
-  void _showLocationDialog(BuildContext context, WidgetRef ref, dynamic store) {
-    final addrCtrl = TextEditingController(text: store.location.address);
-    final pinCtrl = TextEditingController(text: store.location.pincode);
-    String selectedCity = store.location.city.isNotEmpty ? store.location.city : 'Ahmedabad';
-
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) => AlertDialog(
-          title: const Text('Edit Location & Region Cluster'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                value: ['Ahmedabad', 'Gandhinagar', 'Vapi'].contains(selectedCity) ? selectedCity : 'Ahmedabad',
-                decoration: const InputDecoration(labelText: 'Market Cluster City'),
-                items: const [
-                  DropdownMenuItem(value: 'Ahmedabad', child: Text('Kubernagar & East Ahmedabad')),
-                  DropdownMenuItem(value: 'Gandhinagar', child: Text('Gandhinagar Capital Region')),
-                  DropdownMenuItem(value: 'Vapi', child: Text('Vapi Industrial & Silk Corridor')),
-                ],
-                onChanged: (val) {
-                  if (val != null) setDialogState(() => selectedCity = val);
-                },
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: addrCtrl,
-                decoration: const InputDecoration(labelText: 'Street / Market Address'),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: pinCtrl,
-                decoration: const InputDecoration(labelText: 'Pincode'),
-                keyboardType: TextInputType.number,
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
-            ElevatedButton(
-              onPressed: () {
-                ref.read(vendorStoreRepoProvider).updateStoreProfile(
-                      storeId: store.id,
-                      name: store.name,
-                      description: store.description,
-                      address: addrCtrl.text.trim(),
-                      city: selectedCity,
-                    );
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Location & Region updated successfully!')),
-                );
-              },
-              child: const Text('Save Location'),
-            ),
-          ],
-        ),
       ),
     );
   }
@@ -264,35 +226,60 @@ class VendorProfileScreen extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Stores that stay open consistently receive 3x more order dispatches from nearby shoppers.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-            SizedBox(height: 14),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Opening Time:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('09:30 AM', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-              ],
-            ),
+            Text('Monday – Sunday: 09:30 AM – 10:00 PM'),
             SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Closing Time:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('10:00 PM', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
-              ],
+            Text('Orders received outside hours will be queued for the next morning.'),
+          ],
+        ),
+        actions: [
+          ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
+        ],
+      ),
+    );
+  }
+
+  void _showLocationDialog(BuildContext context, WidgetRef ref, dynamic store) {
+    final addressCtrl = TextEditingController(text: store.location.address);
+    final cityCtrl = TextEditingController(text: store.location.city);
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Store Location Details'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: addressCtrl,
+              decoration: const InputDecoration(labelText: 'Store Address / Landmark'),
             ),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('Working Days:', style: TextStyle(fontWeight: FontWeight.bold)),
-                Text('Monday to Sunday', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
-              ],
+            const SizedBox(height: 12),
+            TextField(
+              controller: cityCtrl,
+              decoration: const InputDecoration(labelText: 'City / Region'),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Done')),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              ref.read(vendorStoreRepoProvider).updateStoreProfile(
+                    storeId: store.id,
+                    name: store.name,
+                    description: store.description,
+                    address: addressCtrl.text.trim(),
+                    city: cityCtrl.text.trim(),
+                    bannerImageUrl: store.bannerImageUrl,
+                    logoImageUrl: store.logoImageUrl,
+                  );
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Store location updated!')),
+              );
+            },
+            child: const Text('Save'),
+          ),
         ],
       ),
     );
@@ -301,45 +288,41 @@ class VendorProfileScreen extends ConsumerWidget {
   void _showPlatformTermsSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
       builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Platform Terms & Commission Policy', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
-              ],
+            const Text(
+              'Platform Terms & Settlement',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             const _TermItem(
               title: '10% Platform Commission',
-              desc: 'Only charged on successfully delivered orders. No hidden onboarding or monthly listing fees.',
+              desc: 'Subtracted from the item subtotal automatically at settlement.',
             ),
             const SizedBox(height: 12),
             const _TermItem(
-              title: '1% Eco Packaging & Handling',
-              desc: 'Collected on each quantity to support sustainable retail clothing bags and protective covers.',
+              title: 'Weekly Payout Settlement',
+              desc: 'Paid directly to your linked UPI/Bank account every Monday with unique UTR tracking.',
             ),
             const SizedBox(height: 12),
             const _TermItem(
-              title: '₹21 Cash on Delivery Handling',
-              desc: 'Covers cash collection, safe transport, and T+2 settlement to your verified merchant bank account.',
-            ),
-            const SizedBox(height: 12),
-            const _TermItem(
-              title: '48-Hour Local Size Exchange',
-              desc: 'Shoppers can exchange sizes within 48 hours. A driver handles the replacement directly from your shelf.',
+              title: '48h Local Size Exchange Guarantee',
+              desc: 'Customers can exchange unworn garments within 48h for alternate sizes.',
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(minimumSize: const Size.fromHeight(44)),
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('I Understand & Agree'),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: const Text('Understood'),
+              ),
             ),
           ],
         ),
@@ -348,47 +331,34 @@ class VendorProfileScreen extends ConsumerWidget {
   }
 
   void _showReferralDialog(BuildContext context, dynamic store) {
-    final link = 'https://hyperlocalfashion.in/store/${store.id}?ref=KUBER50';
-
+    final link = 'https://xyzstartup.in/store/${store.id}';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Store Affiliate & Referral Link'),
+        title: const Text('Store Share & Referral'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Share your store link with customers in your neighborhood. When they place orders, you earn bonus Store Coins to offset commission fees.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: SelectableText(
-                link,
-                style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, fontSize: 12),
-              ),
+            const Text('Share your digital storefront link with your neighborhood customers:'),
+            const SizedBox(height: 12),
+            SelectableText(
+              link,
+              style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Close')),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.copy_rounded, size: 16),
-            label: const Text('Copy Link'),
+          TextButton(
             onPressed: () {
               Clipboard.setData(ClipboardData(text: link));
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Affiliate link copied to clipboard!')),
+                const SnackBar(content: Text('Link copied to clipboard!')),
               );
             },
+            child: const Text('Copy Link'),
           ),
+          ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('Done')),
         ],
       ),
     );
@@ -422,3 +392,4 @@ class _TermItem extends StatelessWidget {
     );
   }
 }
+

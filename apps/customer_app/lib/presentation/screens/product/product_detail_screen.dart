@@ -252,16 +252,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           isLoading: _isAdding,
                           onPressed: inStock
                               ? () async {
-                                  if (user == null) {
-                                    context.push('/login');
-                                    return;
-                                  }
+                                  final customerId = user?.uid ?? 'guest-cust-session';
                                   setState(() => _isAdding = true);
                                   final cartRepo = ref.read(cartRepositoryProvider);
                                   await cartRepo.addToCart(
                                     CartItemEntity(
                                       id: '${product.id}_${_selectedSize}_${_selectedColor}',
-                                      customerId: user.uid,
+                                      customerId: customerId,
                                       productId: product.id,
                                       variantId: matchingVariant.id,
                                       storeId: product.storeId,
@@ -295,3 +292,4 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
     );
   }
 }
+

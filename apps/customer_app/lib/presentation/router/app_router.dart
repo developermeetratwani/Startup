@@ -19,6 +19,7 @@ import '../screens/address/address_list_screen.dart';
 import '../screens/address/add_address_screen.dart';
 import '../screens/search/search_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/legal/legal_and_consent_screen.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
@@ -109,6 +110,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/profile',
         builder: (_, __) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/legal',
+        builder: (_, __) => const LegalAndConsentScreen(),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

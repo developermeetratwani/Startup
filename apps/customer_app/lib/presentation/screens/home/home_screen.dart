@@ -6,6 +6,7 @@ import 'package:domain/domain.dart';
 import '../../providers/location_provider.dart';
 import '../../providers/store_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../widgets/live_rider_tracking_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -47,13 +48,36 @@ class HomeScreen extends ConsumerWidget {
                 ],
               ),
               Text(
-                '${location.cityName} • Hyperlocal Delivery',
+                '${location.cityName} â€¢ Hyperlocal Delivery',
                 style: AppTextStyles.bodySmall,
               ),
             ],
           ),
         ),
         actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            child: InkWell(
+              onTap: () => LiveRiderTrackingSheet.show(context),
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: AppColors.accent.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.6)),
+                ),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.two_wheeler_rounded, size: 16, color: AppColors.accent),
+                    SizedBox(width: 4),
+                    Text('Radar', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
+                  ],
+                ),
+              ),
+            ),
+          ),
           IconButton(
             icon: Stack(
               clipBehavior: Clip.none,
@@ -157,6 +181,26 @@ class HomeScreen extends ConsumerWidget {
                       const Text(
                         'Get local delivery in under 2 hours',
                         style: TextStyle(color: Color(0xFFADB5BD), fontSize: 12),
+                      ),
+                      const SizedBox(height: 10),
+                      InkWell(
+                        onTap: () => LiveRiderTrackingSheet.show(context),
+                        borderRadius: BorderRadius.circular(20),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.accent,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 14),
+                              SizedBox(width: 6),
+                              Text('Track Nearby Riders on Map 🗺️', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -284,86 +328,24 @@ class HomeScreen extends ConsumerWidget {
           BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
         ],
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: const Color(0xFFE23744),
+        icon: const Icon(Icons.two_wheeler_rounded, color: Colors.white),
+        label: const Text('Live Radar (Zomato Map)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        onPressed: () => LiveRiderTrackingSheet.show(context),
+      ),
     );
   }
 
   void _showLocationSelector(BuildContext context, WidgetRef ref) {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
       ),
-      builder: (context) {
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.pagePadding),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Select Delivery Market', style: AppTextStyles.titleLarge),
-                const SizedBox(height: 8),
-                Text(
-                  'Choose your target location to see stores in your vicinity',
-                  style: AppTextStyles.bodySmall,
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.my_location, color: AppColors.accent),
-                  title: const Text('Use Current GPS Location'),
-                  onTap: () {
-                    ref.read(locationProvider.notifier).detectCurrentLocation();
-                    Navigator.pop(context);
-                  },
-                ),
-                const Divider(),
-                ListTile(
-                  leading: const Icon(Icons.storefront, color: AppColors.primary),
-                  title: const Text('Kubernagar, Ahmedabad'),
-                  subtitle: const Text('Market cluster • Ahmedabad East'),
-                  onTap: () {
-                    ref.read(locationProvider.notifier).setPresetLocation(
-                          area: 'Kubernagar',
-                          city: 'Ahmedabad',
-                          lat: 23.0768,
-                          lng: 72.6346,
-                        );
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.storefront, color: AppColors.primary),
-                  title: const Text('Gandhinagar, Gujarat'),
-                  subtitle: const Text('Sector 1-30 & Infocity cluster'),
-                  onTap: () {
-                    ref.read(locationProvider.notifier).setPresetLocation(
-                          area: 'Sector 21',
-                          city: 'Gandhinagar',
-                          lat: 23.2156,
-                          lng: 72.6369,
-                        );
-                    Navigator.pop(context);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.storefront, color: AppColors.primary),
-                  title: const Text('Vapi, Gujarat'),
-                  subtitle: const Text('Gunjan Market, Koparli Rd & GIDC cluster'),
-                  onTap: () {
-                    ref.read(locationProvider.notifier).setPresetLocation(
-                          area: 'Gunjan Market',
-                          city: 'Vapi',
-                          lat: 20.3712,
-                          lng: 72.9044,
-                        );
-                    Navigator.pop(context);
-                  },
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+      builder: (_) => _LocationSelectorSheet(widgetRef: ref),
     );
   }
 
@@ -453,7 +435,7 @@ class _StoreCard extends StatelessWidget {
                       Text(
                         store.location.address.isNotEmpty
                             ? store.location.address
-                            : '${store.location.city} • Fast Local Pickup',
+                            : '${store.location.city} â€¢ Fast Local Pickup',
                         style: AppTextStyles.bodySmall,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -468,7 +450,7 @@ class _StoreCard extends StatelessWidget {
                             style: AppTextStyles.labelSmall.copyWith(color: AppColors.textPrimary),
                           ),
                           const SizedBox(width: 8),
-                          Text('•  ${store.totalRatings} ratings', style: AppTextStyles.bodySmall),
+                          Text('â€¢  ${store.totalRatings} ratings', style: AppTextStyles.bodySmall),
                         ],
                       ),
                     ],
@@ -483,3 +465,341 @@ class _StoreCard extends StatelessWidget {
     );
   }
 }
+
+  void _promptForHouseDetails(BuildContext context, WidgetRef ref) {
+    final loc = ref.read(locationProvider);
+    final houseCtrl = TextEditingController();
+    final societyCtrl = TextEditingController();
+    final landmarkCtrl = TextEditingController();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+        title: Row(
+          children: [
+            const Icon(Icons.home_work_rounded, color: AppColors.primary, size: 24),
+            const SizedBox(width: 8),
+            Text('Complete Delivery Address', style: AppTextStyles.titleMedium),
+          ],
+        ),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.gps_fixed_rounded, color: AppColors.success, size: 14),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        'GPS Location: ${loc.areaName}, ${loc.cityName}',
+                        style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: houseCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'House / Flat / Block No. *',
+                  hintText: 'e.g. Flat 302, Block B',
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: societyCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Building / Society / Apartment Name *',
+                  hintText: 'e.g. Krishna Park Residency',
+                  isDense: true,
+                ),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: landmarkCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Nearby Landmark (Optional)',
+                  hintText: 'e.g. Near Water Tank or Main Road',
+                  isDense: true,
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Skip for Now'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final house = houseCtrl.text.trim();
+              final society = societyCtrl.text.trim();
+              final landmark = landmarkCtrl.text.trim();
+              final fullAddress = [
+                if (house.isNotEmpty) house,
+                if (society.isNotEmpty) society,
+                if (landmark.isNotEmpty) 'Near $landmark',
+                loc.areaName,
+                loc.cityName,
+              ].join(', ');
+
+              ref.read(locationProvider.notifier).setPresetLocation(
+                area: society.isNotEmpty ? society : loc.areaName,
+                city: loc.cityName,
+                lat: loc.latitude,
+                lng: loc.longitude,
+              );
+
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Delivery address saved:\n$fullAddress')),
+              );
+            },
+            child: const Text('Save Address'),
+          ),
+        ],
+      ),
+    );
+  }
+class _LocationSelectorSheet extends ConsumerWidget {
+  final WidgetRef widgetRef;
+  const _LocationSelectorSheet({required this.widgetRef});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final locationState = ref.watch(locationProvider);
+
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
+      ),
+      padding: const EdgeInsets.all(AppSpacing.pagePadding),
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Select Delivery Market', style: AppTextStyles.titleLarge),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'Choose your delivery hub to discover local fashion stores in your vicinity',
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 16),
+            InkWell(
+              onTap: locationState.isLoading
+                  ? null
+                  : () async {
+                      await ref.read(locationProvider.notifier).detectCurrentLocation();
+                      if (context.mounted) {
+                        Navigator.pop(context);
+                        _promptForHouseDetails(context, ref);
+                      }
+                    },
+              borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                  border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+                ),
+                child: Row(
+                  children: [
+                    if (locationState.isLoading)
+                      const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                      )
+                    else
+                      const Icon(Icons.my_location_rounded, color: AppColors.primary, size: 24),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Use Exact Live GPS Location',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: AppColors.primary),
+                          ),
+                          Text(
+                            locationState.isLoading
+                                ? 'Pinpointing your GPS coordinates...'
+                                : 'Auto-detects Ghuma, Nikol, Kubernagar, Gandhinagar...',
+                            style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.chevron_right_rounded, color: AppColors.primary),
+                  ],
+                ),
+              ),
+            ),
+            if (locationState.error != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                locationState.error!,
+                style: const TextStyle(color: Colors.red, fontSize: 12),
+              ),
+            ],
+            const SizedBox(height: 20),
+            const Text(
+              'POPULAR LOCAL HUBS',
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary, letterSpacing: 0.8),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'Gandhinagar',
+                    subtitle: 'Capital Hub • Delivery across all Sectors',
+                    area: 'Gandhinagar',
+                    city: 'Gandhinagar',
+                    lat: 23.2156,
+                    lng: 72.6369,
+                  ),
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'Kubernagar, Ahmedabad',
+                    subtitle: 'Market Cluster • Ahmedabad East',
+                    area: 'Kubernagar',
+                    city: 'Ahmedabad',
+                    lat: 23.0768,
+                    lng: 72.6346,
+                  ),
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'Nikol, Ahmedabad',
+                    subtitle: 'East Ahmedabad Fashion Hub',
+                    area: 'Nikol',
+                    city: 'Ahmedabad',
+                    lat: 23.0485,
+                    lng: 72.6738,
+                  ),
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'Ghuma / Bopal, Ahmedabad',
+                    subtitle: 'West Ahmedabad Lifestyle Hub',
+                    area: 'Ghuma',
+                    city: 'Ahmedabad',
+                    lat: 23.0330,
+                    lng: 72.4646,
+                  ),
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'C.G. Road, Ahmedabad',
+                    subtitle: 'Central Fashion & Boutique District',
+                    area: 'Navrangpura',
+                    city: 'Ahmedabad',
+                    lat: 23.0373,
+                    lng: 72.5562,
+                  ),
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'Sindhu Bhavan Road (SBR), Ahmedabad',
+                    subtitle: 'West Ahmedabad High-Street & Bodakdev Couture',
+                    area: 'Sindhu Bhavan Road',
+                    city: 'Ahmedabad',
+                    lat: 23.0402,
+                    lng: 72.5028,
+                  ),
+                  _hubTile(
+                    context: context,
+                    ref: ref,
+                    title: 'Prahlad Nagar & SG Highway, Ahmedabad',
+                    subtitle: 'West Ahmedabad Premium Retail Hub',
+                    area: 'Prahlad Nagar',
+                    city: 'Ahmedabad',
+                    lat: 23.0125,
+                    lng: 72.5100,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _hubTile({
+    required BuildContext context,
+    required WidgetRef ref,
+    required String title,
+    required String subtitle,
+    required String area,
+    required String city,
+    required double lat,
+    required double lng,
+  }) {
+    return ListTile(
+      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: Colors.grey.shade100,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 20),
+      ),
+      title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+      subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+      trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.textHint),
+      onTap: () {
+        ref.read(locationProvider.notifier).setPresetLocation(
+          area: area,
+          city: city,
+          lat: lat,
+          lng: lng,
+        );
+        Navigator.pop(context);
+      },
+    );
+  }
+}
+

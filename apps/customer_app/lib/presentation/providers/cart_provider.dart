@@ -9,9 +9,9 @@ final cartRepositoryProvider = Provider<CartRepository>((ref) {
 
 final cartStreamProvider = StreamProvider<List<CartItemEntity>>((ref) {
   final user = ref.watch(currentUserProvider);
-  if (user == null) return Stream.value([]);
+  final customerId = user?.uid ?? 'guest-cust-session';
   final repo = ref.watch(cartRepositoryProvider);
-  return repo.watchCart(user.uid);
+  return repo.watchCart(customerId);
 });
 
 final selectedPaymentMethodProvider = StateProvider<PaymentMethod>((ref) => PaymentMethod.cod);

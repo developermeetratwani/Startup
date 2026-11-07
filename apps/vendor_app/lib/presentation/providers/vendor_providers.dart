@@ -1,3 +1,4 @@
+﻿import 'package:core/core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domain/domain.dart';
@@ -174,7 +175,7 @@ final vendorOrdersProvider = StreamProvider<List<OrderEntity>>((ref) {
   final storeAsync = ref.watch(currentStoreProvider);
   final storeId = storeAsync.valueOrNull?.id ?? 'store-kubernagar-1';
 
-  return repo.watchVendorOrders(storeId).map((orders) {
+  return repo.watchVendorOrders(storeId).handleError((_) => OrderSyncService.getOrdersForStore(storeId)).map((orders) {
     if (orders.isEmpty) {
       return [
         OrderEntity(
@@ -262,3 +263,5 @@ final vendorEarningsProvider = StreamProvider<VendorEarningsSummary>((ref) {
     return summary;
   });
 });
+
+

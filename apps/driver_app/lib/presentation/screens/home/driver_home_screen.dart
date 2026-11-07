@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:domain/domain.dart';
+import 'package:core/core.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../providers/driver_providers.dart';
 
 class DriverHomeScreen extends ConsumerWidget {
@@ -251,6 +253,11 @@ class _ActiveDeliveryCard extends ConsumerWidget {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+
+          // Payment Type Indicator (COD vs Online Prepaid)
+          _buildPaymentBanner(delivery.orderId),
+
           const Divider(height: 24),
 
           // Pickup Location
@@ -259,14 +266,40 @@ class _ActiveDeliveryCard extends ConsumerWidget {
             children: [
               const Icon(Icons.storefront_rounded, color: AppColors.primary, size: 22),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('PICKUP FROM STORE', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2),
-                    Text('Shreeji Ethnic & Bridal Studio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text('Main Bazaar, Kubernagar, Ahmedabad', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    const Text('PICKUP FROM STORE', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    const Text('Shreeji Ethnic & Bridal Studio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const Text('Main Bazaar, Kubernagar, Ahmedabad', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () => _launchGoogleMaps(
+                        context: context,
+                        lat: delivery.pickupLat,
+                        lng: delivery.pickupLng,
+                        label: 'Shreeji Ethnic & Bridal Studio, Kubernagar',
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.directions_rounded, size: 16, color: AppColors.primary),
+                            SizedBox(width: 6),
+                            Text('Google Maps Navigation', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.primary)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -287,14 +320,40 @@ class _ActiveDeliveryCard extends ConsumerWidget {
             children: [
               const Icon(Icons.location_on_rounded, color: AppColors.accent, size: 22),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('DELIVER TO CUSTOMER', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 2),
-                    Text('Kavya Sharma', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    Text('Block C-4, Krishna Complex, Kubernagar', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    const Text('DELIVER TO CUSTOMER', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 2),
+                    const Text('Kavya Sharma', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const Text('Block C-4, Krishna Complex, Kubernagar', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: () => _launchGoogleMaps(
+                        context: context,
+                        lat: delivery.dropLat,
+                        lng: delivery.dropLng,
+                        label: 'Kavya Sharma, Block C-4, Krishna Complex, Kubernagar',
+                      ),
+                      borderRadius: BorderRadius.circular(6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: AppColors.accent.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.near_me_rounded, size: 16, color: AppColors.accent),
+                            SizedBox(width: 6),
+                            Text('Google Maps Navigation', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.accent)),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -310,30 +369,168 @@ class _ActiveDeliveryCard extends ConsumerWidget {
     );
   }
 
+  Future<void> _launchGoogleMaps({
+    required BuildContext context,
+    required double lat,
+    required double lng,
+    required String label,
+  }) async {
+    // Universal 100% free Google Maps navigation deep link
+    final urlString = 'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng&destination_place_id=${Uri.encodeComponent(label)}';
+    final uri = Uri.parse(urlString);
+
+    try {
+      final launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      if (!launched) {
+        await launchUrl(uri, mode: LaunchMode.platformDefault);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            backgroundColor: AppColors.primary,
+            content: Text('Opening Google Maps navigation to $label...'),
+          ),
+        );
+      }
+    }
+  }
+
+  Widget _buildPaymentBanner(String orderId) {
+    final order = OrderSyncService.currentOrders.firstWhere(
+      (o) => o.id == orderId,
+      orElse: () => OrderEntity(
+        id: orderId,
+        customerId: '',
+        storeId: '',
+        vendorId: '',
+        deliveryAddressId: '',
+        deliveryAddressSnapshot: const {},
+        status: OrderStatus.readyForPickup,
+        paymentMethod: PaymentMethod.cod,
+        paymentStatus: PaymentStatus.pending,
+        pricing: const OrderPricing(
+          productTotal: 89900,
+          deliveryCharge: 2500,
+          grandTotal: 95399,
+          platformCommission: 8990,
+          vendorEarning: 80910,
+          driverEarning: 4500,
+        ),
+        placedAt: DateTime.now(),
+      ),
+    );
+
+    final isCod = order.paymentMethod == PaymentMethod.cod;
+    final amountText = '₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}';
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: isCod ? Colors.amber.shade50 : Colors.green.shade50,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: isCod ? Colors.amber.shade600 : Colors.green.shade600),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isCod ? Icons.payments_rounded : Icons.check_circle_rounded,
+            color: isCod ? Colors.amber.shade900 : Colors.green.shade900,
+            size: 22,
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isCod ? 'CASH ON DELIVERY (COD)' : 'PREPAID ORDER (ONLINE UPI)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12,
+                    color: isCod ? Colors.amber.shade900 : Colors.green.shade900,
+                  ),
+                ),
+                Text(
+                  isCod
+                      ? 'Collect $amountText cash from customer upon handover'
+                      : 'Customer paid online. DO NOT collect any cash.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: isCod ? Colors.amber.shade900 : Colors.green.shade900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildActionButton(BuildContext context, WidgetRef ref, DeliveryStatus status) {
     switch (status) {
       case DeliveryStatus.assigned:
         return Row(
           children: [
             Expanded(
-              child: ElevatedButton(
+              child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
+                icon: const Icon(Icons.check_circle_outline, color: Colors.white, size: 18),
+                label: const Text('Accept Delivery (₹45)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
                 onPressed: () {
-                  ref.read(driverDeliveryRepoProvider).updateDeliveryStatus(
-                        delivery.id,
-                        DeliveryStatus.accepted,
-                        delivery.orderId,
+                  final success = ref.read(driverDeliveryRepoProvider).acceptDelivery(
+                        orderId: delivery.orderId,
+                        driverId: 'driver-1',
+                        driverName: 'Suresh Solanki',
                       );
+                  if (!success) {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: const Row(
+                          children: [
+                            Icon(Icons.warning_amber_rounded, color: AppColors.error),
+                            SizedBox(width: 8),
+                            Text('Order Already Claimed'),
+                          ],
+                        ),
+                        content: const Text(
+                          'Another driver in your cluster has already accepted this order. Multi-driver concurrency lock prevents multiple drivers dispatched to the same store.',
+                        ),
+                        actions: [
+                          ElevatedButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+                        ],
+                      ),
+                    );
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        backgroundColor: AppColors.success,
+                        content: Text('✅ Delivery Accepted & Locked to You! Drive to store for pickup.'),
+                      ),
+                    );
+                  }
                 },
-                child: const Text('Accept Delivery (₹45)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: OutlinedButton(
+              child: OutlinedButton.icon(
                 style: OutlinedButton.styleFrom(foregroundColor: AppColors.error),
-                onPressed: () {},
-                child: const Text('Decline'),
+                icon: const Icon(Icons.close_rounded, size: 18),
+                label: const Text('Decline'),
+                onPressed: () {
+                  ref.read(driverDeliveryRepoProvider).declineDelivery(
+                        orderId: delivery.orderId,
+                        driverId: 'driver-1',
+                      );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Delivery request declined. Searching for next request...'),
+                    ),
+                  );
+                },
               ),
             ),
           ],
@@ -391,12 +588,44 @@ class _ActiveDeliveryCard extends ConsumerWidget {
         );
 
       case DeliveryStatus.atDelivery:
+        final order = OrderSyncService.currentOrders.firstWhere(
+          (o) => o.id == delivery.orderId,
+          orElse: () => OrderEntity(
+            id: delivery.orderId,
+            customerId: '',
+            storeId: '',
+            vendorId: '',
+            deliveryAddressId: '',
+            deliveryAddressSnapshot: const {},
+            status: OrderStatus.pickedUp,
+            paymentMethod: PaymentMethod.cod,
+            paymentStatus: PaymentStatus.pending,
+            pricing: const OrderPricing(
+              productTotal: 89900,
+              deliveryCharge: 2500,
+              grandTotal: 95399,
+              platformCommission: 8990,
+              vendorEarning: 80910,
+              driverEarning: 4500,
+            ),
+            placedAt: DateTime.now(),
+          ),
+        );
+        final isCod = order.paymentMethod == PaymentMethod.cod;
+        final amountText = '₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}';
+
         return SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.success),
-            icon: const Icon(Icons.verified_rounded, color: Colors.white),
-            label: const Text('Confirm Handover & Deliver (Collect ₹)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: isCod ? Colors.amber.shade800 : AppColors.success,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+            icon: Icon(isCod ? Icons.payments_rounded : Icons.verified_rounded, color: Colors.white),
+            label: Text(
+              isCod ? 'Collect $amountText Cash & Complete Delivery' : 'Confirm Handover & Deliver (Prepaid)',
+              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
             onPressed: () {
               ref.read(driverDeliveryRepoProvider).updateDeliveryStatus(
                     delivery.id,
@@ -404,14 +633,35 @@ class _ActiveDeliveryCard extends ConsumerWidget {
                     delivery.orderId,
                   );
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Delivery Completed! ₹45 credited to your balance.')),
+                SnackBar(
+                  backgroundColor: AppColors.success,
+                  content: Text(
+                    isCod
+                        ? '✅ Delivery Completed! $amountText cash collected. Submit remittance under Earnings.'
+                        : '✅ Prepaid Delivery Completed! ₹45 credited to your earnings.',
+                  ),
+                ),
               );
             },
           ),
         );
 
       case DeliveryStatus.delivered:
-        return const Center(child: Text('Trip Completed 🎉', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)));
+        return Column(
+          children: [
+            const Center(child: Text('Trip Completed 🎉', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 16))),
+            const SizedBox(height: 8),
+            OutlinedButton(
+              onPressed: () {
+                ref.read(driverDeliveryRepoProvider).declineDelivery(
+                      orderId: delivery.orderId,
+                      driverId: 'driver-1',
+                    );
+              },
+              child: const Text('Ready for Next Order'),
+            ),
+          ],
+        );
     }
   }
 }

@@ -1,3 +1,4 @@
+﻿import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -165,10 +166,10 @@ class _OrderCard extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text('Total: ₹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}', style: AppTextStyles.bodySmall),
-                  Text('10% Comm: -₹${(order.pricing.platformCommission / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, color: AppColors.error)),
+                  Text('Total: â‚¹${(order.pricing.grandTotal / 100).toStringAsFixed(0)}', style: AppTextStyles.bodySmall),
+                  Text('10% Comm: -â‚¹${(order.pricing.platformCommission / 100).toStringAsFixed(0)}', style: const TextStyle(fontSize: 11, color: AppColors.error)),
                   Text(
-                    'Net: ₹${(order.pricing.vendorEarning / 100).toStringAsFixed(0)}',
+                    'Net: â‚¹${(order.pricing.vendorEarning / 100).toStringAsFixed(0)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success, fontSize: 13),
                   ),
                 ],
@@ -257,3 +258,5 @@ class _OrderCard extends ConsumerWidget {
     );
   }
 }
+
+

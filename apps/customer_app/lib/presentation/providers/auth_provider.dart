@@ -13,5 +13,5 @@ final authStateProvider = StreamProvider<UserEntity?>((ref) {
 
 final currentUserProvider = Provider<UserEntity?>((ref) {
   final authState = ref.watch(authStateProvider);
-  return authState.valueOrNull;
+  return authState.valueOrNull ?? ref.watch(authRepositoryProvider).currentUser;
 });

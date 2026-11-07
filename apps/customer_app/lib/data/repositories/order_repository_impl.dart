@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
@@ -194,7 +194,7 @@ class OrderRepositoryImpl implements OrderRepository {
       final isCod = paymentMethod == 'cod';
       final int subtotal = 149900;
       final int packagingCharge = (subtotal * 0.01).round(); // 1% packaging charge
-      final int codCharge = isCod ? 2100 : 0;                 // ₹21 COD charge
+      final int codCharge = isCod ? 2100 : 0;                 // â‚¹21 COD charge
       final int deliveryCharge = 2500;
       final int grandTotal = subtotal + packagingCharge + codCharge + deliveryCharge;
 
@@ -407,3 +407,6 @@ class OrderRepositoryImpl implements OrderRepository {
     };
   }
 }
+
+
+

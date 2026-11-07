@@ -4,6 +4,8 @@ import 'package:core/core.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthService _authService;
+  final SmtpAuthService _smtpService;
+
   static final StreamController<UserEntity?> _controller = StreamController<UserEntity?>.broadcast();
   static UserEntity? _currentUser = UserEntity(
     uid: 'cust-ahmedabad-01',
@@ -14,8 +16,9 @@ class AuthRepositoryImpl implements AuthRepository {
     createdAt: DateTime(2026, 1, 1),
   );
 
-  AuthRepositoryImpl({AuthService? authService})
-      : _authService = authService ?? AuthService();
+  AuthRepositoryImpl({AuthService? authService, SmtpAuthService? smtpService})
+      : _authService = authService ?? AuthService(),
+        _smtpService = smtpService ?? const SmtpAuthService();
 
   @override
   Stream<UserEntity?> get authStateChanges {
@@ -61,22 +64,26 @@ class AuthRepositoryImpl implements AuthRepository {
       password: password,
       displayName: displayName,
     );
-    if (user != null) {
-      _currentUser = user;
-      _controller.add(user);
-      return (user, null);
-    }
-    final localUser = UserEntity(
+
+    final registeredUser = user ?? UserEntity(
       uid: 'cust-${email.split('@').first}',
       email: email,
-      phone: '+91 98765 43210',
+      phone: '',
       role: UserRole.customer,
       displayName: displayName,
       createdAt: DateTime.now(),
     );
-    _currentUser = localUser;
-    _controller.add(localUser);
-    return (localUser, null);
+
+    _currentUser = registeredUser;
+    _controller.add(registeredUser);
+
+    // Fire welcome email — non-blocking
+    _smtpService.sendWelcomeEmail(
+      recipientEmail: email,
+      displayName: displayName,
+    );
+
+    return (registeredUser, null);
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
@@ -9,15 +10,62 @@ class VendorOrderRepository {
       : _firestore = firestore ?? FirebaseFirestore.instance;
 
   Stream<List<OrderEntity>> watchVendorOrders(String storeId) {
-    return _firestore
-        .collection('orders')
-        .where('storeId', isEqualTo: storeId)
-        .orderBy('placedAt', descending: true)
-        .snapshots()
-        .map((snap) => snap.docs.map((doc) => _mapToOrderEntity(doc)).toList());
+    // 1. Listen to cross-app live sync bus
+    final localStream = OrderSyncService.ordersStream.map((orders) {
+      return OrderSyncService.getOrdersForStore(storeId);
+    });
+
+    // 2. Query Firestore without multi-field composite index constraint
+    Stream<List<OrderEntity>> firestoreStream;
+    try {
+      firestoreStream = _firestore
+          .collection('orders')
+          .where('storeId', isEqualTo: storeId)
+          .snapshots()
+          .map((snap) {
+            final orders = snap.docs.map((doc) => _mapToOrderEntity(doc)).toList();
+            // Sort in memory by placedAt descending
+            orders.sort((a, b) => b.placedAt.compareTo(a.placedAt));
+            if (orders.isNotEmpty) return orders;
+            return OrderSyncService.getOrdersForStore(storeId);
+          })
+          .handleError((error) {
+            AppLogger.warning('VendorOrderRepository.watchVendorOrders', 'Fallback to OrderSync: $error');
+            return OrderSyncService.getOrdersForStore(storeId);
+          });
+    } catch (_) {
+      firestoreStream = Stream.value(OrderSyncService.getOrdersForStore(storeId));
+    }
+
+    // Merge streams with local orders as default seed
+    final controller = StreamController<List<OrderEntity>>.broadcast();
+    
+    // Seed immediately with existing local orders
+    final initial = OrderSyncService.getOrdersForStore(storeId);
+    controller.add(initial);
+
+    // Listen to local bus
+    localStream.listen((orders) {
+      if (!controller.isClosed) controller.add(orders);
+    });
+
+    // Listen to Firestore
+    firestoreStream.listen(
+      (orders) {
+        if (!controller.isClosed && orders.isNotEmpty) controller.add(orders);
+      },
+      onError: (_) {
+        if (!controller.isClosed) {
+          controller.add(OrderSyncService.getOrdersForStore(storeId));
+        }
+      },
+    );
+
+    return controller.stream;
   }
 
   Future<void> acceptOrder(String orderId) async {
+    OrderSyncService.updateOrderStatus(orderId, OrderStatus.confirmed);
     try {
       await _firestore.collection('orders').doc(orderId).update({
         'status': 'confirmed',
@@ -25,11 +73,12 @@ class VendorOrderRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      AppLogger.error('acceptOrder', e.toString());
+      AppLogger.warning('VendorOrderRepository.acceptOrder', e.toString());
     }
   }
 
   Future<void> markReadyForPickup(String orderId) async {
+    OrderSyncService.updateOrderStatus(orderId, OrderStatus.readyForPickup);
     try {
       await _firestore.collection('orders').doc(orderId).update({
         'status': 'ready_for_pickup',
@@ -37,11 +86,12 @@ class VendorOrderRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      AppLogger.error('markReadyForPickup', e.toString());
+      AppLogger.warning('VendorOrderRepository.markReadyForPickup', e.toString());
     }
   }
 
   Future<void> rejectOrder(String orderId, String reason) async {
+    OrderSyncService.updateOrderStatus(orderId, OrderStatus.cancelled);
     try {
       await _firestore.collection('orders').doc(orderId).update({
         'status': 'cancelled',
@@ -50,7 +100,7 @@ class VendorOrderRepository {
         'updatedAt': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      AppLogger.error('rejectOrder', e.toString());
+      AppLogger.warning('VendorOrderRepository.rejectOrder', e.toString());
     }
   }
 

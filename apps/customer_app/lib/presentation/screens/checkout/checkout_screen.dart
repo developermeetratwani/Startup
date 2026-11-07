@@ -1,3 +1,5 @@
+import '../../providers/location_provider.dart';
+import 'package:core/core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -35,6 +37,21 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final cartSummary = ref.watch(cartSummaryProvider);
     final selectedAddress = ref.watch(selectedAddressProvider);
     final user = ref.watch(currentUserProvider);
+    final location = ref.watch(locationProvider);
+
+    const etaService = DeliveryEtaService();
+    final etaMinutes = etaService.estimateMinutes(
+      storeLat: 23.0768,
+      storeLng: 72.6346,
+      customerLat: location.latitude,
+      customerLng: location.longitude,
+    );
+    final distanceKm = etaService.distanceKm(
+      lat1: 23.0768,
+      lng1: 72.6346,
+      lat2: location.latitude,
+      lng2: location.longitude,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -45,24 +62,63 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Hyperlocal Delivery Promise
+            // Dynamic Whole Ahmedabad Delivery Estimation Banner
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.08),
+                color: distanceKm > 8 ? Colors.indigo.shade50 : AppColors.primary.withOpacity(0.08),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+                border: Border.all(
+                  color: distanceKm > 8 ? Colors.indigo.shade300 : AppColors.primary.withOpacity(0.25),
+                ),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.bolt_rounded, color: AppColors.primary, size: 28),
-                  SizedBox(width: 10),
+                  Icon(
+                    distanceKm > 8 ? Icons.explore_rounded : Icons.bolt_rounded,
+                    color: distanceKm > 8 ? Colors.indigo.shade800 : AppColors.primary,
+                    size: 28,
+                  ),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Guaranteed 35-45 Mins Delivery', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                        Text('Dispatched from local partner store directly to your location', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        Row(
+                          children: [
+                            Text(
+                              'Estimated ~$etaMinutes Mins Delivery',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: distanceKm > 8 ? Colors.indigo.shade900 : AppColors.textPrimary,
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            if (distanceKm > 8)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.indigo.shade100,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: Text(
+                                  'WHOLE AHMEDABAD',
+                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.indigo.shade900),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          distanceKm > 8
+                              ? 'Cross-city route from Kubernagar to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km). Time adjusts dynamically for cross-city traffic (not guaranteed 45 mins).'
+                              : 'Hyperlocal delivery to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km from store • traffic dependent).',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: distanceKm > 8 ? Colors.indigo.shade800 : AppColors.textSecondary,
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -110,7 +166,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             // 1. Cash on Delivery (COD)
             _PaymentCard(
               title: 'Cash on Delivery (COD)',
-              subtitle: 'Pay cash to driver upon delivery • ₹21 handling surcharge',
+              subtitle: 'Pay cash to driver upon delivery â€¢ â‚¹21 handling surcharge',
               icon: Icons.money_rounded,
               color: AppColors.success,
               value: 'cod',
@@ -134,7 +190,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             // 3. Online Payment (Razorpay / Instant)
             _PaymentCard(
               title: 'Online Payment (Razorpay / Cards)',
-              subtitle: 'Cards, Netbanking & Wallets • Instant order confirmation',
+              subtitle: 'Cards, Netbanking & Wallets â€¢ Instant order confirmation',
               icon: Icons.credit_card_rounded,
               color: AppColors.accent,
               value: 'online',
@@ -176,7 +232,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     const SizedBox(height: 8),
                     _PriceRow(
                       title: 'Cash on Delivery Handling Fee',
-                      value: '₹21',
+                      value: 'â‚¹21',
                       color: AppColors.primary,
                     ),
                   ],
@@ -205,10 +261,33 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
           ],
         ),
         child: SafeArea(
-          child: AppButton(
-            label: _getButtonLabel(cartSummary.grandTotalDisplay),
-            isLoading: _isPlacingOrder,
-            onPressed: () async {
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: InkWell(
+                  onTap: () => context.push('/legal'),
+                  child: const Text.rich(
+                    TextSpan(
+                      text: 'By placing order you agree to our ',
+                      style: TextStyle(fontSize: 10, color: AppColors.textSecondary),
+                      children: [
+                        TextSpan(
+                          text: 'DPDP Privacy, 48h Size Exchange & Terms',
+                          style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.primary, decoration: TextDecoration.underline),
+                        ),
+                        TextSpan(text: ' • Grievance: Meet Ratwani'),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              AppButton(
+                label: _getButtonLabel(cartSummary.grandTotalDisplay),
+                isLoading: _isPlacingOrder,
+                onPressed: () async {
               setState(() => _isPlacingOrder = true);
 
               final effectiveUserId = user?.uid ?? 'cust-ahmedabad-01';
@@ -240,6 +319,8 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 context.go('/orders/track/${orderId ?? 'ord-kubernagar-8920'}');
               }
             },
+          ),
+            ],
           ),
         ),
       ),
@@ -353,3 +434,6 @@ class _PriceRow extends StatelessWidget {
     );
   }
 }
+
+
+

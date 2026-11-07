@@ -76,7 +76,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 Text('Welcome back 👋', style: AppTextStyles.displayMedium),
                 const SizedBox(height: 8),
                 Text(
-                  'Sign in to explore local clothing stores in Kubernagar, Gandhinagar & Vapi',
+                  'Sign in to explore clothing stores across all Ahmedabad (Sindhu Bhavan, Bodakdev, Kubernagar & Gandhinagar)',
                   style: AppTextStyles.bodyLarge.copyWith(color: AppColors.textSecondary),
                 ),
                 const SizedBox(height: 32),

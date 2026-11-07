@@ -233,10 +233,10 @@ class DriverProfileScreen extends ConsumerWidget {
               },
             ),
             ListTile(
-              title: const Text('Vapi Industrial & Retail Belt'),
-              subtitle: const Text('14 km delivery radius • Gunjan silk markets'),
+              title: const Text('Sindhu Bhavan & Bodakdev (West Ahmedabad)'),
+              subtitle: const Text('20 km cross-city radius • SBR, SG Highway & Prahlad Nagar'),
               onTap: () {
-                ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Vapi Industrial & Retail Belt');
+                ref.read(driverProfileProvider.notifier).state = profile.copyWith(cluster: 'Sindhu Bhavan & Bodakdev (West Ahmedabad)');
                 Navigator.pop(ctx);
               },
             ),

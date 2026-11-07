@@ -106,6 +106,14 @@ class ProfileScreen extends ConsumerWidget {
                       AppSnackbar.show(context, message: 'Support helpline: support@hyperlocalfashion.in');
                     },
                   ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.security_rounded, color: AppColors.primary),
+                    title: const Text('Privacy, Consent & App Permissions'),
+                    subtitle: const Text('DPDP Act 2023, 25 Statutory Protections & Grievance Desk'),
+                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                    onTap: () => context.push('/legal'),
+                  ),
                 ],
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domain/domain.dart';
+import 'package:core/core.dart';
 import '../../data/repositories/driver_delivery_repository.dart';
 import '../../data/repositories/driver_earnings_repository.dart';
 
@@ -50,6 +51,23 @@ final driverEarningsProvider = StreamProvider<DriverEarningsSummary>((ref) {
   return repo.watchEarnings(driverId);
 });
 
+// Driver COD & Remittance Reconciliation Provider
+final driverCodSummaryProvider = Provider<DriverCodSummary>((ref) {
+  // Listen to order updates to recalculate COD metrics live
+  ref.watch(driverDeliveriesProvider);
+  return OrderSyncService.getDriverCodSummary('driver-1', 'Suresh Solanki');
+});
+
+// Driver Remittance History Stream
+final driverRemittancesProvider = StreamProvider<List<DriverRemittanceRecord>>((ref) {
+  return OrderSyncService.remittancesStream;
+});
+
+// Driver Hub Cash Handover OTP Stream
+final driverHandoversProvider = StreamProvider<List<DriverHubHandoverRequest>>((ref) {
+  return OrderSyncService.handoversStream;
+});
+
 // Driver Profile & Fleet Security state
 class DriverProfileState {
   final String name;
@@ -71,7 +89,7 @@ class DriverProfileState {
     this.vehicleType = 'Two-Wheeler Scooter',
     this.aadhaarNumber = 'XXXX-XXXX-8912',
     this.electricityBillProvider = 'Torrent Power (Ahmedabad)',
-    this.cluster = 'Kubernagar, Gandhinagar & Vapi',
+    this.cluster = 'All Ahmedabad (Sindhu Bhavan, Bodakdev, Kubernagar & Gandhinagar)',
     this.isVerified = true,
     this.isBlacklisted = false,
   });

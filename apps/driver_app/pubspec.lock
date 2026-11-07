@@ -854,6 +854,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.3.1"
+  mailer:
+    dependency: transitive
+    description:
+      name: mailer
+      sha256: "56824d48355d6d0d48abbdd33c499ad26cda12ec64f6d0361f5ba7a6c4ac27b6"
+      url: "https://pub.dev"
+    source: hosted
+    version: "7.2.2"
   matcher:
     dependency: transitive
     description:
@@ -1070,6 +1078,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
+  punycoder:
+    dependency: transitive
+    description:
+      name: punycoder
+      sha256: "982734df864d9588eb13e28ac1c5a46b57e22117b3696032ac58739966cec190"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.0"
   riverpod:
     dependency: transitive
     description:
@@ -1346,6 +1362,14 @@ packages:
       relative: true
     source: path
     version: "0.0.1"
+  unorm_dart:
+    dependency: transitive
+    description:
+      name: unorm_dart
+      sha256: b4f4d2aff27d65a5fc37f400d4c09e55d7535359315acbe3b895a9add4de3a23
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.3.3"
   url_launcher:
     dependency: "direct main"
     description:
@@ -1515,5 +1539,5 @@ packages:
     source: hosted
     version: "3.1.4"
 sdks:
-  dart: ">=3.7.0 <4.0.0"
+  dart: ">=3.7.2 <4.0.0"
   flutter: ">=3.29.0"

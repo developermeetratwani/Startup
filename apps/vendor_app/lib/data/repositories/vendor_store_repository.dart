@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
 
@@ -60,15 +60,17 @@ class VendorStoreRepository {
     }
   }
 
-  Future<void> updateStoreProfile({
+    Future<void> updateStoreProfile({
     required String storeId,
     required String name,
     required String description,
     required String address,
     required String city,
+    String? bannerImageUrl,
+    String? logoImageUrl,
   }) async {
     try {
-      await _firestore.collection('stores').doc(storeId).set({
+      final data = <String, dynamic>{
         'name': name,
         'description': description,
         'location': {
@@ -76,9 +78,17 @@ class VendorStoreRepository {
           'city': city,
         },
         'updatedAt': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+      };
+      if (bannerImageUrl != null && bannerImageUrl.isNotEmpty) {
+        data['bannerImageUrl'] = bannerImageUrl;
+      }
+      if (logoImageUrl != null && logoImageUrl.isNotEmpty) {
+        data['logoImageUrl'] = logoImageUrl;
+      }
+      await _firestore.collection('stores').doc(storeId).set(data, SetOptions(merge: true));
     } catch (e) {
       AppLogger.error('updateStoreProfile', e.toString());
     }
   }
 }
+
