@@ -1,7 +1,16 @@
+import 'dart:math';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:domain/domain.dart';
 import '../../data/repositories/cart_repository_impl.dart';
 import 'auth_provider.dart';
+
+String _isolatedGuestSessionId = '';
+String get isolatedGuestSessionId {
+  if (_isolatedGuestSessionId.isEmpty) {
+    _isolatedGuestSessionId = 'guest-${DateTime.now().millisecondsSinceEpoch}-${Random().nextInt(999999)}';
+  }
+  return _isolatedGuestSessionId;
+}
 
 final cartRepositoryProvider = Provider<CartRepository>((ref) {
   return CartRepositoryImpl();
@@ -9,7 +18,8 @@ final cartRepositoryProvider = Provider<CartRepository>((ref) {
 
 final cartStreamProvider = StreamProvider<List<CartItemEntity>>((ref) {
   final user = ref.watch(currentUserProvider);
-  final customerId = user?.uid ?? 'guest-cust-session';
+  // Strictly isolated customer ID: authenticated Firebase UID or isolated browser session
+  final customerId = user?.uid ?? isolatedGuestSessionId;
   final repo = ref.watch(cartRepositoryProvider);
   return repo.watchCart(customerId);
 });

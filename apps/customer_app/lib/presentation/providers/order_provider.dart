@@ -9,9 +9,11 @@ final orderRepositoryProvider = Provider<OrderRepository>((ref) {
 
 final customerOrdersProvider = StreamProvider<List<OrderEntity>>((ref) {
   final user = ref.watch(currentUserProvider);
-  final effectiveUid = user?.uid ?? 'cust-ahmedabad-01';
+  if (user == null) {
+    return Stream.value([]);
+  }
   final repo = ref.watch(orderRepositoryProvider);
-  return repo.watchCustomerOrders(effectiveUid);
+  return repo.watchCustomerOrders(user.uid);
 });
 
 final singleOrderStreamProvider = StreamProvider.family<OrderEntity?, String>((ref, orderId) {

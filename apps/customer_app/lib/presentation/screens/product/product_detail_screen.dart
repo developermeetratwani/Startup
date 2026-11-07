@@ -285,7 +285,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           isLoading: _isAdding,
                           onPressed: inStock
                               ? () async {
-                                  final customerId = user?.uid ?? 'guest-cust-session';
+                                  final customerId = user?.uid ?? isolatedGuestSessionId;
                                   setState(() => _isAdding = true);
                                   final cartRepo = ref.read(cartRepositoryProvider);
                                   await cartRepo.addToCart(

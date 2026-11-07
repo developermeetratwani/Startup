@@ -36,8 +36,8 @@ class CartScreen extends ConsumerWidget {
                     ],
                   ),
                 );
-                if (confirm == true && user != null) {
-                  await cartRepo.clearCart(user.uid);
+                if (confirm == true) {
+                  await cartRepo.clearCart(user?.uid ?? isolatedGuestSessionId);
                 }
               },
             ),
@@ -105,7 +105,7 @@ class CartScreen extends ConsumerWidget {
                   // Cart Items
                   Text('Order Items (${cartSummary.itemCount})', style: AppTextStyles.titleMedium),
                   const SizedBox(height: 10),
-                  ...cartSummary.items.map((item) => _CartItemTile(item: item, userId: user?.uid ?? '')),
+                  ...cartSummary.items.map((item) => _CartItemTile(item: item, userId: user?.uid ?? isolatedGuestSessionId)),
 
                   const SizedBox(height: 20),
 
