@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:domain/domain.dart';
 import 'package:core/core.dart';
@@ -40,7 +41,23 @@ class DriverHomeScreen extends ConsumerWidget {
               child: Switch(
                 value: isOnline,
                 activeColor: AppColors.success,
-                onChanged: (val) {
+                onChanged: (val) async {
+                  if (val) {
+                    try {
+                      LocationPermission perm = await Geolocator.checkPermission();
+                      if (perm == LocationPermission.denied) {
+                        perm = await Geolocator.requestPermission();
+                      }
+                      if (perm == LocationPermission.deniedForever) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('⚠️ GPS location permission is required for active driver duty')),
+                          );
+                        }
+                        return;
+                      }
+                    } catch (_) {}
+                  }
                   ref.read(driverDutyProvider.notifier).state = val;
                 },
               ),
