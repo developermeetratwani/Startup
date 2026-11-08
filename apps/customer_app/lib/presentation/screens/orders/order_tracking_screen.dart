@@ -21,10 +21,7 @@ class OrderTrackingScreen extends ConsumerStatefulWidget {
   ConsumerState<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
 }
 
-class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _radarPulseController;
-  late final Animation<double> _radarPulseAnimation;
+class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
   late final MapController _mapController;
   StreamSubscription<AppNotification>? _notificationSub;
 
@@ -33,15 +30,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
     super.initState();
     _mapController = MapController();
 
-    // Pulse animation controller for realistic Swiggy/Zomato radar waves
-    _radarPulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1800),
-    )..repeat(reverse: true);
 
-    _radarPulseAnimation = Tween<double>(begin: 0.85, end: 1.28).animate(
-      CurvedAnimation(parent: _radarPulseController, curve: Curves.easeInOut),
-    );
 
     // Listen to real-time notification stream for in-app alert toasts
     _notificationSub = NotificationService.notificationStream.listen((notification) {
@@ -84,7 +73,6 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
 
   @override
   void dispose() {
-    _radarPulseController.dispose();
     _notificationSub?.cancel();
     super.dispose();
   }
@@ -382,89 +370,105 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                                     ),
                                   ),
 
-                                  // 2. Animated Live Delivery Scooter with Pulsing Radar Wave
+                                  // 2. Premium Delivery Partner Scooter Marker (Clean Zomato/Uber styling)
                                   Marker(
                                     point: riderLocation,
-                                    width: 90,
-                                    height: 80,
-                                    child: AnimatedBuilder(
-                                      animation: _radarPulseAnimation,
-                                      builder: (context, child) {
-                                        return Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            // Floating Courier Pill
-                                            Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                              decoration: BoxDecoration(
-                                                color: Colors.black.withValues(alpha: 0.88),
-                                                borderRadius: BorderRadius.circular(10),
-                                                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                                    width: 100,
+                                    height: 75,
+                                    child: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        // Floating Driver Status Pill
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                          decoration: BoxDecoration(
+                                            color: const Color(0xFF0F172A),
+                                            borderRadius: BorderRadius.circular(12),
+                                            boxShadow: const [
+                                              BoxShadow(
+                                                color: Colors.black26,
+                                                blurRadius: 6,
+                                                offset: Offset(0, 2),
                                               ),
-                                              child: const Row(
-                                                mainAxisSize: MainAxisSize.min,
-                                                children: [
-                                                  CircleAvatar(radius: 3, backgroundColor: Color(0xFF10B981)),
-                                                  SizedBox(width: 4),
-                                                  Text('Suresh • 12m', style: TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold)),
+                                            ],
+                                          ),
+                                          child: const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              CircleAvatar(radius: 3.5, backgroundColor: Color(0xFF10B981)),
+                                              SizedBox(width: 5),
+                                              Text(
+                                                'Suresh • 12m',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 10,
+                                                  fontWeight: FontWeight.w700,
+                                                  letterSpacing: 0.2,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                        const SizedBox(height: 4),
+
+                                        // Elevated Scooter Core Badge with Direction Heading
+                                        Stack(
+                                          clipBehavior: Clip.none,
+                                          alignment: Alignment.center,
+                                          children: [
+                                            Container(
+                                              width: 40,
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                gradient: const LinearGradient(
+                                                  colors: [Color(0xFFE23744), Color(0xFFDC2626)],
+                                                  begin: Alignment.topLeft,
+                                                  end: Alignment.bottomRight,
+                                                ),
+                                                shape: BoxShape.circle,
+                                                border: Border.all(color: Colors.white, width: 2.5),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: const Color(0xFFE23744).withValues(alpha: 0.35),
+                                                    blurRadius: 8,
+                                                    offset: const Offset(0, 3),
+                                                  ),
+                                                  const BoxShadow(
+                                                    color: Colors.black12,
+                                                    blurRadius: 4,
+                                                    offset: Offset(0, 1),
+                                                  ),
                                                 ],
                                               ),
+                                              child: const Center(
+                                                child: Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 22),
+                                              ),
                                             ),
-                                            const SizedBox(height: 3),
-                                            // Scooter with Animated Pulsing Halo
-                                            Stack(
-                                              alignment: Alignment.center,
-                                              children: [
-                                                // Outer Radar Pulse Wave
-                                                Container(
-                                                  width: 48 * _radarPulseAnimation.value,
-                                                  height: 48 * _radarPulseAnimation.value,
-                                                  decoration: BoxDecoration(
-                                                    shape: BoxShape.circle,
-                                                    color: const Color(0xFFE23744).withValues(
-                                                      alpha: (0.35 / _radarPulseAnimation.value).clamp(0.0, 1.0),
-                                                    ),
-                                                  ),
+
+                                            // Directional Heading Indicator
+                                            Positioned(
+                                              top: -2,
+                                              right: -2,
+                                              child: Container(
+                                                padding: const EdgeInsets.all(3),
+                                                decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  shape: BoxShape.circle,
+                                                  boxShadow: const [
+                                                    BoxShadow(color: Colors.black26, blurRadius: 3),
+                                                  ],
+                                                  border: Border.all(color: const Color(0xFFE23744), width: 1.2),
                                                 ),
-                                                // Elevated Scooter Core Badge
-                                                Container(
-                                                  width: 38,
-                                                  height: 38,
-                                                  decoration: BoxDecoration(
-                                                    color: const Color(0xFFE23744),
-                                                    shape: BoxShape.circle,
-                                                    border: Border.all(color: Colors.white, width: 2.5),
-                                                    boxShadow: [
-                                                      BoxShadow(
-                                                        color: const Color(0xFFE23744).withValues(alpha: 0.45),
-                                                        blurRadius: 8,
-                                                        offset: const Offset(0, 3),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                  child: const Center(
-                                                    child: Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 20),
-                                                  ),
+                                                child: const Icon(
+                                                  Icons.navigation_rounded,
+                                                  size: 10,
+                                                  color: Color(0xFFE23744),
                                                 ),
-                                                // Heading Indicator
-                                                Positioned(
-                                                  top: 0,
-                                                  right: 0,
-                                                  child: Container(
-                                                    padding: const EdgeInsets.all(2),
-                                                    decoration: const BoxDecoration(
-                                                      color: Colors.white,
-                                                      shape: BoxShape.circle,
-                                                      boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 2)],
-                                                    ),
-                                                    child: const Icon(Icons.navigation_rounded, size: 9, color: Color(0xFFE23744)),
-                                                  ),
-                                                ),
-                                              ],
+                                              ),
                                             ),
                                           ],
-                                        );
-                                      },
+                                        ),
+                                      ],
                                     ),
                                   ),
 
