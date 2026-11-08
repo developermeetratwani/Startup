@@ -33,12 +33,18 @@ class AppColors {
   static const Color tomatoLight   = Color(0xFFFEECEB);
 
   // ─── Surfaces ──────────────────────────────────────────────────────────────
-  // Warm Linen canvas replaces stark grey for an editorial high-end boutique feel
-  static const Color background    = Color(0xFFF4EFE9);
-  static const Color surface       = Color(0xFFFFFFFF);
-  static const Color surfaceWarm   = Color(0xFFFAF7F3);
-  static const Color surfaceVariant = Color(0xFFEBE5DC);
-  static const Color cardBorder    = Color(0xFFE5DDD3);
+  // Crisp modern canvas with subtle warm tones for a top-tier delivery app feel (Swiggy / Zomato)
+  static const Color background    = Color(0xFFF8F9FA); // Crisp, ultra-clean modern canvas
+  static const Color surface       = Color(0xFFFFFFFF); // Pristine white card surface
+  static const Color surfaceWarm   = Color(0xFFFAF7F3); // Warm linen editorial card tint
+  static const Color surfaceVariant = Color(0xFFF1F3F5); // Soft neutral background for pills/inputs
+  static const Color cardBorder    = Color(0xFFEDEDF0); // Subtle, clean card border
+  static const Color divider       = Color(0xFFF0F1F3); // Crisp divider line
+
+  // ─── Hyperlocal Indicators (Zomato / Swiggy standard) ──────────────────────
+  static const Color ratingGreen   = Color(0xFF267E3E); // Iconic high-trust emerald rating badge
+  static const Color ratingGold    = Color(0xFFF59E0B);
+  static const Color fastDelivery  = Color(0xFFE23744); // Flash delivery badge
 
   // ─── Typography ────────────────────────────────────────────────────────────
   static const Color textPrimary   = Color(0xFF171717);
@@ -62,8 +68,7 @@ class AppColors {
   static const Color statusCancelled   = Color(0xFFDC2626);
 
   // ─── Misc ──────────────────────────────────────────────────────────────────
-  static const Color divider       = Color(0xFFE5DDD3);
-  static const Color shadow        = Color(0x0F171717); // Soft diffused shadow
-  static const Color shimmerBase   = Color(0xFFE8E2D9);
-  static const Color shimmerHighlight = Color(0xFFF4EFE9);
+  static const Color shadow        = Color(0x0C171717); // Soft diffused ambient shadow
+  static const Color shimmerBase   = Color(0xFFEEEEF2);
+  static const Color shimmerHighlight = Color(0xFFF8F9FA);
 }

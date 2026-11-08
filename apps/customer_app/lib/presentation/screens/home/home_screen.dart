@@ -4,10 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:domain/domain.dart';
+import 'package:core/core.dart';
 import '../../providers/location_provider.dart';
 import '../../providers/store_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/product_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/support_chatbot_sheet.dart';
 import '../../widgets/floating_cart_bar.dart';
 
@@ -20,6 +22,8 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   bool _isNavBarVisible = true;
+  String _activeQuickFilter = 'all';
+  int _activeDealPage = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -29,17 +33,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final cartSummary = ref.watch(cartSummaryProvider);
     final productsAsync = ref.watch(homeProductsProvider(selectedCategory));
 
-    final categories = [
-      {'id': 'all', 'label': 'All Fashion', 'icon': Icons.grid_view_rounded},
-      {'id': 'women', 'label': 'Women', 'icon': Icons.woman_rounded},
-      {'id': 'men', 'label': 'Men', 'icon': Icons.man_rounded},
-      {'id': 'ethnic', 'label': 'Ethnic Wear', 'icon': Icons.dry_cleaning_rounded},
-      {'id': 'western', 'label': 'Western', 'icon': Icons.checkroom_rounded},
-      {'id': 'kids', 'label': 'Kids', 'icon': Icons.child_care_rounded},
+    final categoriesList = [
+      {'id': 'all', 'label': 'All Fashion', 'sub': 'Explore all', 'icon': Icons.local_fire_department_rounded, 'color': const Color(0xFFF04438), 'bg': const Color(0xFFFFF0F3)},
+      {'id': 'ethnic', 'label': 'Ethnic Wear', 'sub': 'Kurtis & Sarees', 'icon': Icons.dry_cleaning_rounded, 'color': const Color(0xFFD93670), 'bg': const Color(0xFFFDF2F7)},
+      {'id': 'women', 'label': 'Women', 'sub': 'Dresses & Tops', 'icon': Icons.woman_rounded, 'color': const Color(0xFFA78BFA), 'bg': const Color(0xFFF5F0FF)},
+      {'id': 'men', 'label': 'Men', 'sub': 'Tees & Shirts', 'icon': Icons.man_rounded, 'color': const Color(0xFF2563EB), 'bg': const Color(0xFFEFF6FF)},
+      {'id': 'western', 'label': 'Western', 'sub': 'Denim & Cargo', 'icon': Icons.checkroom_rounded, 'color': const Color(0xFF0D9488), 'bg': const Color(0xFFF0FDFA)},
+      {'id': 'kids', 'label': 'Kids & Teens', 'sub': 'Trendy wear', 'icon': Icons.child_care_rounded, 'color': const Color(0xFF16A34A), 'bg': const Color(0xFFF0FDF4)},
+    ];
+
+    final quickFilters = [
+      {'id': 'all', 'label': 'All Stores'},
+      {'id': 'fast', 'label': '⚡ Under 20m'},
+      {'id': 'rating', 'label': '★ 4.0+ Top Rated'},
+      {'id': 'offers', 'label': '🏷️ Great Offers'},
+      {'id': 'exchange', 'label': '🔄 48h Exchange'},
     ];
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
         titleSpacing: AppSpacing.pagePadding,
         title: GestureDetector(
           onTap: () => _showLocationSelector(context, ref),
@@ -50,47 +66,98 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Icon(Icons.location_on, color: AppColors.accent, size: 16),
-                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [AppColors.accent, AppColors.accentTomato],
+                      ),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.location_on_rounded, color: Colors.white, size: 14),
+                  ),
+                  const SizedBox(width: 6),
                   Flexible(
                     child: Text(
-                      location.areaName,
+                      location.areaName.isNotEmpty ? location.areaName : 'Ahmedabad',
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.w700),
+                      style: AppTextStyles.titleMedium.copyWith(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 16,
+                        letterSpacing: -0.3,
+                      ),
                     ),
                   ),
-                  const Icon(Icons.keyboard_arrow_down, size: 18),
+                  const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AppColors.textPrimary),
                 ],
               ),
-              Text(
-                '${location.cityName} • Hyperlocal',
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: AppTextStyles.bodySmall,
+              const SizedBox(height: 2),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFE8F5E9),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.bolt_rounded, size: 11, color: Color(0xFF267E3E)),
+                        SizedBox(width: 2),
+                        Text(
+                          '10-15 MINS',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            color: Color(0xFF267E3E),
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    '${location.cityName} • Hyperlocal Delivery',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                  ),
+                ],
               ),
             ],
           ),
         ),
         actions: [
+          // Order Receipt shortcut
+          IconButton(
+            icon: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 22),
+            tooltip: 'My Orders',
+            onPressed: () => context.push('/orders'),
+          ),
+          // Cart Bag with vibrant badge
           IconButton(
             icon: Stack(
               clipBehavior: Clip.none,
               children: [
-                const Icon(Icons.shopping_bag_outlined),
+                const Icon(Icons.shopping_bag_outlined, color: AppColors.primary, size: 24),
                 if (cartSummary.itemCount > 0)
                   Positioned(
-                    right: -4,
-                    top: -4,
+                    right: -5,
+                    top: -5,
                     child: Container(
                       padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: AppColors.accent,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(colors: [AppColors.accent, AppColors.accentTomato]),
                         shape: BoxShape.circle,
+                        boxShadow: const [BoxShadow(color: Color(0x33D93670), blurRadius: 4)],
                       ),
                       child: Text(
                         '${cartSummary.itemCount}',
-                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
                       ),
                     ),
                   ),
@@ -98,416 +165,627 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
             onPressed: () => context.push('/cart'),
           ),
-          IconButton(
-            icon: const Icon(Icons.receipt_long_outlined),
-            tooltip: 'My Orders',
-            onPressed: () => context.push('/orders'),
-          ),
-          IconButton(
-            icon: const Icon(Icons.person_outline_rounded),
-            tooltip: 'Profile & Account',
-            onPressed: () => context.push('/profile'),
+          // User Avatar
+          GestureDetector(
+            onTap: () => context.push('/profile'),
+            child: Container(
+              margin: const EdgeInsets.only(right: 14, left: 2),
+              padding: const EdgeInsets.all(2),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: AppColors.cardBorder, width: 1.5),
+              ),
+              child: const CircleAvatar(
+                radius: 14,
+                backgroundColor: AppColors.primary,
+                child: Icon(Icons.person_rounded, size: 16, color: Colors.white),
+              ),
+            ),
           ),
         ],
       ),
       body: NotificationListener<UserScrollNotification>(
         onNotification: (notification) {
           if (notification.metrics.pixels <= 10) {
-            if (!_isNavBarVisible) {
-              setState(() => _isNavBarVisible = true);
-            }
+            if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
           } else if (notification.direction == ScrollDirection.reverse) {
-            // User scrolled down -> hide navigation bar
-            if (_isNavBarVisible) {
-              setState(() => _isNavBarVisible = false);
-            }
+            if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
           } else if (notification.direction == ScrollDirection.forward) {
-            // User scrolled up / pulled up -> show navigation bar
-            if (!_isNavBarVisible) {
-              setState(() => _isNavBarVisible = true);
-            }
+            if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
           }
           return true;
         },
         child: RefreshIndicator(
+          color: AppColors.accent,
           onRefresh: () async => ref.refresh(nearbyStoresProvider),
           child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Active Order Live Tracking Quick Banner (Zomato style)
-              Padding(
-                padding: const EdgeInsets.only(left: AppSpacing.pagePadding, right: AppSpacing.pagePadding, bottom: 12),
-                child: InkWell(
-                  onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
-                  borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withValues(alpha: 0.08),
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                      border: Border.all(color: AppColors.accent.withValues(alpha: 0.4)),
-                    ),
-                    child: Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(7),
-                          decoration: const BoxDecoration(
-                            color: AppColors.accent,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.near_me_rounded, color: Colors.white, size: 16),
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.only(bottom: 24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Active Order Live Tracking Banner (Zomato style)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 12, AppSpacing.pagePadding, 8),
+                  child: InkWell(
+                    onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
+                    borderRadius: BorderRadius.circular(16),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF171717), Color(0xFF282828)],
                         ),
-                        const SizedBox(width: 10),
-                        const Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Text('Active Delivery: En Route', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.accent)),
-                                  SizedBox(width: 6),
-                                  CircleAvatar(radius: 3, backgroundColor: Colors.green),
-                                ],
-                              ),
-                              SizedBox(height: 2),
-                              Text('Suresh Solanki (~18 Mins) • Tap to view', maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                          decoration: BoxDecoration(
-                            color: AppColors.accent,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Text('Track', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              // Search Bar
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                child: GestureDetector(
-                  onTap: () => context.push('/search'),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: AppColors.surface,
-                      borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                      border: Border.all(color: AppColors.cardBorder, width: 1),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x08171717),
-                          blurRadius: 10,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        const Icon(Icons.search, color: AppColors.accent, size: 20),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            'Search kurta, sarees, jeans, shirts...',
-                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.lg),
-
-              // Promotional Banner
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(22),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFF171717), Color(0xFF262422)],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                    boxShadow: const [
-                      BoxShadow(
-                        color: Color(0x1F171717),
-                        blurRadius: 16,
-                        offset: Offset(0, 8),
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x1F000000), blurRadius: 10, offset: Offset(0, 3)),
+                        ],
                       ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                      child: Row(
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                            decoration: BoxDecoration(
-                              gradient: const LinearGradient(
-                                colors: [AppColors.accentTomato, AppColors.accent],
-                              ),
-                              borderRadius: BorderRadius.circular(6),
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                              color: AppColors.accent,
+                              shape: BoxShape.circle,
                             ),
-                            child: const Text(
-                              'LOCAL DISCOVERY',
+                            child: const Icon(Icons.delivery_dining_rounded, color: Colors.white, size: 18),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Text('Active Order • En Route', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white)),
+                                    SizedBox(width: 6),
+                                    CircleAvatar(radius: 3.5, backgroundColor: Color(0xFF22C55E)),
+                                  ],
+                                ),
+                                SizedBox(height: 2),
+                                Text('Rider Suresh (~14 Mins) • Tap to view GPS map', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                              ],
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: const Text('TRACK', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Floating Search Bar (Zomato / Swiggy Pill)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: 8),
+                  child: GestureDetector(
+                    onTap: () => context.push('/search'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.cardBorder, width: 1.2),
+                        boxShadow: const [
+                          BoxShadow(
+                            color: Color(0x08000000),
+                            blurRadius: 14,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.search_rounded, color: AppColors.accent, size: 22),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Search "kurta", "oversized tee", "denims"...',
                               style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                letterSpacing: 0.6,
+                                color: AppColors.textHint,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            height: 20,
+                            width: 1,
+                            color: AppColors.divider,
+                            margin: const EdgeInsets.symmetric(horizontal: 8),
+                          ),
+                          const Icon(Icons.mic_none_rounded, color: AppColors.accent, size: 20),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
+
+                // Dynamic Promotional Banner Carousel (Admin sync)
+                StreamBuilder<List<DealBanner>>(
+                  stream: DealsService.dealsStream,
+                  builder: (context, snapshot) {
+                    final deals = snapshot.data ?? DealsService.allDeals.where((d) => d.isActive).toList();
+                    if (deals.isEmpty) return const SizedBox.shrink();
+
+                    return Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                          child: SizedBox(
+                            height: 195,
+                            child: PageView.builder(
+                              itemCount: deals.length,
+                              onPageChanged: (idx) => setState(() => _activeDealPage = idx),
+                              itemBuilder: (context, index) {
+                                final deal = deals[index];
+                                final startColor = Color(int.tryParse(deal.gradientStart) ?? 0xFF171717);
+                                final endColor = Color(int.tryParse(deal.gradientEnd) ?? 0xFFD93670);
+
+                                return Container(
+                                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                                  padding: const EdgeInsets.all(18),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [startColor, endColor],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(20),
+                                    boxShadow: const [
+                                      BoxShadow(
+                                        color: Color(0x1F171717),
+                                        blurRadius: 16,
+                                        offset: Offset(0, 8),
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withValues(alpha: 0.22),
+                                              borderRadius: BorderRadius.circular(6),
+                                            ),
+                                            child: Text(
+                                              deal.badgeText,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w800,
+                                                letterSpacing: 0.6,
+                                              ),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                                            decoration: BoxDecoration(
+                                              color: Colors.black.withValues(alpha: 0.3),
+                                              borderRadius: BorderRadius.circular(20),
+                                            ),
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                const Icon(Icons.local_offer_rounded, color: Color(0xFFFFD700), size: 13),
+                                                const SizedBox(width: 4),
+                                                Text(
+                                                  '${deal.discountPercent}% OFF',
+                                                  style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w900),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        deal.title,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 19,
+                                          fontWeight: FontWeight.w900,
+                                          letterSpacing: -0.3,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Expanded(
+                                        child: Text(
+                                          deal.subtitle,
+                                          style: TextStyle(
+                                            color: Colors.white.withValues(alpha: 0.88),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          maxLines: 2,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Row(
+                                        children: [
+                                          InkWell(
+                                            onTap: () {
+                                              ScaffoldMessenger.of(context).showSnackBar(
+                                                SnackBar(
+                                                  content: Text('🎉 Promo Code "${deal.promoCode}" copied! Enjoy ${deal.discountPercent}% OFF.'),
+                                                  backgroundColor: AppColors.primary,
+                                                  behavior: SnackBarBehavior.floating,
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                                ),
+                                              );
+                                            },
+                                            borderRadius: BorderRadius.circular(20),
+                                            child: Container(
+                                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.circular(20),
+                                                boxShadow: const [BoxShadow(color: Color(0x24000000), blurRadius: 6)],
+                                              ),
+                                              child: Row(
+                                                mainAxisSize: MainAxisSize.min,
+                                                children: [
+                                                  const Icon(Icons.copy_rounded, color: AppColors.primary, size: 13),
+                                                  const SizedBox(width: 6),
+                                                  Text(
+                                                    'USE: ${deal.promoCode}',
+                                                    style: const TextStyle(color: AppColors.primary, fontSize: 11, fontWeight: FontWeight.w900),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          const Spacer(),
+                                          const Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Text('Swipe for deals', style: TextStyle(color: Colors.white70, fontSize: 11, fontWeight: FontWeight.w600)),
+                                              SizedBox(width: 4),
+                                              Icon(Icons.arrow_forward_rounded, color: Colors.white70, size: 14),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        // Page Dots Indicator
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: List.generate(
+                            deals.length,
+                            (i) => AnimatedContainer(
+                              duration: const Duration(milliseconds: 250),
+                              margin: const EdgeInsets.symmetric(horizontal: 3),
+                              height: 5,
+                              width: _activeDealPage == i ? 18 : 6,
+                              decoration: BoxDecoration(
+                                color: _activeDealPage == i ? AppColors.accent : AppColors.cardBorder,
+                                borderRadius: BorderRadius.circular(3),
                               ),
                             ),
                           ),
-                          const Spacer(),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                            decoration: BoxDecoration(
-                              color: AppColors.purple.withOpacity(0.18),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: AppColors.purple.withOpacity(0.4),
-                                width: 1,
-                              ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+
+                const SizedBox(height: 18),
+
+                // Category Explorer ("WHAT'S ON YOUR MIND?")
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "WHAT'S ON YOUR MIND?",
+                            style: AppTextStyles.labelSmall.copyWith(
+                              letterSpacing: 1.2,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textSecondary,
                             ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                const Icon(Icons.flash_on_rounded, color: AppColors.purple, size: 12),
-                                const SizedBox(width: 3),
-                                Text(
-                                  '< 2h delivery',
-                                  style: TextStyle(
-                                    color: AppColors.purple,
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            "Explore Hyperlocal Fashion",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: AppColors.textPrimary,
+                              letterSpacing: -0.4,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Direct from Gandhinagar &\nKubernagar Stores',
-                        style: TextStyle(
-                          color: AppColors.linen,
-                          fontSize: 19,
-                          fontWeight: FontWeight.w700,
-                          height: 1.25,
-                        ),
+                      TextButton(
+                        onPressed: () {
+                          ref.read(selectedCategoryProvider.notifier).state = null;
+                        },
+                        child: const Text('View All', style: TextStyle(color: AppColors.accent, fontWeight: FontWeight.w700, fontSize: 13)),
                       ),
-                      const SizedBox(height: 6),
-                      Text(
-                        'Curated boutique collections delivered straight to your door',
-                        style: TextStyle(
-                          color: AppColors.linen.withOpacity(0.72),
-                          fontSize: 12,
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 104,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                    itemCount: categoriesList.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 14),
+                    itemBuilder: (context, index) {
+                      final item = categoriesList[index];
+                      final catId = item['id'] == 'all' ? null : item['id'] as String;
+                      final isSelected = selectedCategory == catId;
+
+                      return GestureDetector(
+                        onTap: () {
+                          ref.read(selectedCategoryProvider.notifier).state = catId;
+                        },
+                        child: Column(
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              width: 66,
+                              height: 66,
+                              decoration: BoxDecoration(
+                                color: item['bg'] as Color,
+                                borderRadius: BorderRadius.circular(22),
+                                border: Border.all(
+                                  color: isSelected ? AppColors.primary : Colors.transparent,
+                                  width: isSelected ? 2.5 : 0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: (item['color'] as Color).withValues(alpha: isSelected ? 0.25 : 0.08),
+                                    blurRadius: isSelected ? 12 : 6,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  item['icon'] as IconData,
+                                  color: item['color'] as Color,
+                                  size: 32,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              item['label'] as String,
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(height: 10),
-                      InkWell(
-                        onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Interactive Quick Filters Bar (Swiggy / Zomato style)
+                SizedBox(
+                  height: 38,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                    itemCount: quickFilters.length,
+                    separatorBuilder: (_, __) => const SizedBox(width: 8),
+                    itemBuilder: (context, index) {
+                      final qf = quickFilters[index];
+                      final isSelected = _activeQuickFilter == qf['id'];
+
+                      return InkWell(
+                        onTap: () => setState(() => _activeQuickFilter = qf['id'] as String),
                         borderRadius: BorderRadius.circular(20),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 180),
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                           decoration: BoxDecoration(
-                            color: AppColors.accent,
+                            color: isSelected ? AppColors.primary : Colors.white,
                             borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: const Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(Icons.near_me_rounded, color: Colors.white, size: 14),
-                              SizedBox(width: 6),
-                              Text('Track Active Delivery', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
+                            border: Border.all(
+                              color: isSelected ? AppColors.primary : AppColors.cardBorder,
+                              width: 1,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color(0x08000000),
+                                blurRadius: 6,
+                                offset: const Offset(0, 2),
+                              ),
                             ],
                           ),
+                          child: Text(
+                            qf['label'] as String,
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : AppColors.textPrimary,
+                              fontSize: 12,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 22),
+
+                // Fresh Apparel Arrivals (Instant Add)
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Flexible(
+                        child: Text(
+                          'Trending Boutique Drops',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.4,
+                            color: AppColors.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.raspberryLight,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: const Text(
+                          '48h Doorstep Exchange ⚡',
+                          style: TextStyle(fontSize: 10, color: AppColors.accent, fontWeight: FontWeight.w800),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                productsAsync.when(
+                  data: (products) {
+                    if (products.isEmpty) return const SizedBox.shrink();
+                    return SizedBox(
+                      height: 252,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                        itemCount: products.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 14),
+                        itemBuilder: (context, index) => _HomeProductCard(product: products[index]),
+                      ),
+                    );
+                  },
+                  loading: () => const SizedBox(
+                    height: 230,
+                    child: Center(child: CircularProgressIndicator(color: AppColors.accent)),
+                  ),
+                  error: (_, __) => const SizedBox.shrink(),
+                ),
 
-              const SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: 26),
 
-              // Categories
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                child: Text('Explore Categories', style: AppTextStyles.titleLarge),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                height: 44,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
+                // Nearby Stores Header
+                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                  itemCount: categories.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 8),
-                  itemBuilder: (context, index) {
-                    final cat = categories[index];
-                    final catId = cat['id'] == 'all' ? null : cat['id'] as String;
-                    final isSelected = selectedCategory == catId;
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Flexible(
+                        child: Text(
+                          'Featured Boutiques & Stores',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w900,
+                            letterSpacing: -0.4,
+                            color: AppColors.textPrimary,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Text(
+                        'Within 15 km',
+                        style: TextStyle(fontSize: 12, color: AppColors.accent, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 12),
 
-                    return ChoiceChip(
-                      label: Text(cat['label'] as String),
-                      selected: isSelected,
-                      selectedColor: AppColors.primary,
-                      backgroundColor: AppColors.surface,
-                      side: BorderSide(
-                        color: isSelected ? AppColors.primary : AppColors.cardBorder,
-                        width: 1,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(22),
-                      ),
-                      labelStyle: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
-                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                        fontSize: 13,
-                      ),
-                      onSelected: (_) {
-                        ref.read(selectedCategoryProvider.notifier).state = catId;
+                // Store List with Active Filters applied
+                storesAsync.when(
+                  data: (stores) {
+                    if (stores.isEmpty) {
+                      return _buildEmptyStoresState(context, ref);
+                    }
+
+                    // Apply filter
+                    var filteredStores = List<StoreEntity>.from(stores);
+                    if (_activeQuickFilter == 'rating') {
+                      filteredStores = filteredStores.where((s) => s.rating >= 4.0).toList();
+                    }
+
+                    return ListView.separated(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
+                      itemCount: filteredStores.length,
+                      separatorBuilder: (_, __) => const SizedBox(height: 16),
+                      itemBuilder: (context, index) {
+                        return _StoreCard(store: filteredStores[index]);
                       },
                     );
                   },
-                ),
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // Fresh & Trending Apparel Arrivals (Direct from Local Boutiques)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        'Fresh Apparel Arrivals',
-                        style: AppTextStyles.titleLarge,
-                        overflow: TextOverflow.ellipsis,
+                  loading: () => Column(
+                    children: List.generate(
+                      3,
+                      (i) => const Padding(
+                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: 8),
+                        child: ShimmerProductCard(),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      '48h Size Exchange ⚡',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-              productsAsync.when(
-                data: (products) {
-                  if (products.isEmpty) return const SizedBox.shrink();
-                  return SizedBox(
-                    height: 215,
-                    child: ListView.separated(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                      itemCount: products.length,
-                      separatorBuilder: (_, __) => const SizedBox(width: 12),
-                      itemBuilder: (context, index) => _HomeProductCard(product: products[index]),
-                    ),
-                  );
-                },
-                loading: () => const SizedBox(
-                  height: 200,
-                  child: Center(child: CircularProgressIndicator()),
-                ),
-                error: (_, __) => const SizedBox.shrink(),
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
-
-              // Nearby Stores Header
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text('Nearby Stores', style: AppTextStyles.titleLarge, overflow: TextOverflow.ellipsis),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Within 15 km',
-                      style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Store List
-              storesAsync.when(
-                data: (stores) {
-                  if (stores.isEmpty) {
-                    return _buildEmptyStoresState(context, ref);
-                  }
-                  return ListView.separated(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
-                    itemCount: stores.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 16),
-                    itemBuilder: (context, index) {
-                      final store = stores[index];
-                      return _StoreCard(store: store);
-                    },
-                  );
-                },
-                loading: () => Column(
-                  children: List.generate(
-                    3,
-                    (i) => const Padding(
-                      padding: EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: 8),
-                      child: ShimmerProductCard(),
+                  ),
+                  error: (err, _) => Padding(
+                    padding: const EdgeInsets.all(AppSpacing.pagePadding),
+                    child: Center(
+                      child: Column(
+                        children: [
+                          const Icon(Icons.error_outline, size: 48, color: AppColors.error),
+                          const SizedBox(height: 8),
+                          Text('Could not load stores: $err'),
+                          TextButton(
+                            onPressed: () => ref.refresh(nearbyStoresProvider),
+                            child: const Text('Retry'),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-                error: (err, _) => Padding(
-                  padding: const EdgeInsets.all(AppSpacing.pagePadding),
-                  child: Center(
-                    child: Column(
-                      children: [
-                        const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                        const SizedBox(height: 8),
-                        Text('Could not load stores: $err'),
-                        TextButton(
-                          onPressed: () => ref.refresh(nearbyStoresProvider),
-                          child: const Text('Retry'),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
-    ),
-    bottomNavigationBar: AnimatedSlide(
+      bottomNavigationBar: AnimatedSlide(
         offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
         duration: const Duration(milliseconds: 280),
         curve: Curves.easeInOutCubic,
@@ -520,19 +798,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const FloatingCartBar(),
-                BottomNavigationBar(
-                  currentIndex: 0,
-                  onTap: (index) {
-                    if (index == 1) context.push('/search');
-                    if (index == 2) context.push('/cart');
-                    if (index == 3) context.push('/profile');
-                  },
-                  items: const [
-                    BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-                    BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-                    BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: 'Cart'),
-                    BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-                  ],
+                Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    border: Border(top: BorderSide(color: Color(0xFFEEEEF0), width: 1)),
+                  ),
+                  child: BottomNavigationBar(
+                    backgroundColor: Colors.white,
+                    elevation: 0,
+                    currentIndex: 0,
+                    selectedItemColor: AppColors.accent,
+                    unselectedItemColor: AppColors.textSecondary,
+                    selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
+                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+                    onTap: (index) {
+                      if (index == 1) context.push('/search');
+                      if (index == 2) context.push('/cart');
+                      if (index == 3) context.push('/profile');
+                    },
+                    items: const [
+                      BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
+                      BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
+                      BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: 'Cart'),
+                      BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -578,8 +868,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       margin: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: 24),
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder),
       ),
       child: Center(
         child: Column(
@@ -589,7 +880,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             Text('No stores found in this area', style: AppTextStyles.titleMedium),
             const SizedBox(height: 6),
             const Text(
-              'Try switching your market location between Kubernagar or Gandhinagar',
+              'Try switching your market location between Kubernagar, Bodakdev, or Gandhinagar',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
             ),
@@ -605,6 +896,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
+// ── Ultra-Premium Store Card (Zomato / Swiggy Restaurant Tier) ─────────────────
 class _StoreCard extends StatelessWidget {
   final StoreEntity store;
 
@@ -612,198 +904,601 @@ class _StoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AppCard(
-      onTap: () => context.push('/store/${store.id}'),
-      padding: EdgeInsets.zero,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Banner / Image
-          Stack(
-            children: [
-              ProductImage(
-                imageUrl: store.bannerImageUrl,
-                height: 140,
-                width: double.infinity,
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusLg)),
-              ),
-              Positioned(
-                top: 10,
-                right: 10,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: store.isOpen ? AppColors.success : AppColors.error,
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    store.isOpen ? 'OPEN' : 'CLOSED',
-                    style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                  ),
-                ),
-              ),
-            ],
-          ),
-
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.cardPadding),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(store.name, style: AppTextStyles.titleMedium),
-                      const SizedBox(height: 4),
-                      Text(
-                        store.location.address.isNotEmpty
-                            ? store.location.address
-                            : '${store.location.city} • Fast Local Pickup',
-                        style: AppTextStyles.bodySmall,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 6),
-                      Row(
-                        children: [
-                          const Icon(Icons.star_rounded, color: AppColors.warning, size: 16),
-                          const SizedBox(width: 4),
-                          Text(
-                            store.rating.toStringAsFixed(1),
-                            style: AppTextStyles.labelSmall.copyWith(color: AppColors.textPrimary),
-                          ),
-                          const SizedBox(width: 8),
-                          Text('•  ${store.totalRatings} ratings', style: AppTextStyles.bodySmall),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-                const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.textHint),
-              ],
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.cardBorder, width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0C000000),
+            blurRadius: 18,
+            offset: Offset(0, 6),
           ),
         ],
       ),
-    );
-  }
-}
-
-  void _promptForHouseDetails(BuildContext context, WidgetRef ref) {
-    final loc = ref.read(locationProvider);
-    final houseCtrl = TextEditingController();
-    final societyCtrl = TextEditingController();
-    final landmarkCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
-        title: Row(
-          children: [
-            const Icon(Icons.home_work_rounded, color: AppColors.primary, size: 24),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Complete Delivery Address',
-                style: AppTextStyles.titleMedium,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ],
-        ),
-        content: SingleChildScrollView(
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(20),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push('/store/${store.id}'),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.success.withOpacity(0.12),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Row(
+              // Hero Store Image with Scrim
+              Stack(
+                children: [
+                  ProductImage(
+                    imageUrl: store.bannerImageUrl,
+                    height: 165,
+                    width: double.infinity,
+                    borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  ),
+                  // Dark Scrim Gradient
+                  Positioned.fill(
+                    child: Container(
+                      decoration: const BoxDecoration(
+                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.transparent,
+                            Colors.transparent,
+                            Color(0xCC000000),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  // Top Status Chip
+                  Positioned(
+                    top: 12,
+                    left: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: store.isOpen ? const Color(0xFF16A34A) : Colors.black87,
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x33000000), blurRadius: 6),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          CircleAvatar(
+                            radius: 3,
+                            backgroundColor: store.isOpen ? Colors.white : Colors.redAccent,
+                          ),
+                          const SizedBox(width: 5),
+                          Text(
+                            store.isOpen ? 'OPEN NOW' : 'CLOSED',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  // Top Right Favorite Button
+                  Positioned(
+                    top: 10,
+                    right: 10,
+                    child: Container(
+                      padding: const EdgeInsets.all(7),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        shape: BoxShape.circle,
+                        boxShadow: const [
+                          BoxShadow(color: Color(0x1F000000), blurRadius: 6),
+                        ],
+                      ),
+                      child: const Icon(Icons.favorite_border_rounded, size: 18, color: AppColors.primary),
+                    ),
+                  ),
+                  // Bottom Left Scrim Offer
+                  const Positioned(
+                    bottom: 10,
+                    left: 12,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.local_offer_rounded, color: Color(0xFFFFD700), size: 14),
+                        SizedBox(width: 5),
+                        Text(
+                          'FLAT ₹150 OFF ABOVE ₹599',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 12,
+                            letterSpacing: 0.3,
+                            shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Bottom Right Scrim ETA
+                  Positioned(
+                    bottom: 8,
+                    right: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.black.withValues(alpha: 0.65),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.bolt_rounded, color: Color(0xFFFF9800), size: 13),
+                          SizedBox(width: 2),
+                          Text(
+                            '15-20 MINS',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+
+              // Store Info Body
+              Padding(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.gps_fixed_rounded, color: AppColors.success, size: 14),
-                    const SizedBox(width: 6),
-                    Expanded(
-                      child: Text(
-                        'GPS Location: ${loc.areaName}, ${loc.cityName}',
-                        style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.bold, fontSize: 12),
+                    // Title and Rating Row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: Text(
+                                  store.name,
+                                  style: AppTextStyles.titleMedium.copyWith(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                    letterSpacing: -0.2,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              const Icon(Icons.verified_rounded, color: Color(0xFF2563EB), size: 16),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        // Emerald Green Rating Badge
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.ratingGreen,
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                store.rating > 0 ? store.rating.toStringAsFixed(1) : '4.5',
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              const SizedBox(width: 2),
+                              const Icon(Icons.star_rounded, color: Colors.white, size: 13),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    // Categories / Subtitle
+                    Text(
+                      store.location.address.isNotEmpty
+                          ? store.location.address
+                          : 'Kurtas • Western Wear • Streetwear • Local Boutique',
+                      style: AppTextStyles.bodySmall.copyWith(
+                        color: AppColors.textSecondary,
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 10),
+                    // Zomato/Swiggy style footer strip
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: AppColors.surfaceVariant,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.delivery_dining_rounded, size: 15, color: AppColors.accent),
+                          const SizedBox(width: 6),
+                          const Expanded(
+                            child: Text(
+                              'Free delivery above ₹299',
+                              style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: AppColors.textPrimary),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppColors.accent.withValues(alpha: 0.12),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: const Text(
+                              '48h Exchange',
+                              style: TextStyle(fontSize: 9, color: AppColors.accent, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 14),
-              TextField(
-                controller: houseCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'House / Flat / Block No. *',
-                  hintText: 'e.g. Flat 302, Block B',
-                  isDense: true,
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Home Product Card with Instant One-Tap ADD+ (Swiggy / Blinkit style) ──────
+class _HomeProductCard extends ConsumerWidget {
+  final ProductEntity product;
+
+  const _HomeProductCard({required this.product});
+
+  Future<void> _quickAddToCart(BuildContext context, WidgetRef ref) async {
+    final user = ref.read(currentUserProvider);
+    final customerId = user?.uid ?? isolatedGuestSessionId;
+    final cartRepo = ref.read(cartRepositoryProvider);
+
+    final variant = product.variants.isNotEmpty ? product.variants.first : null;
+    final item = CartItemEntity(
+      id: '${product.id}_${variant?.id ?? "default"}',
+      customerId: customerId,
+      productId: product.id,
+      variantId: variant?.id ?? 'default',
+      storeId: product.storeId,
+      vendorId: product.storeId,
+      productName: product.name,
+      imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : '',
+      unitPrice: product.discountedPrice > 0 ? product.discountedPrice : product.basePrice,
+      quantity: 1,
+      size: variant?.size ?? 'M',
+      color: variant?.color ?? 'Standard',
+    );
+
+    await cartRepo.addToCart(item);
+
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Added "${product.name}" to cart!', style: const TextStyle(fontWeight: FontWeight.w600)),
+              ),
+              TextButton(
+                onPressed: () => context.push('/cart'),
+                child: const Text('VIEW CART', style: TextStyle(color: Colors.amber, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+          backgroundColor: AppColors.primary,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          duration: const Duration(seconds: 2),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final image = product.imageUrls.isNotEmpty ? product.imageUrls.first : null;
+    final hasDiscount = product.discountedPrice > 0 && product.discountedPrice < product.basePrice;
+    final discountPercent = hasDiscount
+        ? (((product.basePrice - product.discountedPrice) / product.basePrice) * 100).round()
+        : 0;
+
+    return Container(
+      width: 165,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: AppColors.cardBorder, width: 1),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x0A000000),
+            blurRadius: 10,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(16),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () => context.push('/product/${product.id}'),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Product Image
+              SizedBox(
+                height: 130,
+                width: double.infinity,
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: [
+                    ProductImage(
+                      imageUrl: image,
+                      borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                    ),
+                    if (hasDiscount)
+                      Positioned(
+                        top: 8,
+                        left: 8,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [AppColors.accent, AppColors.accentTomato],
+                            ),
+                            borderRadius: BorderRadius.circular(6),
+                            boxShadow: const [BoxShadow(color: Color(0x28000000), blurRadius: 4)],
+                          ),
+                          child: Text(
+                            '$discountPercent% OFF',
+                            style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w800),
+                          ),
+                        ),
+                      ),
+                    Positioned(
+                      top: 6,
+                      right: 6,
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.9),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.favorite_border_rounded, size: 14, color: AppColors.primary),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 6,
+                      right: 6,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.black87,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.bolt_rounded, color: Colors.amber, size: 10),
+                            SizedBox(width: 2),
+                            Text('15m', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: societyCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Building / Society / Apartment Name *',
-                  hintText: 'e.g. Krishna Park Residency',
-                  isDense: true,
-                ),
-              ),
-              const SizedBox(height: 10),
-              TextField(
-                controller: landmarkCtrl,
-                decoration: const InputDecoration(
-                  labelText: 'Nearby Landmark (Optional)',
-                  hintText: 'e.g. Near Water Tank or Main Road',
-                  isDense: true,
+              // Body
+              Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      product.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13, color: AppColors.textPrimary),
+                    ),
+                    const SizedBox(height: 2),
+                    const Text(
+                      '48h Doorstep Exchange',
+                      style: TextStyle(fontSize: 10, color: AppColors.accent, fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 6),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        // Price
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              '₹${((product.discountedPrice > 0 ? product.discountedPrice : product.basePrice) / 100).toStringAsFixed(0)}',
+                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.primary),
+                            ),
+                            if (hasDiscount)
+                              Text(
+                                '₹${(product.basePrice / 100).toStringAsFixed(0)}',
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppColors.textHint,
+                                  decoration: TextDecoration.lineThrough,
+                                ),
+                              ),
+                          ],
+                        ),
+                        // Interactive ADD Button
+                        InkWell(
+                          onTap: () => _quickAddToCart(context, ref),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: AppColors.accent, width: 1.4),
+                              boxShadow: const [
+                                BoxShadow(color: Color(0x12D93670), blurRadius: 4, offset: Offset(0, 2)),
+                              ],
+                            ),
+                            child: const Text(
+                              'ADD +',
+                              style: TextStyle(
+                                color: AppColors.accent,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 11,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Skip for Now'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              final house = houseCtrl.text.trim();
-              final society = societyCtrl.text.trim();
-              final landmark = landmarkCtrl.text.trim();
-              final fullAddress = [
-                if (house.isNotEmpty) house,
-                if (society.isNotEmpty) society,
-                if (landmark.isNotEmpty) 'Near $landmark',
-                loc.areaName,
-                loc.cityName,
-              ].join(', ');
-
-              ref.read(locationProvider.notifier).setPresetLocation(
-                area: society.isNotEmpty ? society : loc.areaName,
-                city: loc.cityName,
-                lat: loc.latitude,
-                lng: loc.longitude,
-              );
-
-              Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Delivery address saved:\n$fullAddress')),
-              );
-            },
-            child: const Text('Save Address'),
-          ),
-        ],
       ),
     );
   }
+}
+
+void _promptForHouseDetails(BuildContext context, WidgetRef ref) {
+  final loc = ref.read(locationProvider);
+  final houseCtrl = TextEditingController();
+  final societyCtrl = TextEditingController();
+  final landmarkCtrl = TextEditingController();
+
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (ctx) => AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusMd)),
+      title: Row(
+        children: [
+          const Icon(Icons.home_work_rounded, color: AppColors.primary, size: 24),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'Complete Delivery Address',
+              style: AppTextStyles.titleMedium,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Help our delivery rider reach your door in 15 minutes:',
+              style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: houseCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Flat / House / Floor No.',
+                hintText: 'e.g. Flat 402, Block B',
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: societyCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Building / Society / Apartment',
+                hintText: 'e.g. Shaligram Heights',
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 10),
+            TextField(
+              controller: landmarkCtrl,
+              decoration: const InputDecoration(
+                labelText: 'Nearby Landmark',
+                hintText: 'e.g. Opposite Metro Pillar 128',
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: const Text('Skip for Now'),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            final house = houseCtrl.text.trim();
+            final society = societyCtrl.text.trim();
+            final landmark = landmarkCtrl.text.trim();
+            final fullAddress = [
+              if (house.isNotEmpty) house,
+              if (society.isNotEmpty) society,
+              if (landmark.isNotEmpty) 'Near $landmark',
+              loc.areaName,
+              loc.cityName,
+            ].join(', ');
+
+            ref.read(locationProvider.notifier).setPresetLocation(
+              area: society.isNotEmpty ? society : loc.areaName,
+              city: loc.cityName,
+              lat: loc.latitude,
+              lng: loc.longitude,
+            );
+
+            Navigator.pop(ctx);
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Delivery address saved:\n$fullAddress')),
+            );
+          },
+          child: const Text('Save Address'),
+        ),
+      ],
+    ),
+  );
+}
+
 class _LocationSelectorSheet extends ConsumerWidget {
   final WidgetRef widgetRef;
   const _LocationSelectorSheet({required this.widgetRef});
@@ -866,9 +1561,9 @@ class _LocationSelectorSheet extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.08),
+                  color: AppColors.primary.withValues(alpha: 0.08),
                   borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  border: Border.all(color: AppColors.primary.withOpacity(0.25)),
+                  border: Border.all(color: AppColors.primary.withValues(alpha: 0.25)),
                 ),
                 child: Row(
                   children: [
@@ -892,7 +1587,7 @@ class _LocationSelectorSheet extends ConsumerWidget {
                           Text(
                             locationState.isLoading
                                 ? 'Pinpointing your GPS coordinates...'
-                                : 'Auto-detects Ghuma, Nikol, Kubernagar, Gandhinagar...',
+                                : 'Auto-detects Bodakdev, Vastrapur, Kubernagar, Gandhinagar...',
                             style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
                           ),
                         ],
@@ -913,104 +1608,61 @@ class _LocationSelectorSheet extends ConsumerWidget {
             const SizedBox(height: 20),
             const Text(
               'POPULAR LOCAL HUBS',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: AppColors.textSecondary, letterSpacing: 0.8),
+              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, letterSpacing: 1.1, color: AppColors.textHint),
             ),
             const SizedBox(height: 8),
-            Expanded(
-              child: ListView(
-                shrinkWrap: true,
-                children: [
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'Gandhinagar',
-                    subtitle: 'Capital Hub • Delivery across all Sectors',
-                    area: 'Gandhinagar',
-                    city: 'Gandhinagar',
-                    lat: 23.2156,
-                    lng: 72.6369,
-                  ),
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'Kubernagar, Ahmedabad',
-                    subtitle: 'Market Cluster • Ahmedabad East',
-                    area: 'Kubernagar',
-                    city: 'Ahmedabad',
-                    lat: 23.0768,
-                    lng: 72.6346,
-                  ),
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'Nikol, Ahmedabad',
-                    subtitle: 'East Ahmedabad Fashion Hub',
-                    area: 'Nikol',
-                    city: 'Ahmedabad',
-                    lat: 23.0485,
-                    lng: 72.6738,
-                  ),
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'Ghuma / Bopal, Ahmedabad',
-                    subtitle: 'West Ahmedabad Lifestyle Hub',
-                    area: 'Ghuma',
-                    city: 'Ahmedabad',
-                    lat: 23.0330,
-                    lng: 72.4646,
-                  ),
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'C.G. Road, Ahmedabad',
-                    subtitle: 'Central Fashion & Boutique District',
-                    area: 'Navrangpura',
-                    city: 'Ahmedabad',
-                    lat: 23.0373,
-                    lng: 72.5562,
-                  ),
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'Sindhu Bhavan Road (SBR), Ahmedabad',
-                    subtitle: 'West Ahmedabad High-Street & Bodakdev Couture',
-                    area: 'Sindhu Bhavan Road',
-                    city: 'Ahmedabad',
-                    lat: 23.0402,
-                    lng: 72.5028,
-                  ),
-                  _hubTile(
-                    context: context,
-                    ref: ref,
-                    title: 'Prahlad Nagar & SG Highway, Ahmedabad',
-                    subtitle: 'West Ahmedabad Premium Retail Hub',
-                    area: 'Prahlad Nagar',
-                    city: 'Ahmedabad',
-                    lat: 23.0125,
-                    lng: 72.5100,
-                  ),
-                ],
-              ),
+            _HubTile(
+              title: 'Kubernagar Market Hub',
+              subtitle: 'Kubernagar, Ahmedabad • 18+ active boutiques',
+              area: 'Kubernagar',
+              city: 'Ahmedabad',
+              lat: 23.0673,
+              lng: 72.6394,
+            ),
+            _HubTile(
+              title: 'Bodakdev & Vastrapur Hub',
+              subtitle: 'SG Highway, Ahmedabad • 24+ premium stores',
+              area: 'Bodakdev',
+              city: 'Ahmedabad',
+              lat: 23.0378,
+              lng: 72.5126,
+            ),
+            _HubTile(
+              title: 'Gandhinagar Sector 11 Hub',
+              subtitle: 'Gandhinagar Central • 12+ stores',
+              area: 'Sector 11',
+              city: 'Gandhinagar',
+              lat: 23.2156,
+              lng: 72.6369,
             ),
           ],
         ),
       ),
     );
   }
+}
 
-  Widget _hubTile({
-    required BuildContext context,
-    required WidgetRef ref,
-    required String title,
-    required String subtitle,
-    required String area,
-    required String city,
-    required double lat,
-    required double lng,
-  }) {
+class _HubTile extends ConsumerWidget {
+  final String title;
+  final String subtitle;
+  final String area;
+  final String city;
+  final double lat;
+  final double lng;
+
+  const _HubTile({
+    required this.title,
+    required this.subtitle,
+    required this.area,
+    required this.city,
+    required this.lat,
+    required this.lng,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+      contentPadding: EdgeInsets.zero,
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
@@ -1031,114 +1683,6 @@ class _LocationSelectorSheet extends ConsumerWidget {
         );
         Navigator.pop(context);
       },
-    );
-  }
-}
-
-
-class _HomeProductCard extends StatelessWidget {
-  final ProductEntity product;
-
-  const _HomeProductCard({required this.product});
-
-  @override
-  Widget build(BuildContext context) {
-    final image = product.imageUrls.isNotEmpty ? product.imageUrls.first : null;
-    final hasDiscount = product.discountedPrice > 0 && product.discountedPrice < product.basePrice;
-
-    return InkWell(
-      onTap: () => context.push('/product/${product.id}'),
-      borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      child: Container(
-        width: 150,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-          border: Border.all(color: Colors.grey.shade200),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.04),
-              blurRadius: 6,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Stack(
-                fit: StackFit.expand,
-                children: [
-                  ProductImage(
-                    imageUrl: image,
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(AppSpacing.radiusMd)),
-                  ),
-                  if (hasDiscount)
-                    Positioned(
-                      top: 6,
-                      left: 6,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: AppColors.accent,
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: const Text('OFFER', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                  Positioned(
-                    bottom: 4,
-                    right: 4,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.black.withValues(alpha: 0.65),
-                        borderRadius: BorderRadius.circular(3),
-                      ),
-                      child: const Text('48h Exch', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w600)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(8),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    product.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                  ),
-                  const SizedBox(height: 2),
-                  Row(
-                    children: [
-                      Text(
-                        '₹${((product.discountedPrice > 0 ? product.discountedPrice : product.basePrice) / 100).toStringAsFixed(0)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: AppColors.primary),
-                      ),
-                      if (hasDiscount) ...[
-                        const SizedBox(width: 4),
-                        Text(
-                          '₹${(product.basePrice / 100).toStringAsFixed(0)}',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppColors.textHint,
-                            decoration: TextDecoration.lineThrough,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

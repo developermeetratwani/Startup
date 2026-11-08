@@ -65,9 +65,10 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   final _tabs = [
     'Overview & Metrics',
     'Vendor Approvals',
-    'Clothing Stores',
+    'Clothing Stores & Settlements',
     'Order Monitoring',
     'Driver Fleet & KYC',
+    'Promotions & Deals Ad Manager',
     'Size Exchanges',
     'Multi-Region Settings',
     'Commissions & Coins',
@@ -116,7 +117,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   Icons.verified_user_rounded,
                   Icons.storefront_rounded,
                   Icons.shopping_bag_rounded,
-                  Icons.near_me_rounded,
+                  Icons.two_wheeler_rounded,
+                  Icons.campaign_rounded,
                   Icons.change_circle_rounded,
                   Icons.map_rounded,
                   Icons.account_balance_wallet_rounded,
@@ -274,10 +276,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       case 4:
         return _buildDriversTab(isMobile);
       case 5:
-        return _buildExchangeTab(isMobile);
+        return _buildDealsTab(isMobile);
       case 6:
-        return _buildMultiRegionTab(isMobile);
+        return _buildExchangeTab(isMobile);
       case 7:
+        return _buildMultiRegionTab(isMobile);
+      case 8:
         return _buildCommissionsTab(isMobile);
       default:
         return _buildOverviewTab(isMobile);
@@ -525,15 +529,75 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   Widget _buildStoresTab(bool isMobile) {
     final stores = [
-      {'name': 'Navkar Menswear & Suits', 'cluster': 'Sindhu Bhavan Road (SBR)', 'items': '142 Items', 'status': 'ACTIVE', 'orders': '18 Today'},
-      {'name': 'Rajwadi Ethnic & Bridal', 'cluster': 'Kubernagar Main Bazar', 'items': '380 Items', 'status': 'ACTIVE', 'orders': '34 Today'},
-      {'name': 'Kubernagar Denim Hub', 'cluster': 'Kubernagar Cluster', 'items': '95 Items', 'status': 'ACTIVE', 'orders': '12 Today'},
-      {'name': 'Metro Vogue Boutique', 'cluster': 'Gandhinagar Sector 11', 'items': '210 Items', 'status': 'ACTIVE', 'orders': '22 Today'},
+      {
+        'id': 'store-1',
+        'name': 'Navkar Menswear & Suits',
+        'cluster': 'Sindhu Bhavan Road (SBR)',
+        'deliveries': 142,
+        'grossSales': 28400000,
+        'settled': 21000000,
+        'status': 'ACTIVE',
+      },
+      {
+        'id': 'store-2',
+        'name': 'Rajwadi Ethnic & Bridal',
+        'cluster': 'Kubernagar Main Bazar',
+        'deliveries': 380,
+        'grossSales': 76000000,
+        'settled': 60000000,
+        'status': 'ACTIVE',
+      },
+      {
+        'id': 'store-3',
+        'name': 'Kubernagar Denim Hub',
+        'cluster': 'Kubernagar Cluster',
+        'deliveries': 95,
+        'grossSales': 14250000,
+        'settled': 10000000,
+        'status': 'ACTIVE',
+      },
+      {
+        'id': 'store-4',
+        'name': 'Metro Vogue Boutique',
+        'cluster': 'Gandhinagar Sector 11',
+        'deliveries': 210,
+        'grossSales': 42000000,
+        'settled': 33000000,
+        'status': 'ACTIVE',
+      },
+    ];
+
+    int totalDeliveries = 0;
+    int totalGross = 0;
+    int totalMarsCut = 0;
+    int totalDue = 0;
+
+    for (final s in stores) {
+      final gross = s['grossSales'] as int;
+      final deliveries = s['deliveries'] as int;
+      final settled = s['settled'] as int;
+      final marsCut = (gross * 0.10).round();
+      final netVendor = gross - marsCut;
+      final due = netVendor - settled;
+
+      totalDeliveries += deliveries;
+      totalGross += gross;
+      totalMarsCut += marsCut;
+      totalDue += due;
+    }
+
+    final kpiCards = [
+      _KPICardData(title: 'Dispatches Handed Out', value: '$totalDeliveries Orders', subtitle: 'Across 4 registered stores', color: AppColors.primary),
+      _KPICardData(title: 'Gross Boutique Sales', value: '₹${(totalGross / 100).toStringAsFixed(0)}', subtitle: 'Customer purchases', color: AppColors.accent),
+      _KPICardData(title: 'MARS 10% Revenue Cut', value: '₹${(totalMarsCut / 100).toStringAsFixed(0)}', subtitle: 'Our platform profit (10%)', color: AppColors.success),
+      _KPICardData(title: 'Net Vendor Settlement Due', value: '₹${(totalDue / 100).toStringAsFixed(0)}', subtitle: 'Payable to store accounts', color: AppColors.tomato),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        _buildKPIGrid(kpiCards, isMobile: isMobile),
+        const SizedBox(height: 16),
         Card(
           elevation: 0,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
@@ -548,42 +612,84 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    const Text('Registered Clothing Retailers & Outlets', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    const Text('Registered Stores & Financial Settlement Ledger', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: AppColors.success.withValues(alpha: 0.12),
                         borderRadius: BorderRadius.circular(4),
                       ),
-                      child: const Text('4 ACTIVE STORES', style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: const Text('10% PLATFORM SPLIT ACTIVE', style: TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 6),
-                const Text('All stores are synced with catalog images, real-time inventory, and 45-minute delivery radiuses.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                const Text('View each registered boutique, orders handed out, total sales, our 10% cut, net vendor earnings, and execute settlements.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
                 const SizedBox(height: 16),
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: DataTable(
-                    columnSpacing: 22,
+                    columnSpacing: 18,
                     columns: const [
                       DataColumn(label: Text('Store Name')),
                       DataColumn(label: Text('Cluster Location')),
-                      DataColumn(label: Text('Inventory Size')),
-                      DataColumn(label: Text('Dispatches')),
-                      DataColumn(label: Text('Operational Status')),
+                      DataColumn(label: Text('Deliveries Handed Out')),
+                      DataColumn(label: Text('Total Gross Sales')),
+                      DataColumn(label: Text('MARS 10% Cut')),
+                      DataColumn(label: Text('Net Vendor (90%)')),
+                      DataColumn(label: Text('Settlement Due')),
+                      DataColumn(label: Text('Settlement Action')),
                     ],
                     rows: stores.map((s) {
+                      final gross = s['grossSales'] as int;
+                      final deliveries = s['deliveries'] as int;
+                      final settled = s['settled'] as int;
+                      final marsCut = (gross * 0.10).round();
+                      final netVendor = gross - marsCut;
+                      final due = netVendor - settled;
+
                       return DataRow(cells: [
-                        DataCell(Text(s['name']!, style: const TextStyle(fontWeight: FontWeight.bold))),
-                        DataCell(Text(s['cluster']!)),
-                        DataCell(Text(s['items']!)),
-                        DataCell(Text(s['orders']!, style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
-                        DataCell(Chip(
-                          label: Text(s['status']!, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.success)),
-                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
-                          padding: EdgeInsets.zero,
-                        )),
+                        DataCell(Text(s['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text(s['cluster'] as String)),
+                        DataCell(Text('$deliveries Orders', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        DataCell(Text('₹${(gross / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text('₹${(marsCut / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.success))),
+                        DataCell(Text('₹${(netVendor / 100).toStringAsFixed(0)}')),
+                        DataCell(Text('₹${(due / 100).toStringAsFixed(0)}', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.tomato))),
+                        DataCell(
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            ),
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: Text('Settle Payout with ${s['name']}'),
+                                  content: Text('Execute direct bank transfer of ₹${(due / 100).toStringAsFixed(0)} to ${s['name']} account? MARS 10% commission (₹${(marsCut / 100).toStringAsFixed(0)}) is retained in company treasury.'),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text('✅ Settlement of ₹${(due / 100).toStringAsFixed(0)} initiated to ${s['name']}.'),
+                                            backgroundColor: AppColors.success,
+                                          ),
+                                        );
+                                      },
+                                      child: const Text('Confirm Settle'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            child: const Text('Settle Due', style: TextStyle(fontSize: 11)),
+                          ),
+                        ),
                       ]);
                     }).toList(),
                   ),
@@ -865,9 +971,358 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             ),
           ),
         ),
+        const SizedBox(height: 16),
+
+        // Full Registered Delivery Partners Directory
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    const Text('Registered Fleet Drivers Roster & Anti-Theft Verification', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text('4 REGISTERED RIDERS', style: TextStyle(color: AppColors.primary, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Text('All registered drivers across Ahmedabad & Gandhinagar clusters with vehicle records, Aadhaar KYC, and cash-in-hand tracking.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                const SizedBox(height: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 18,
+                    columns: const [
+                      DataColumn(label: Text('Driver Name')),
+                      DataColumn(label: Text('Contact Number')),
+                      DataColumn(label: Text('Registered Vehicle')),
+                      DataColumn(label: Text('Cluster Territory')),
+                      DataColumn(label: Text('Completed Deliveries')),
+                      DataColumn(label: Text('Cash In Hand')),
+                      DataColumn(label: Text('KYC Verification')),
+                      DataColumn(label: Text('Duty Status')),
+                      DataColumn(label: Text('Rider Rating')),
+                      DataColumn(label: Text('Admin Action')),
+                    ],
+                    rows: [
+                      DataRow(cells: [
+                        const DataCell(Text('Suresh Solanki', style: TextStyle(fontWeight: FontWeight.bold))),
+                        const DataCell(Text('+91 98980 12345')),
+                        const DataCell(Text('Hero Splendor (GJ-01-AB-1234)')),
+                        const DataCell(Text('Kubernagar & Bazar')),
+                        const DataCell(Text('112 Trips', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        const DataCell(Text('₹1,850', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.tomato))),
+                        DataCell(Chip(
+                          label: const Text('VERIFIED ✅', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success)),
+                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        DataCell(Chip(
+                          label: const Text('ONLINE 🟢', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success)),
+                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        const DataCell(Text('4.9 ⭐', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(TextButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Suresh Solanki: Full KYC on file with verified Aadhaar & clean police clearance.')),
+                            );
+                          },
+                          child: const Text('View KYC', style: TextStyle(fontSize: 11)),
+                        )),
+                      ]),
+                      DataRow(cells: [
+                        const DataCell(Text('Ramesh Patel', style: TextStyle(fontWeight: FontWeight.bold))),
+                        const DataCell(Text('+91 98250 44321')),
+                        const DataCell(Text('Honda Activa 6G (GJ-27-XY-5678)')),
+                        const DataCell(Text('Gandhinagar Sector 11-21')),
+                        const DataCell(Text('84 Trips', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        const DataCell(Text('₹0', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Chip(
+                          label: const Text('VERIFIED ✅', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success)),
+                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        DataCell(Chip(
+                          label: const Text('ONLINE 🟢', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success)),
+                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        const DataCell(Text('4.8 ⭐', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(TextButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Ramesh Patel: Verified Torrent Power bill and active DL.')),
+                            );
+                          },
+                          child: const Text('View KYC', style: TextStyle(fontSize: 11)),
+                        )),
+                      ]),
+                      DataRow(cells: [
+                        const DataCell(Text('Vikram Thakor', style: TextStyle(fontWeight: FontWeight.bold))),
+                        const DataCell(Text('+91 97123 88901')),
+                        const DataCell(Text('TVS Jupiter (GJ-01-CD-9988)')),
+                        const DataCell(Text('Sindhu Bhavan & Bodakdev')),
+                        const DataCell(Text('46 Trips', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        const DataCell(Text('₹950', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.tomato))),
+                        DataCell(Chip(
+                          label: const Text('VERIFIED ✅', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.success)),
+                          backgroundColor: AppColors.success.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        DataCell(Chip(
+                          label: const Text('OFFLINE ⚪', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                          backgroundColor: AppColors.divider.withValues(alpha: 0.4),
+                          padding: EdgeInsets.zero,
+                        )),
+                        const DataCell(Text('4.7 ⭐', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(TextButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Vikram Thakor: Complete verification record verified.')),
+                            );
+                          },
+                          child: const Text('View KYC', style: TextStyle(fontSize: 11)),
+                        )),
+                      ]),
+                      DataRow(cells: [
+                        const DataCell(Text('Amit Joshi', style: TextStyle(fontWeight: FontWeight.bold))),
+                        const DataCell(Text('+91 99042 11234')),
+                        const DataCell(Text('Bajaj Pulsar 150 (GJ-01-EF-4321)')),
+                        const DataCell(Text('Nikol & Nana Chiloda')),
+                        const DataCell(Text('12 Trips', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        const DataCell(Text('₹0', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Chip(
+                          label: const Text('PENDING KYC ⚠️', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.warning)),
+                          backgroundColor: AppColors.warning.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        DataCell(Chip(
+                          label: const Text('LOCKED 🔒', style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: AppColors.error)),
+                          backgroundColor: AppColors.error.withValues(alpha: 0.12),
+                          padding: EdgeInsets.zero,
+                        )),
+                        const DataCell(Text('4.6 ⭐', style: TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(ElevatedButton(
+                          style: ElevatedButton.styleFrom(backgroundColor: AppColors.success, foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4)),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('✅ Approved Amit Joshi KYC! Rider duty unlocked.')),
+                            );
+                          },
+                          child: const Text('Approve KYC', style: TextStyle(fontSize: 10)),
+                        )),
+                      ]),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+
       ],
     );
   }
+
+  Widget _buildDealsTab(bool isMobile) {
+    final deals = DealsService.allDeals;
+
+    final cards = [
+      _KPICardData(title: 'Active Deal Campaigns', value: '${deals.where((d) => d.isActive).length} Live', subtitle: 'Showing on Customer App front page', color: AppColors.accent),
+      _KPICardData(title: 'Customer Tap Rate', value: '38.4%', subtitle: 'High conversion promo banners', color: AppColors.success),
+      _KPICardData(title: 'Top Coupon Code', value: 'KUBER50', subtitle: '50% off ethnic wear collection', color: AppColors.primary),
+      _KPICardData(title: 'Total Campaigns Created', value: '${deals.length} Campaigns', subtitle: 'Syncs live across Ahmedabad', color: AppColors.purple),
+    ];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _buildKPIGrid(cards, isMobile: isMobile),
+        const SizedBox(height: 16),
+        Card(
+          elevation: 0,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Wrap(
+                  alignment: WrapAlignment.spaceBetween,
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    const Text('Customer App Promotional Banners & Flash Deals', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      ),
+                      icon: const Icon(Icons.add_rounded, size: 16),
+                      label: const Text('Add New Deal / Ad', style: TextStyle(fontSize: 12)),
+                      onPressed: () => _showAddDealDialog(context),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                const Text('Publish live promotional campaigns. When toggled Active, they instantly appear on the front page of the Customer App.', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                const SizedBox(height: 16),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: DataTable(
+                    columnSpacing: 20,
+                    columns: const [
+                      DataColumn(label: Text('Campaign Title')),
+                      DataColumn(label: Text('Subtitle / Offer Description')),
+                      DataColumn(label: Text('Promo Code')),
+                      DataColumn(label: Text('Discount')),
+                      DataColumn(label: Text('Badge Tag')),
+                      DataColumn(label: Text('Live on App')),
+                      DataColumn(label: Text('Action')),
+                    ],
+                    rows: deals.map((d) {
+                      return DataRow(cells: [
+                        DataCell(Text(d.title, style: const TextStyle(fontWeight: FontWeight.bold))),
+                        DataCell(Text(d.subtitle)),
+                        DataCell(Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withValues(alpha: 0.08),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: Text(d.promoCode, style: const TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace')),
+                        )),
+                        DataCell(Text('${d.discountPercent}% OFF', style: const TextStyle(fontWeight: FontWeight.bold, color: AppColors.accent))),
+                        DataCell(Chip(
+                          label: Text(d.badgeText, style: const TextStyle(fontSize: 9, fontWeight: FontWeight.bold)),
+                          padding: EdgeInsets.zero,
+                        )),
+                        DataCell(Switch(
+                          value: d.isActive,
+                          activeColor: AppColors.success,
+                          onChanged: (_) {
+                            setState(() {
+                              DealsService.toggleDeal(d.id);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text('Campaign status updated for ${d.title}.')),
+                            );
+                          },
+                        )),
+                        DataCell(IconButton(
+                          icon: const Icon(Icons.delete_outline_rounded, color: AppColors.error, size: 20),
+                          onPressed: () {
+                            setState(() {
+                              DealsService.deleteDeal(d.id);
+                            });
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Campaign removed.')),
+                            );
+                          },
+                        )),
+                      ]);
+                    }).toList(),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _showAddDealDialog(BuildContext context) {
+    final titleCtrl = TextEditingController();
+    final subtitleCtrl = TextEditingController();
+    final codeCtrl = TextEditingController();
+    final percentCtrl = TextEditingController(text: '30');
+    final badgeCtrl = TextEditingController(text: 'LIMITED DEAL');
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Create New Promotional Ad / Deal'),
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: titleCtrl,
+                decoration: const InputDecoration(labelText: 'Campaign Title (e.g. SINDHU BHAVAN SALE)'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: subtitleCtrl,
+                decoration: const InputDecoration(labelText: 'Subtitle (e.g. Flat 30% Off on designer kurtas)'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: codeCtrl,
+                decoration: const InputDecoration(labelText: 'Coupon Code (e.g. FESTIVE30)'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: percentCtrl,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(labelText: 'Discount Percentage (e.g. 30)'),
+              ),
+              const SizedBox(height: 10),
+              TextField(
+                controller: badgeCtrl,
+                decoration: const InputDecoration(labelText: 'Badge Tag (e.g. MEGA DEAL)'),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              if (titleCtrl.text.trim().isEmpty || codeCtrl.text.trim().isEmpty) return;
+              final newDeal = DealBanner(
+                id: 'deal-${DateTime.now().millisecondsSinceEpoch}',
+                title: titleCtrl.text.trim().toUpperCase(),
+                subtitle: subtitleCtrl.text.trim(),
+                promoCode: codeCtrl.text.trim().toUpperCase(),
+                discountPercent: int.tryParse(percentCtrl.text) ?? 30,
+                badgeText: badgeCtrl.text.trim().toUpperCase(),
+                gradientStart: '0xFF171717',
+                gradientEnd: '0xFFD93670',
+                isActive: true,
+              );
+              DealsService.addDeal(newDeal);
+              Navigator.pop(ctx);
+              setState(() {});
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('🎉 New Deal published live to Customer App front page!')),
+              );
+            },
+            child: const Text('Publish Deal to App'),
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildExchangeTab(bool isMobile) {
     return Card(
