@@ -23,6 +23,9 @@ void main() async {
   // Start real-time cross-app order synchronization bus
   OrderSyncService.startBackgroundSync();
 
+  // Load historical route learning cache
+  await DeliveryEtaService.init();
+
   runApp(
     const ProviderScope(
       child: CustomerApp(),

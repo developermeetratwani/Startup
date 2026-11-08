@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../utils/app_logger.dart';
 import 'smtp_auth_service.dart';
 import 'notification_service.dart';
+import 'delivery_eta_service.dart';
 
 /// Remittance Record when a driver deposits collected COD cash to the company
 class DriverRemittanceRecord {
@@ -379,6 +380,16 @@ class OrderSyncService {
         NotificationService.dispatchDeliveryCompleted(
           orderId: orderId,
           customerName: 'Customer',
+        );
+        // Record completed delivery duration for dynamic route ETA learning
+        final destArea = existing.deliveryAddressSnapshot['city']?.toString() ??
+            existing.deliveryAddressSnapshot['area']?.toString() ??
+            'Bodakdev';
+        final duration = DateTime.now().difference(existing.placedAt).inMinutes.clamp(14, 60);
+        DeliveryEtaService.recordCompletedDelivery(
+          originArea: 'Kubernagar',
+          destinationArea: destArea,
+          durationMinutes: duration,
         );
       }
 

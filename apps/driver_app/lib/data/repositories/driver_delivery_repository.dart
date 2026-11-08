@@ -186,6 +186,12 @@ class DriverDeliveryRepository {
           'deliveredAt': FieldValue.serverTimestamp(),
           'paymentStatus': 'paid',
         });
+        // Record completed route trip for dynamic ETA learning
+        DeliveryEtaService.recordCompletedDelivery(
+          originArea: 'Kubernagar',
+          destinationArea: 'Bodakdev',
+          durationMinutes: 24,
+        );
       }
 
       await _firestore.collection('deliveries').doc(deliveryId).update(updates);

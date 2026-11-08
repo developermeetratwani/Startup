@@ -4,8 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:ui_kit/ui_kit.dart';
-import 'package:core/core.dart';
-import '../providers/location_provider.dart';
 
 /// Nearby roaming rider model for Zomato-style live radar
 class RoamingRider {

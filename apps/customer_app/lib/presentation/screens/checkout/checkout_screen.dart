@@ -55,13 +55,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
     final user = ref.watch(currentUserProvider);
     final location = ref.watch(locationProvider);
 
-    const etaService = DeliveryEtaService();
-    final etaMinutes = etaService.estimateMinutes(
+    final routeEta = DeliveryEtaService.getRouteEtaInfo(
+      originArea: 'Kubernagar',
+      destinationArea: location.areaName,
       storeLat: 23.0768,
       storeLng: 72.6346,
       customerLat: location.latitude,
       customerLng: location.longitude,
     );
+    final etaMinutes = routeEta.minutes;
+    const etaService = DeliveryEtaService();
     final distanceKm = etaService.distanceKm(
       lat1: 23.0768,
       lng1: 72.6346,
@@ -92,17 +95,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: distanceKm > 8 ? Colors.indigo.shade50 : AppColors.primary.withValues(alpha: 0.08),
+                color: routeEta.isHistoricalAverage
+                    ? const Color(0xFFF0FDF4)
+                    : (distanceKm > 8 ? Colors.indigo.shade50 : AppColors.primary.withValues(alpha: 0.08)),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 border: Border.all(
-                  color: distanceKm > 8 ? Colors.indigo.shade300 : AppColors.primary.withValues(alpha: 0.25),
+                  color: routeEta.isHistoricalAverage
+                      ? const Color(0xFF86EFAC)
+                      : (distanceKm > 8 ? Colors.indigo.shade300 : AppColors.primary.withValues(alpha: 0.25)),
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
-                    _deliveryMode == 'scheduled' ? Icons.schedule_rounded : (distanceKm > 8 ? Icons.explore_rounded : Icons.bolt_rounded),
-                    color: distanceKm > 8 ? Colors.indigo.shade800 : AppColors.primary,
+                    _deliveryMode == 'scheduled'
+                        ? Icons.schedule_rounded
+                        : (routeEta.isHistoricalAverage
+                            ? Icons.auto_graph_rounded
+                            : (distanceKm > 8 ? Icons.explore_rounded : Icons.bolt_rounded)),
+                    color: routeEta.isHistoricalAverage
+                        ? const Color(0xFF16A34A)
+                        : (distanceKm > 8 ? Colors.indigo.shade800 : AppColors.primary),
                     size: 28,
                   ),
                   const SizedBox(width: 10),
@@ -120,7 +133,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 13,
-                                  color: distanceKm > 8 ? Colors.indigo.shade900 : AppColors.textPrimary,
+                                  color: routeEta.isHistoricalAverage
+                                      ? const Color(0xFF14532D)
+                                      : (distanceKm > 8 ? Colors.indigo.shade900 : AppColors.textPrimary),
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -130,15 +145,27 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: _deliveryMode == 'scheduled' ? Colors.amber.shade100 : Colors.indigo.shade100,
+                                color: _deliveryMode == 'scheduled'
+                                    ? Colors.amber.shade100
+                                    : (routeEta.isHistoricalAverage
+                                        ? const Color(0xFFDCFCE7)
+                                        : Colors.indigo.shade100),
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                _deliveryMode == 'scheduled' ? 'SCHEDULED' : 'WHOLE AHMEDABAD',
+                                _deliveryMode == 'scheduled'
+                                    ? 'SCHEDULED'
+                                    : (routeEta.isHistoricalAverage
+                                        ? '⚡ ${routeEta.completedTripCount} TRIPS AVG'
+                                        : (distanceKm > 8 ? 'WHOLE AHMEDABAD' : 'HYPERLOCAL')),
                                 style: TextStyle(
                                   fontSize: 9,
                                   fontWeight: FontWeight.bold,
-                                  color: _deliveryMode == 'scheduled' ? Colors.amber.shade900 : Colors.indigo.shade900,
+                                  color: _deliveryMode == 'scheduled'
+                                      ? Colors.amber.shade900
+                                      : (routeEta.isHistoricalAverage
+                                          ? const Color(0xFF15803D)
+                                          : Colors.indigo.shade900),
                                 ),
                               ),
                             ),
@@ -148,12 +175,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         Text(
                           _deliveryMode == 'scheduled'
                               ? 'Rider will be dispatched 20 mins prior for on-time precision arrival at your door.'
-                              : (distanceKm > 8
-                                  ? 'Cross-city route to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km). Time adjusts dynamically for traffic.'
-                                  : 'Hyperlocal fashion delivery to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km from store).'),
+                              : (routeEta.isHistoricalAverage
+                                  ? 'Dynamic rolling average from ${routeEta.completedTripCount} deliveries (Kubernagar → ${location.areaName}). Recent: ${routeEta.recentDurations.take(3).join(", ")}m.'
+                                  : (distanceKm > 8
+                                      ? 'Cross-city route to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km). Time adjusts dynamically for traffic.'
+                                      : 'Hyperlocal fashion delivery to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km from store).')),
                           style: TextStyle(
                             fontSize: 11,
-                            color: distanceKm > 8 ? Colors.indigo.shade800 : AppColors.textSecondary,
+                            color: routeEta.isHistoricalAverage
+                                ? const Color(0xFF166534)
+                                : (distanceKm > 8 ? Colors.indigo.shade800 : AppColors.textSecondary),
                           ),
                         ),
                       ],

@@ -29,6 +29,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final location = ref.watch(locationProvider);
     final selectedCategory = ref.watch(selectedCategoryProvider);
+
+    final homeEta = DeliveryEtaService.getRouteEtaInfo(
+      originArea: 'Kubernagar',
+      destinationArea: location.areaName,
+      storeLat: 23.0768,
+      storeLng: 72.6346,
+      customerLat: location.latitude,
+      customerLng: location.longitude,
+    );
+    final etaBadgeText = homeEta.isHistoricalAverage
+        ? '~${homeEta.minutes} MINS AVG'
+        : '${(homeEta.minutes - 4).clamp(10, 90)}-${homeEta.minutes} MINS';
     final storesAsync = ref.watch(nearbyStoresProvider);
     final cartSummary = ref.watch(cartSummaryProvider);
     final productsAsync = ref.watch(homeProductsProvider(selectedCategory));
@@ -102,14 +114,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       color: const Color(0xFFE8F5E9),
                       borderRadius: BorderRadius.circular(4),
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.bolt_rounded, size: 11, color: Color(0xFF267E3E)),
-                        SizedBox(width: 2),
+                        const Icon(Icons.bolt_rounded, size: 11, color: Color(0xFF267E3E)),
+                        const SizedBox(width: 2),
                         Text(
-                          '10-15 MINS',
-                          style: TextStyle(
+                          etaBadgeText,
+                          style: const TextStyle(
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
                             color: Color(0xFF267E3E),

@@ -182,6 +182,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     final password = _signUpPasswordController.text.trim();
 
     try {
+      AppLogger.info("Auth", "Registering customer $phone ($name)");
       final authRepo = ref.read(authRepositoryProvider);
       final (user, failure) = await authRepo.registerWithEmail(
         email: email,
