@@ -37,7 +37,7 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
       utrRef: 'UPI/6312450912/XYZ-SETTLE',
       date: '03 Nov 2026, 02:15 PM',
       isPaid: true,
-      settledBy: 'XYZ Startup Finance Desk',
+      settledBy: 'MARS Finance Desk',
     ),
     SettlementBatch(
       batchId: 'BATCH-2026-W43',
@@ -45,7 +45,7 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
       utrRef: 'IMPS/AXIS991204/XYZ-SETTLE',
       date: '27 Oct 2026, 11:30 AM',
       isPaid: true,
-      settledBy: 'XYZ Startup Finance Desk',
+      settledBy: 'MARS Finance Desk',
     ),
     SettlementBatch(
       batchId: 'CURRENT-CYCLE (Pending)',
@@ -134,7 +134,7 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                 batch.isPaid = true;
                 batch.utrRef = finalUtr;
                 batch.date = 'Paid Just Now (Company Settled)';
-                batch.settledBy = 'XYZ Startup SuperAdmin';
+                batch.settledBy = 'MARS SuperAdmin';
               });
 
               Navigator.pop(ctx);

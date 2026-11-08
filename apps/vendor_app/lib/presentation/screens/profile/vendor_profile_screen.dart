@@ -420,7 +420,7 @@ class VendorProfileScreen extends ConsumerWidget {
   }
 
   void _showReferralDialog(BuildContext context, dynamic store) {
-    final link = 'https://xyzstartup.in/store/${store.id}';
+    final link = 'https://marsfashion.in/store/${store.id}';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(

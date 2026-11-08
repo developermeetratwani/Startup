@@ -111,7 +111,7 @@ void _persistOrders() {
 void main() async {
   _initOrders();
   final server = await HttpServer.bind(InternetAddress.anyIPv4, _kPort);
-  print('🚀 XYZ Startup Inter-App Order Bridge & SMTP Server running on http://0.0.0.0:$_kPort');
+  print('🚀 MARS Inter-App Order Bridge & SMTP Server running on http://0.0.0.0:$_kPort');
 
   await for (HttpRequest request in server) {
     // Enable CORS for Flutter Web running on localhost:3000, 3001, 3002, 3003, 8000
@@ -299,9 +299,9 @@ void main() async {
         final data = jsonDecode(content) as Map<String, dynamic>;
 
         final to = data['to'] as String? ?? '';
-        final subject = data['subject'] as String? ?? 'XYZ Startup Notification';
+        final subject = data['subject'] as String? ?? 'MARS Notification';
         final html = data['html'] as String? ?? '';
-        final appName = data['appName'] as String? ?? 'XYZ Startup';
+        final appName = data['appName'] as String? ?? 'MARS';
 
         if (to.isEmpty) {
           request.response

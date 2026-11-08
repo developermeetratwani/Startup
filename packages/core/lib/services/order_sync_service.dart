@@ -186,9 +186,18 @@ class OrderSyncService {
   static final StreamController<List<DriverHubHandoverRequest>> _handoverController =
       StreamController<List<DriverHubHandoverRequest>>.broadcast();
 
-  static Stream<List<OrderEntity>> get ordersStream => _streamController.stream;
-  static Stream<List<DriverRemittanceRecord>> get remittancesStream => _remittanceController.stream;
-  static Stream<List<DriverHubHandoverRequest>> get handoversStream => _handoverController.stream;
+  static Stream<List<OrderEntity>> get ordersStream async* {
+    yield List.unmodifiable(_orders);
+    yield* _streamController.stream;
+  }
+  static Stream<List<DriverRemittanceRecord>> get remittancesStream async* {
+    yield List.unmodifiable(_remittances);
+    yield* _remittanceController.stream;
+  }
+  static Stream<List<DriverHubHandoverRequest>> get handoversStream async* {
+    yield List.unmodifiable(_handoverRequests);
+    yield* _handoverController.stream;
+  }
 
   static List<OrderEntity> get currentOrders => List.unmodifiable(_orders);
   static List<DriverRemittanceRecord> get currentRemittances => List.unmodifiable(_remittances);
@@ -222,6 +231,9 @@ class OrderSyncService {
 
   /// Starts periodic polling to sync with all apps through the local bridge server
   static void startBackgroundSync() {
+    if (_streamController.hasListener) {
+      _streamController.add(List.unmodifiable(_orders));
+    }
     if (_syncTimer != null) return;
     syncFromBridgeServer();
     _syncTimer = Timer.periodic(const Duration(milliseconds: 1500), (_) {

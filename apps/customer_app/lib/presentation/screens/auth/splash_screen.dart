@@ -92,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
               ),
               const SizedBox(height: 24),
               const Text(
-                'XYZ Startup',
+                'MARS',
                 style: TextStyle(
                   color: AppColors.linen,
                   fontSize: 28,

@@ -23,7 +23,7 @@ class PaymentErrorResult {
   });
 }
 
-/// Razorpay Payment Gateway Service for XYZ Startup
+/// Razorpay Payment Gateway Service for MARS
 /// Supports Web and Mobile test/live checkout flows
 class RazorpayService {
   static const String defaultTestKey = 'rzp_test_meetratwani1234';
@@ -39,7 +39,7 @@ class RazorpayService {
     required String customerName,
     required String customerPhone,
     required String customerEmail,
-    String storeName = 'XYZ Startup Hyperlocal',
+    String storeName = 'MARS Hyperlocal',
     String description = 'Apparel & Fashion Order',
     Map<String, dynamic>? notes,
   }) async {
@@ -53,13 +53,13 @@ class RazorpayService {
       'order_id': orderId.startsWith('ord_') ? orderId : 'order_${orderId.replaceAll('-', '_')}',
       'prefill': {
         'contact': customerPhone.isNotEmpty ? customerPhone : '9898012345',
-        'email': customerEmail.isNotEmpty ? customerEmail : 'customer@xyzstartup.in',
+        'email': customerEmail.isNotEmpty ? customerEmail : 'customer@marsfashion.in',
         'name': customerName.isNotEmpty ? customerName : 'Valued Customer',
       },
       'theme': {
         'color': '#6C5CE7',
       },
-      'notes': notes ?? {'platform': 'XYZ Startup', 'compliance': 'DPDP 2023'},
+      'notes': notes ?? {'platform': 'MARS', 'compliance': 'DPDP 2023'},
     };
 
     debugPrint('[RazorpayService] Initiating checkout with options: $options');

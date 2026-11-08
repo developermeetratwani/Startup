@@ -90,7 +90,7 @@ class DriverProfileState {
     this.aadhaarNumber = 'XXXX-XXXX-8912',
     this.electricityBillProvider = 'Torrent Power (Ahmedabad)',
     this.cluster = 'All Ahmedabad (Sindhu Bhavan, Bodakdev, Kubernagar & Gandhinagar)',
-    this.isVerified = true,
+    this.isVerified = false,
     this.isBlacklisted = false,
   });
 

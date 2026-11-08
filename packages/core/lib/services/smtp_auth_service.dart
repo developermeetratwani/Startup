@@ -7,7 +7,7 @@ import 'package:mailer/smtp_server.dart';
 import 'package:domain/domain.dart';
 import '../utils/app_logger.dart';
 
-/// XYZ Startup SMTP Email Service
+/// MARS SMTP Email Service
 /// Sends branded transactional emails from developermeetratwani@gmail.com
 class SmtpAuthService {
   final String host;
@@ -47,7 +47,7 @@ class SmtpAuthService {
     <!-- Footer -->
     <div style="background:#f1f0f7;padding:20px 36px;border-top:1px solid #e0dff5;">
       <p style="margin:0;font-size:12px;color:#9b9bb4;text-align:center;">
-        You received this email from <strong>XYZ Startup</strong> because you have an account with us.<br/>
+        You received this email from <strong>MARS</strong> because you have an account with us.<br/>
         Kubernagar &amp; Gandhinagar, Gujarat, India &nbsp;|&nbsp;
         <a href="mailto:developermeetratwani@gmail.com" style="color:#6C5CE7;text-decoration:none;">Support</a>
       </p>
@@ -68,7 +68,7 @@ class SmtpAuthService {
     required String to,
     required String subject,
     required String htmlBody,
-    String appName = 'XYZ Startup',
+    String appName = 'MARS',
   }) async {
     try {
       if (kIsWeb) {
@@ -118,7 +118,7 @@ class SmtpAuthService {
   Future<Failure?> sendWelcomeEmail({
     required String recipientEmail,
     required String displayName,
-    String appName = 'XYZ Startup',
+    String appName = 'MARS',
   }) async {
     final body = '''
       ${_header(appName)}
@@ -159,7 +159,7 @@ class SmtpAuthService {
         </table>
 
         <p style="color:#9b9bb4;font-size:12px;margin-top:28px;">
-          From the XYZ Startup team — if you have any questions, reply to this email or reach us at
+          From the MARS team — if you have any questions, reply to this email or reach us at
           <a href="mailto:developermeetratwani@gmail.com" style="color:#6C5CE7;">developermeetratwani@gmail.com</a>.
         </p>
       ${_footer()}
@@ -178,7 +178,7 @@ class SmtpAuthService {
   Future<Failure?> sendOtpEmail({
     required String recipientEmail,
     required String otpCode,
-    String appName = 'XYZ Startup',
+    String appName = 'MARS',
   }) async {
     final body = '''
       ${_header(appName)}
@@ -199,7 +199,7 @@ class SmtpAuthService {
         </p>
         <p style="color:#9b9bb4;font-size:12px;">
           If you did not request this code, you can safely ignore this email.
-          Sent by the <strong>XYZ Startup</strong> team.
+          Sent by the <strong>MARS</strong> team.
         </p>
       ${_footer()}
     ''';
@@ -221,7 +221,7 @@ class SmtpAuthService {
     required String storeName,
     required int grandTotalPaise,
     required int etaMinutes,
-    String appName = 'XYZ Startup',
+    String appName = 'MARS',
   }) async {
     final total = '₹${(grandTotalPaise / 100).toStringAsFixed(0)}';
     final shortId = orderId.length > 8 ? orderId.substring(0, 8).toUpperCase() : orderId.toUpperCase();
@@ -231,7 +231,7 @@ class SmtpAuthService {
         <h2 style="margin:0 0 4px;color:#2d2d4e;font-size:22px;">Order Confirmed! ✅</h2>
         <p style="color:#555;line-height:1.7;margin:0 0 20px;">
           Hi <strong>$customerName</strong>, your order from <strong>$storeName</strong> has been placed successfully.
-          From the XYZ Startup team — we are on it!
+          From the MARS team — we are on it!
         </p>
 
         <!-- Order info card -->
@@ -283,7 +283,7 @@ class SmtpAuthService {
     required String otpCode,
     required int amountPaise,
     required String hubLocation,
-    String appName = 'XYZ Startup',
+    String appName = 'MARS',
   }) async {
     final amountText = '₹${(amountPaise / 100).toStringAsFixed(0)}';
 
@@ -338,7 +338,7 @@ class SmtpAuthService {
     required int amountPaise,
     required String hubLocation,
     required String adminId,
-    String appName = 'XYZ Startup',
+    String appName = 'MARS',
   }) async {
     final amountText = '₹${(amountPaise / 100).toStringAsFixed(0)}';
 

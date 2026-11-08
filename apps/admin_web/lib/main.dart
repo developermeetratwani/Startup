@@ -30,7 +30,7 @@ class AdminDashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'XYZ Startup — Central Admin Portal',
+      title: 'MARS Admin — Central Admin Portal',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       home: const AdminHomeScreen(),
@@ -92,12 +92,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 child: const Icon(Icons.shield_rounded, color: Colors.white, size: 22),
               ),
               const SizedBox(width: 12),
-              const Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('XYZ STARTUP', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                  Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11)),
-                ],
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('MARS FASHION', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  ],
+                ),
               ),
             ],
           ),
@@ -154,7 +156,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               child: Text('AD', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold)),
             ),
             title: Text('Admin Manager', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
-            subtitle: Text('admin@xyzstartup.in', style: TextStyle(color: AppColors.textHint, fontSize: 10)),
+            subtitle: Text('admin@marsfashion.in', style: TextStyle(color: AppColors.textHint, fontSize: 10)),
           ),
         ],
       ),

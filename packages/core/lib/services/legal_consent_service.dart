@@ -36,9 +36,9 @@ class GrievanceOfficerContact {
   const GrievanceOfficerContact({
     this.name = 'Meet Ratwani',
     this.designation = 'Chief Grievance Redressal & Nodal Compliance Officer',
-    this.email = 'grievance@xyzstartup.in',
+    this.email = 'grievance@marsfashion.in',
     this.phone = '+91 98980 12345',
-    this.address = 'XYZ Startup HQ, Kubernagar Main Market, Ahmedabad - 382340, Gujarat, India',
+    this.address = 'MARS HQ, Kubernagar Main Market, Ahmedabad - 382340, Gujarat, India',
     this.acknowledgmentSla = 'Within 48 hours',
     this.resolutionSla = 'Within 30 calendar days',
   });
@@ -99,7 +99,7 @@ class UserConsentState {
   );
 }
 
-/// Comprehensive Statutory Legal & Privacy Consent Service for XYZ Startup
+/// Comprehensive Statutory Legal & Privacy Consent Service for MARS
 /// Strictly compliant with India's Digital Personal Data Protection (DPDP) Act 2023,
 /// Consumer Protection (E-Commerce) Rules 2020, and Information Technology Act 2000.
 class LegalConsentService {
@@ -188,7 +188,7 @@ class LegalConsentService {
       title: 'RBI Tokenized Payments (PCI-DSS Aggregator)',
       governingLaw: 'Reserve Bank of India Payment Aggregator Framework',
       category: 'Financial Data',
-      purposeExplanation: 'Zero card number or CVV storage on XYZ Startup servers. All online transactions routed via RBI-authorized Razorpay gateway.',
+      purposeExplanation: 'Zero card number or CVV storage on MARS servers. All online transactions routed via RBI-authorized Razorpay gateway.',
       isMandatoryForCoreService: true,
     ),
     StatutoryConsentRequirement(
@@ -269,7 +269,7 @@ class LegalConsentService {
       title: 'Mandatory Grievance Redressal Officer Designation',
       governingLaw: 'IT Act 2000 Rule 3(2) & DPDP Act §8(9)',
       category: 'Grievance',
-      purposeExplanation: 'Meet Ratwani designated with contact email grievance@xyzstartup.in. 48-hour acknowledgment and 30-day resolution guaranteed.',
+      purposeExplanation: 'Meet Ratwani designated with contact email grievance@marsfashion.in. 48-hour acknowledgment and 30-day resolution guaranteed.',
       isMandatoryForCoreService: true,
     ),
     StatutoryConsentRequirement(

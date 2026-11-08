@@ -122,6 +122,7 @@ class DriverDeliveryRepository {
     final syncSub = OrderSyncService.ordersStream.listen((_) {
       emitMerged([]);
     });
+    controller.onCancel = () => syncSub.cancel();
 
     // Listen to Firestore deliveries
     try {

@@ -43,7 +43,7 @@ class CustomerApp extends ConsumerWidget {
       theme: AppTheme.light,
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'XYZ Customer Marketplace',
+        badgeText: 'MARS',
         child: child ?? const SizedBox.shrink(),
       ),
     );

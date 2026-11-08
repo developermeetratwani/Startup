@@ -310,7 +310,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                               TileLayer(
                                 urlTemplate: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
                                 fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                userAgentPackageName: 'in.xyzstartup.app',
+                                userAgentPackageName: 'in.marsfashion.app',
                               ),
 
                               // Proximity Geofence Radius Ring (100m around destination)
@@ -1205,7 +1205,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('TAX INVOICE & BILL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF6C5CE7))),
-                        Text('XYZ Startup Hyperlocal Fashion Pvt. Ltd.', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        Text('MARS Hyperlocal Fashion Pvt. Ltd.', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                       ],
                     ),
                     IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),
@@ -1353,7 +1353,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: const Text(
-                            'DPDP Act 2023 & Consumer Protection Compliant. Designated Grievance Officer: Meet Ratwani (grievance@xyzstartup.in, Kubernagar, Ahmedabad).',
+                            'DPDP Act 2023 & Consumer Protection Compliant. Designated Grievance Officer: Meet Ratwani (grievance@marsfashion.in, Kubernagar, Ahmedabad).',
                             style: TextStyle(fontSize: 10, color: Colors.black54),
                           ),
                         ),

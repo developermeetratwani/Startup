@@ -215,9 +215,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       children: [
                         const Icon(Icons.search, color: AppColors.accent, size: 20),
                         const SizedBox(width: 10),
-                        Text(
-                          'Search kurta, sarees, jeans, shirts...',
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
+                        Expanded(
+                          child: Text(
+                            'Search kurta, sarees, jeans, shirts...',
+                            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ],
                     ),
@@ -396,7 +400,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Fresh Apparel Arrivals', style: AppTextStyles.titleLarge),
+                    Flexible(
+                      child: Text(
+                        'Fresh Apparel Arrivals',
+                        style: AppTextStyles.titleLarge,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       '48h Size Exchange ⚡',
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent, fontWeight: FontWeight.bold),
@@ -434,7 +445,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Nearby Stores', style: AppTextStyles.titleLarge),
+                    Flexible(
+                      child: Text('Nearby Stores', style: AppTextStyles.titleLarge, overflow: TextOverflow.ellipsis),
+                    ),
+                    const SizedBox(width: 8),
                     Text(
                       'Within 15 km',
                       style: AppTextStyles.bodySmall.copyWith(color: AppColors.accent),
@@ -691,7 +705,13 @@ class _StoreCard extends StatelessWidget {
           children: [
             const Icon(Icons.home_work_rounded, color: AppColors.primary, size: 24),
             const SizedBox(width: 8),
-            Text('Complete Delivery Address', style: AppTextStyles.titleMedium),
+            Expanded(
+              child: Text(
+                'Complete Delivery Address',
+                style: AppTextStyles.titleMedium,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: SingleChildScrollView(
@@ -817,7 +837,9 @@ class _LocationSelectorSheet extends ConsumerWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Select Delivery Market', style: AppTextStyles.titleLarge),
+                Flexible(
+                  child: Text('Select Delivery Market', style: AppTextStyles.titleLarge, overflow: TextOverflow.ellipsis),
+                ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded),
                   onPressed: () => Navigator.pop(context),

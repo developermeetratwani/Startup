@@ -88,7 +88,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
             onPressed: () async {
               Navigator.pop(ctx);
               final res = await LegalConsentService.submitDataErasureRequest(
-                userEmail: 'current.user@xyzstartup.in',
+                userEmail: 'current.user@marsfashion.in',
                 userName: 'Valued Customer',
                 reason: reasonCtrl.text.trim(),
               );
@@ -377,7 +377,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
         children: [
           _policySection(
             title: '1. Privacy Policy & Data Fiduciary Disclosure',
-            content: 'XYZ Startup acts as a Data Fiduciary under Section 2(i) of the Digital Personal Data Protection Act, 2023. We collect names, phone numbers, delivery coordinates, and order histories exclusively for order fulfillment, fraud prevention, and tax compliance. Data is processed locally within India (Google Cloud Asia-South1 Mumbai data center) and never sold to third-party ad networks.',
+            content: 'MARS acts as a Data Fiduciary under Section 2(i) of the Digital Personal Data Protection Act, 2023. We collect names, phone numbers, delivery coordinates, and order histories exclusively for order fulfillment, fraud prevention, and tax compliance. Data is processed locally within India (Google Cloud Asia-South1 Mumbai data center) and never sold to third-party ad networks.',
           ),
           _policySection(
             title: '2. Cookie & Local Storage Policy',
@@ -389,7 +389,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
           ),
           _policySection(
             title: '4. Platform Fee & Commission Transparency',
-            content: 'XYZ Startup charges a standard 10% platform facilitation fee to onboarded clothing merchants in Kubernagar, Gandhinagar, and across Ahmedabad. Delivery fees are calculated dynamically based on distance (~65 minutes for cross-city deliveries like Kubernagar to Sindhu Bhavan Road, ~19.2 km). All fees and applicable GST (5% / 12% on apparel) are displayed transparently prior to checkout.',
+            content: 'MARS charges a standard 10% platform facilitation fee to onboarded clothing merchants in Kubernagar, Gandhinagar, and across Ahmedabad. Delivery fees are calculated dynamically based on distance (~65 minutes for cross-city deliveries like Kubernagar to Sindhu Bhavan Road, ~19.2 km). All fees and applicable GST (5% / 12% on apparel) are displayed transparently prior to checkout.',
           ),
           _policySection(
             title: '5. Data Retention & Statutory Disposal',

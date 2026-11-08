@@ -38,12 +38,12 @@ class VendorApp extends ConsumerWidget {
     final router = ref.watch(vendorRouterProvider);
 
     return MaterialApp.router(
-      title: 'XYZ Startup — Retailer Portal',
+      title: 'MARS Vendor — Retailer Portal',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'XYZ Retailer Portal (Vendor)',
+        badgeText: 'MARS Vendor',
         child: child ?? const SizedBox.shrink(),
       ),
     );

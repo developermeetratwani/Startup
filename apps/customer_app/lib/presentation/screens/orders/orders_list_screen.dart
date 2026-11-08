@@ -105,14 +105,18 @@ class _OrderTile extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                order.isActive ? 'Active Delivery' : (order.status == OrderStatus.exchangeRequested ? 'Exchange Pending' : 'Completed'),
-                style: TextStyle(
-                  fontSize: 12,
-                  color: order.isActive ? AppColors.accent : (order.status == OrderStatus.exchangeRequested ? AppColors.warning : AppColors.textSecondary),
-                  fontWeight: FontWeight.w600,
+              Flexible(
+                child: Text(
+                  order.isActive ? 'Active Delivery' : (order.status == OrderStatus.exchangeRequested ? 'Exchange Pending' : 'Completed'),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: order.isActive ? AppColors.accent : (order.status == OrderStatus.exchangeRequested ? AppColors.warning : AppColors.textSecondary),
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
+              const SizedBox(width: 8),
               const Row(
                 children: [
                   Text('Track & Exchange', style: TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.bold)),

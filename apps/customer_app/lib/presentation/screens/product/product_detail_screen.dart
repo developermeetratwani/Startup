@@ -248,7 +248,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             _metrologyRow('Maximum Retail Price (MRP)', '₹${(product.basePrice / 100).toStringAsFixed(0)} (Incl. of all taxes)'),
                             _metrologyRow('Manufactured & Packed By', 'Authorized Boutique Merchant, Kubernagar / Ahmedabad, Gujarat'),
                             _metrologyRow('48-Hour Size Exchange', 'Guaranteed doorstep replacement under Consumer Protection Rules'),
-                            _metrologyRow('Grievance Redressal Desk', 'Meet Ratwani (grievance@xyzstartup.in, Kubernagar, Ahmedabad)'),
+                            _metrologyRow('Grievance Redressal Desk', 'Meet Ratwani (grievance@marsfashion.in, Kubernagar, Ahmedabad)'),
                           ],
                         ),
                       ),

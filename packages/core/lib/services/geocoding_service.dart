@@ -20,7 +20,7 @@ class GeoResult {
 
 /// Free OpenStreetMap & Nominatim Geocoding Service (Zero API Keys required)
 class FreeGeocodingService {
-  static const String _userAgent = 'XYZHyperlocalFashion/1.0 (support@xyzstartup.in)';
+  static const String _userAgent = 'XYZHyperlocalFashion/1.0 (support@marsfashion.in)';
 
   /// Reverse geocode GPS coordinates to human-readable area name (e.g., "Nana Chiloda", "Ahmedabad")
   static Future<GeoResult> reverseGeocode({

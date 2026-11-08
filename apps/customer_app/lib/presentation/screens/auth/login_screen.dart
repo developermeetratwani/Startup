@@ -116,7 +116,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       await smtp.sendOtpEmail(
         recipientEmail: email,
         otpCode: otp,
-        appName: 'XYZ Startup',
+        appName: 'MARS',
       );
 
       setState(() {
@@ -161,7 +161,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     );
 
     if (mounted) {
-      AppSnackbar.show(context, message: '✅ OTP Verified! Welcome to XYZ Startup.', type: SnackbarType.success);
+      AppSnackbar.show(context, message: '✅ OTP Verified! Welcome to MARS.', type: SnackbarType.success);
       context.go('/home');
     }
   }
@@ -223,28 +223,38 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(11),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6C5CE7), Color(0xFFA29BFE)],
-                      ),
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(14),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Color(0x18171717),
+                          blurRadius: 10,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
                     ),
-                    child: const Icon(Icons.checkroom_rounded, color: Colors.white, size: 26),
+                    child: const Icon(Icons.checkroom_rounded, color: Colors.white, size: 24),
                   ),
-                  const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'XYZ STARTUP',
-                        style: TextStyle(fontWeight: FontWeight.w900, fontSize: 18, letterSpacing: -0.3, color: Color(0xFF1E293B)),
-                      ),
-                      Text(
-                        'Hyperlocal Fashion Delivery • Ahmedabad & Gandhinagar',
-                        style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-                      ),
-                    ],
+                  const SizedBox(width: 14),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'MARS FASHION',
+                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, letterSpacing: -0.2, color: AppColors.textPrimary),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Hyperlocal Fashion Delivery • Ahmedabad & Gandhinagar',
+                          style: TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
@@ -255,23 +265,23 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               Container(
                 height: 48,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.grey.shade200),
+                  color: AppColors.surfaceWarm,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.cardBorder),
                 ),
                 child: TabBar(
                   controller: _tabController,
                   indicator: BoxDecoration(
-                    color: const Color(0xFF6C5CE7),
-                    borderRadius: BorderRadius.circular(10),
+                    color: AppColors.primary,
+                    borderRadius: BorderRadius.circular(11),
                     boxShadow: const [
-                      BoxShadow(color: Color(0x336C5CE7), blurRadius: 6, offset: Offset(0, 2)),
+                      BoxShadow(color: Color(0x18171717), blurRadius: 6, offset: Offset(0, 2)),
                     ],
                   ),
                   labelColor: Colors.white,
-                  unselectedLabelColor: Colors.grey.shade600,
-                  labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  unselectedLabelColor: AppColors.textSecondary,
+                  labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                  unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 14),
                   indicatorSize: TabBarIndicatorSize.tab,
                   dividerColor: Colors.transparent,
                   tabs: const [
@@ -283,19 +293,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
               const SizedBox(height: 24),
 
-              // Tab View Content
-              SizedBox(
-                height: 520,
-                child: TabBarView(
-                  controller: _tabController,
-                  children: [
-                    // ── TAB 1: SIGN IN ───────────────────────────────────────
-                    _buildSignInTab(),
-
-                    // ── TAB 2: CREATE ACCOUNT (SIGN UP) ──────────────────────
-                    _buildSignUpTab(),
-                  ],
-                ),
+              // Dynamic Tab View Content without rigid height bounds
+              AnimatedBuilder(
+                animation: _tabController,
+                builder: (context, _) {
+                  return _tabController.index == 0
+                      ? _buildSignInTab()
+                      : _buildSignUpTab();
+                },
               ),
             ],
           ),
@@ -382,15 +387,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 child: OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: const BorderSide(color: Color(0xFF6C5CE7)),
+                    side: const BorderSide(color: AppColors.primary),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
                   icon: _isSendingOtp
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6C5CE7)))
-                      : const Icon(Icons.mark_email_read_rounded, color: Color(0xFF6C5CE7), size: 18),
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
+                      : const Icon(Icons.mark_email_read_rounded, color: AppColors.primary, size: 18),
                   label: Text(
                     _isSendingOtp ? 'Sending OTP via SMTP...' : 'Send 6-Digit Login OTP to Email 📧',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFF6C5CE7)),
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary),
                   ),
                   onPressed: _isSendingOtp ? null : _sendEmailOtp,
                 ),
@@ -438,7 +443,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               Center(
                 child: TextButton(
                   onPressed: () => setState(() => _isOtpMode = false),
-                  child: const Text('Back to Password Login', style: TextStyle(color: Color(0xFF6C5CE7), fontSize: 12)),
+                  child: const Text('Back to Password Login', style: TextStyle(color: AppColors.primary, fontSize: 12)),
                 ),
               ),
             ],

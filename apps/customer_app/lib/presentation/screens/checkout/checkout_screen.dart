@@ -437,14 +437,17 @@ class _PriceRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(title, style: AppTextStyles.bodyMedium),
-            if (subtitle != null)
-              Text(subtitle!, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary)),
-          ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title, style: AppTextStyles.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+              if (subtitle != null)
+                Text(subtitle!, style: const TextStyle(fontSize: 10, color: AppColors.textSecondary), maxLines: 1, overflow: TextOverflow.ellipsis),
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
           style: AppTextStyles.labelLarge.copyWith(color: color ?? AppColors.textPrimary),

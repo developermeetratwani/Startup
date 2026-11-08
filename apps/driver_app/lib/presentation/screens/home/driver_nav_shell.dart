@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'driver_home_screen.dart';
 import '../earnings/driver_earnings_screen.dart';
 import '../profile/driver_profile_screen.dart';
+import '../auth/driver_kyc_screen.dart';
+import '../../providers/driver_providers.dart';
 
-class DriverNavShell extends StatefulWidget {
+class DriverNavShell extends ConsumerStatefulWidget {
   const DriverNavShell({super.key});
 
   @override
-  State<DriverNavShell> createState() => _DriverNavShellState();
+  ConsumerState<DriverNavShell> createState() => _DriverNavShellState();
 }
 
-class _DriverNavShellState extends State<DriverNavShell> {
+class _DriverNavShellState extends ConsumerState<DriverNavShell> {
   int _currentIndex = 0;
 
   final _screens = const [
@@ -22,6 +25,13 @@ class _DriverNavShellState extends State<DriverNavShell> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(driverProfileProvider);
+
+    // Hard KYC Gate: Lock all delivery and earnings access until all KYC items are verified
+    if (!profile.isVerified) {
+      return const DriverKycScreen();
+    }
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,

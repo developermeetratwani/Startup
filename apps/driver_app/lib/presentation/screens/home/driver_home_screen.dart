@@ -43,6 +43,18 @@ class DriverHomeScreen extends ConsumerWidget {
                 activeColor: AppColors.success,
                 onChanged: (val) async {
                   if (val) {
+                    final profile = ref.read(driverProfileProvider);
+                    if (!profile.isVerified) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('⚠️ KYC Incomplete: You must complete verification before going on duty.'),
+                            backgroundColor: AppColors.error,
+                          ),
+                        );
+                      }
+                      return;
+                    }
                     try {
                       LocationPermission perm = await Geolocator.checkPermission();
                       if (perm == LocationPermission.denied) {

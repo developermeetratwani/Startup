@@ -80,8 +80,9 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
               ),
               const SizedBox(height: 20),
 
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+              Wrap(
+                alignment: WrapAlignment.center,
+                crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
                   const Text("New clothing retailer? "),
                   GestureDetector(

@@ -84,9 +84,11 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Stream<List<OrderEntity>> watchCustomerOrders(String customerId) {
+  Stream<List<OrderEntity>> watchCustomerOrders(String customerId) async* {
     OrderSyncService.startBackgroundSync();
-    return OrderSyncService.ordersStream.map((orders) {
+    final initial = OrderSyncService.currentOrders.where((o) => o.customerId == customerId || customerId == 'cust-ahmedabad-01').toList();
+    yield initial.isNotEmpty ? initial : _mockOrders;
+    yield* OrderSyncService.ordersStream.map((orders) {
       final filtered = orders.where((o) => o.customerId == customerId || customerId == 'cust-ahmedabad-01').toList();
       return filtered.isNotEmpty ? filtered : _mockOrders;
     });
@@ -159,9 +161,17 @@ class OrderRepositoryImpl implements OrderRepository {
   }
 
   @override
-  Stream<OrderEntity?> watchOrder(String orderId) {
+  Stream<OrderEntity?> watchOrder(String orderId) async* {
     OrderSyncService.startBackgroundSync();
-    return OrderSyncService.ordersStream.map((orders) {
+    final initial = OrderSyncService.currentOrders.firstWhere(
+      (o) => o.id == orderId,
+      orElse: () => _mockOrders.firstWhere(
+        (o) => o.id == orderId,
+        orElse: () => _mockOrders.first,
+      ),
+    );
+    yield initial;
+    yield* OrderSyncService.ordersStream.map((orders) {
       return orders.firstWhere(
         (o) => o.id == orderId,
         orElse: () => _mockOrders.firstWhere(

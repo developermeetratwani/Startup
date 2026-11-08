@@ -38,12 +38,12 @@ class DriverApp extends ConsumerWidget {
     final router = ref.watch(driverRouterProvider);
 
     return MaterialApp.router(
-      title: 'XYZ Startup — Delivery Partner',
+      title: 'MARS Driver — Delivery Partner',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'XYZ Delivery Partner (Driver)',
+        badgeText: 'MARS Driver',
         child: child ?? const SizedBox.shrink(),
       ),
     );
