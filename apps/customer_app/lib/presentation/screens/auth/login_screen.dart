@@ -18,7 +18,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   // Sign In Controllers
   final _signInFormKey = GlobalKey<FormState>();
-  final _signInEmailController = TextEditingController();
+  final _signInIdentifierController = TextEditingController();
   final _signInPasswordController = TextEditingController();
   bool _obscureSignInPassword = true;
   bool _isSignInLoading = false;
@@ -26,12 +26,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   // Sign Up Controllers
   final _signUpFormKey = GlobalKey<FormState>();
   final _signUpNameController = TextEditingController();
-  final _signUpEmailController = TextEditingController();
   final _signUpPhoneController = TextEditingController();
+  final _signUpEmailController = TextEditingController();
   final _signUpPasswordController = TextEditingController();
+  final _signUpConfirmPasswordController = TextEditingController();
   final _referralController = TextEditingController();
   bool _obscureSignUpPassword = true;
+  bool _obscureSignUpConfirmPassword = true;
   bool _isSignUpLoading = false;
+  bool _isReferralExpanded = false;
+  bool _receiveEmailDeals = true;
 
   // Email OTP Sign In State
   bool _isOtpMode = false;
@@ -48,27 +52,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   @override
   void dispose() {
     _tabController.dispose();
-    _signInEmailController.dispose();
+    _signInIdentifierController.dispose();
     _signInPasswordController.dispose();
     _signUpNameController.dispose();
-    _signUpEmailController.dispose();
     _signUpPhoneController.dispose();
+    _signUpEmailController.dispose();
     _signUpPasswordController.dispose();
+    _signUpConfirmPasswordController.dispose();
     _referralController.dispose();
     _otpController.dispose();
     super.dispose();
   }
 
-  // ── 1. Standard Email + Password Sign In ────────────────────────────────────
+  // ── 1. Standard Sign In ───────────────────────────────────────────────────
   Future<void> _handleSignIn() async {
     if (!_signInFormKey.currentState!.validate()) return;
     setState(() => _isSignInLoading = true);
 
-    final email = _signInEmailController.text.trim();
+    final identifier = _signInIdentifierController.text.trim();
     final password = _signInPasswordController.text.trim();
 
     try {
       final authRepo = ref.read(authRepositoryProvider);
+      final email = identifier.contains('@') ? identifier : '$identifier@marsfashion.in';
       final (user, failure) = await authRepo.signInWithEmail(
         email: email,
         password: password,
@@ -86,7 +92,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (mounted) {
         AppSnackbar.show(
           context,
-          message: 'Welcome back, ${user?.displayName ?? email.split('@').first}!',
+          message: 'Welcome back, ${user?.displayName ?? identifier}!',
           type: SnackbarType.success,
         );
         context.go('/home');
@@ -101,8 +107,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   // ── 2. Send Real Email OTP via SMTP ─────────────────────────────────────────
   Future<void> _sendEmailOtp() async {
-    final email = _signInEmailController.text.trim();
-    if (email.isEmpty || !email.contains('@')) {
+    final identifier = _signInIdentifierController.text.trim();
+    if (identifier.isEmpty || !identifier.contains('@')) {
       AppSnackbar.show(context, message: 'Please enter a valid email address first', type: SnackbarType.warning);
       return;
     }
@@ -114,7 +120,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     try {
       const smtp = SmtpAuthService();
       await smtp.sendOtpEmail(
-        recipientEmail: email,
+        recipientEmail: identifier,
         otpCode: otp,
         appName: 'MARS',
       );
@@ -127,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (mounted) {
         AppSnackbar.show(
           context,
-          message: '✅ 6-digit OTP sent to $email via SMTP mail service!',
+          message: '✅ 6-digit OTP sent to $identifier via SMTP mail service!',
           type: SnackbarType.success,
         );
       }
@@ -152,11 +158,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       return;
     }
 
-    // OTP matched! Sign in as authentic unique user for this email
-    final email = _signInEmailController.text.trim();
+    final identifier = _signInIdentifierController.text.trim();
     final authRepo = ref.read(authRepositoryProvider);
     await authRepo.signInWithEmail(
-      email: email,
+      email: identifier,
       password: 'OtpLogin_2026!',
     );
 
@@ -166,12 +171,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     }
   }
 
-  // ── 4. Create Account / Registration (Syncs to Cloud Firestore + Sends SMTP Welcome)
+  // ── 4. Create Account / Registration ──────────────────────────────────────
   Future<void> _handleSignUp() async {
     if (!_signUpFormKey.currentState!.validate()) return;
     setState(() => _isSignUpLoading = true);
 
     final name = _signUpNameController.text.trim();
+    final phone = _signUpPhoneController.text.trim();
     final email = _signUpEmailController.text.trim();
     final password = _signUpPasswordController.text.trim();
 
@@ -195,7 +201,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (mounted) {
         AppSnackbar.show(
           context,
-          message: '🎉 Account created in Firebase & Welcome Email sent to $email!',
+          message: '🎉 Welcome to MARS, $name! Account created successfully.',
           type: SnackbarType.success,
         );
         context.go('/home');
@@ -259,7 +265,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 ],
               ),
 
-              const SizedBox(height: 28),
+              const SizedBox(height: 24),
 
               // Segmented Tab Bar for Sign In vs Sign Up
               Container(
@@ -291,9 +297,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
-              // Dynamic Tab View Content without rigid height bounds
+              // Dynamic Tab View Content
               AnimatedBuilder(
                 animation: _tabController,
                 builder: (context, _) {
@@ -311,215 +317,51 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
 
   // ── BUILD SIGN IN TAB ──────────────────────────────────────────────────────
   Widget _buildSignInTab() {
-    return SingleChildScrollView(
-      child: Form(
-        key: _signInFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Welcome Back 👋',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF1E293B)),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Sign in to access your saved boutique garments, orders, and addresses.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 20),
+    return Form(
+      key: _signInFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Welcome Back 👋',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF1E293B)),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Sign in to access your saved boutique garments, orders, and addresses.',
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 18),
 
-            // Email Input
-            AppTextField(
-              label: 'Email Address',
-              hint: 'e.g. rahul@example.com',
-              controller: _signInEmailController,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                if (v == null || v.isEmpty) return 'Email is required';
-                if (!v.contains('@')) return 'Enter a valid email';
-                return null;
-              },
-            ),
-            const SizedBox(height: AppSpacing.md),
+          // Phone or Email Input
+          AppTextField(
+            label: 'Phone Number or Email *',
+            hint: 'e.g. +91 98765 43210 or email@domain.com',
+            controller: _signInIdentifierController,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Phone number or email is required';
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.md),
 
-            if (!_isOtpMode) ...[
-              // Password Input
-              AppTextField(
-                label: 'Password',
-                hint: 'Enter your password',
-                controller: _signInPasswordController,
-                obscureText: _obscureSignInPassword,
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) => _handleSignIn(),
-                suffixIcon: IconButton(
-                  icon: Icon(
-                    _obscureSignInPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-                    color: AppColors.textSecondary,
-                  ),
-                  onPressed: () => setState(() => _obscureSignInPassword = !_obscureSignInPassword),
-                ),
-                validator: (v) {
-                  if (v == null || v.isEmpty) return 'Password is required';
-                  if (v.length < 6) return 'Minimum 6 characters';
-                  return null;
-                },
-              ),
-              const SizedBox(height: AppSpacing.sm),
-
-              // Password Sign In Button
-              const SizedBox(height: 12),
-              AppButton(
-                label: 'Sign In with Password',
-                onPressed: _handleSignIn,
-                isLoading: _isSignInLoading,
-              ),
-
-              const SizedBox(height: 16),
-              const Center(
-                child: Text('— OR FAST EMAIL OTP —', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
-              ),
-              const SizedBox(height: 12),
-
-              // SMTP Email OTP Button
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    side: const BorderSide(color: AppColors.primary),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  icon: _isSendingOtp
-                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
-                      : const Icon(Icons.mark_email_read_rounded, color: AppColors.primary, size: 18),
-                  label: Text(
-                    _isSendingOtp ? 'Sending OTP via SMTP...' : 'Send 6-Digit Login OTP to Email 📧',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary),
-                  ),
-                  onPressed: _isSendingOtp ? null : _sendEmailOtp,
-                ),
-              ),
-            ] else ...[
-              // OTP Mode Active
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.green.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.green.shade200),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        'OTP sent to ${_signInEmailController.text}. Please check your inbox.',
-                        style: const TextStyle(fontSize: 11, color: Color(0xFF166534), fontWeight: FontWeight.w600),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 14),
-
-              AppTextField(
-                label: 'Enter 6-Digit Email OTP',
-                hint: 'e.g. 549210',
-                controller: _otpController,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-                onFieldSubmitted: (_) => _verifyEmailOtp(),
-              ),
-              const SizedBox(height: 14),
-
-              AppButton(
-                label: 'Verify OTP & Enter App',
-                onPressed: _verifyEmailOtp,
-              ),
-              const SizedBox(height: 10),
-
-              Center(
-                child: TextButton(
-                  onPressed: () => setState(() => _isOtpMode = false),
-                  child: const Text('Back to Password Login', style: TextStyle(color: AppColors.primary, fontSize: 12)),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ── BUILD CREATE ACCOUNT (SIGN UP) TAB ────────────────────────────────────
-  Widget _buildSignUpTab() {
-    return SingleChildScrollView(
-      child: Form(
-        key: _signUpFormKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Create Your Account 🛍️',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF1E293B)),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Register in seconds to discover Kubernagar & Gandhinagar fashion boutiques.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: 16),
-
-            // Full Name Input
-            AppTextField(
-              label: 'Full Name',
-              hint: 'e.g. Rahul Sharma',
-              controller: _signUpNameController,
-              textInputAction: TextInputAction.next,
-              validator: (v) => (v == null || v.trim().isEmpty) ? 'Name is required' : null,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-
-            // Email Input
-            AppTextField(
-              label: 'Email Address',
-              hint: 'e.g. rahul@example.com',
-              controller: _signUpEmailController,
-              keyboardType: TextInputType.emailAddress,
-              textInputAction: TextInputAction.next,
-              validator: (v) {
-                if (v == null || v.isEmpty) return 'Email is required';
-                if (!v.contains('@')) return 'Enter a valid email';
-                return null;
-              },
-            ),
-            const SizedBox(height: AppSpacing.sm),
-
-            // Phone Number Input
-            AppTextField(
-              label: 'Phone Number (Optional)',
-              hint: '+91 98765 43210',
-              controller: _signUpPhoneController,
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.next,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-
+          if (!_isOtpMode) ...[
             // Password Input
             AppTextField(
-              label: 'Create Password',
-              hint: 'At least 6 characters',
-              controller: _signUpPasswordController,
-              obscureText: _obscureSignUpPassword,
-              textInputAction: TextInputAction.next,
+              label: 'Password *',
+              hint: 'Enter your account password',
+              controller: _signInPasswordController,
+              obscureText: _obscureSignInPassword,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => _handleSignIn(),
               suffixIcon: IconButton(
                 icon: Icon(
-                  _obscureSignUpPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                  _obscureSignInPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                   color: AppColors.textSecondary,
                 ),
-                onPressed: () => setState(() => _obscureSignUpPassword = !_obscureSignUpPassword),
+                onPressed: () => setState(() => _obscureSignInPassword = !_obscureSignInPassword),
               ),
               validator: (v) {
                 if (v == null || v.isEmpty) return 'Password is required';
@@ -527,35 +369,301 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 return null;
               },
             ),
-            const SizedBox(height: AppSpacing.sm),
-
-            // Referral Code Input
-            AppTextField(
-              label: 'Store Referral Code (Optional)',
-              hint: 'e.g. KUBERNAGAR50 for 50 coins',
-              controller: _referralController,
-              textInputAction: TextInputAction.done,
-              onFieldSubmitted: (_) => _handleSignUp(),
-            ),
             const SizedBox(height: 16),
 
-            // Create Account Button
+            // Password Sign In Button
             AppButton(
-              label: 'Create Account & Start Shopping',
-              onPressed: _handleSignUp,
-              isLoading: _isSignUpLoading,
+              label: 'Sign In',
+              onPressed: _handleSignIn,
+              isLoading: _isSignInLoading,
             ),
-            const SizedBox(height: 8),
 
+            const SizedBox(height: 16),
             const Center(
-              child: Text(
-                '🔒 Fully protected under Indian DPDP Act 2023 & Firebase Authentication',
-                style: TextStyle(fontSize: 10, color: Colors.grey),
-                textAlign: TextAlign.center,
+              child: Text('— OR FAST LOGIN OTP —', style: TextStyle(fontSize: 11, color: Colors.grey, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 12),
+
+            // SMTP Email OTP Button
+            SizedBox(
+              width: double.infinity,
+              child: OutlinedButton.icon(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: const BorderSide(color: AppColors.primary),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                icon: _isSendingOtp
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary))
+                    : const Icon(Icons.mark_email_read_rounded, color: AppColors.primary, size: 18),
+                label: Text(
+                  _isSendingOtp ? 'Sending OTP via SMTP...' : 'Send Login OTP to Email 📧',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: AppColors.primary),
+                ),
+                onPressed: _isSendingOtp ? null : _sendEmailOtp,
+              ),
+            ),
+          ] else ...[
+            // OTP Mode Active
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.green.shade200),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded, color: Colors.green, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'OTP sent to ${_signInIdentifierController.text}. Please check your inbox.',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF166534), fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 14),
+
+            AppTextField(
+              label: 'Enter 6-Digit Email OTP',
+              hint: 'e.g. 549210',
+              controller: _otpController,
+              keyboardType: TextInputType.number,
+              textInputAction: TextInputAction.done,
+              onFieldSubmitted: (_) => _verifyEmailOtp(),
+            ),
+            const SizedBox(height: 14),
+
+            AppButton(
+              label: 'Verify OTP & Enter App',
+              onPressed: _verifyEmailOtp,
+            ),
+            const SizedBox(height: 10),
+
+            Center(
+              child: TextButton(
+                onPressed: () => setState(() => _isOtpMode = false),
+                child: const Text('Back to Password Login', style: TextStyle(color: AppColors.primary, fontSize: 12)),
               ),
             ),
           ],
-        ),
+        ],
+      ),
+    );
+  }
+
+  // ── BUILD CREATE ACCOUNT (SIGN UP) TAB ────────────────────────────────────
+  Widget _buildSignUpTab() {
+    return Form(
+      key: _signUpFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Create Your Account 🛍️',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Color(0xFF1E293B)),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Join MARS to shop verified fashion boutiques in Ahmedabad & Gandhinagar.',
+            style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+          ),
+          const SizedBox(height: 16),
+
+          // Full Name Input (Mandatory)
+          AppTextField(
+            label: 'Full Name *',
+            hint: 'e.g. Rahul Sharma',
+            controller: _signUpNameController,
+            textInputAction: TextInputAction.next,
+            validator: (v) => (v == null || v.trim().isEmpty) ? 'Full name is required' : null,
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Phone Number Input (Compulsory)
+          AppTextField(
+            label: 'Phone Number *',
+            hint: '+91 98765 43210',
+            controller: _signUpPhoneController,
+            keyboardType: TextInputType.phone,
+            textInputAction: TextInputAction.next,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Phone number is mandatory';
+              final digits = v.replaceAll(RegExp(r'[^0-9]'), '');
+              if (digits.length < 10) return 'Enter a valid 10-digit mobile number';
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Email Input (Compulsory)
+          AppTextField(
+            label: 'Email Address *',
+            hint: 'e.g. rahul@example.com',
+            controller: _signUpEmailController,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            validator: (v) {
+              if (v == null || v.trim().isEmpty) return 'Email address is mandatory';
+              if (!v.contains('@') || !v.contains('.')) return 'Enter a valid email address';
+              return null;
+            },
+          ),
+          const SizedBox(height: 6),
+
+          // Opt-in Newsletter / Deals Checkbox
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              SizedBox(
+                height: 22,
+                width: 22,
+                child: Checkbox(
+                  value: _receiveEmailDeals,
+                  activeColor: AppColors.primary,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                  onChanged: (val) => setState(() => _receiveEmailDeals = val ?? false),
+                ),
+              ),
+              const SizedBox(width: 8),
+              const Expanded(
+                child: Text(
+                  'Keep me updated on exclusive deals and personalized offers via email',
+                  style: TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Create Password Input
+          AppTextField(
+            label: 'Create Password *',
+            hint: 'At least 6 characters',
+            controller: _signUpPasswordController,
+            obscureText: _obscureSignUpPassword,
+            textInputAction: TextInputAction.next,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureSignUpPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: () => setState(() => _obscureSignUpPassword = !_obscureSignUpPassword),
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Password is required';
+              if (v.length < 6) return 'Minimum 6 characters required';
+              return null;
+            },
+          ),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Confirm Password Input (Compulsory matching)
+          AppTextField(
+            label: 'Confirm Password *',
+            hint: 'Re-enter your password',
+            controller: _signUpConfirmPasswordController,
+            obscureText: _obscureSignUpConfirmPassword,
+            textInputAction: TextInputAction.done,
+            suffixIcon: IconButton(
+              icon: Icon(
+                _obscureSignUpConfirmPassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+                color: AppColors.textSecondary,
+              ),
+              onPressed: () => setState(() => _obscureSignUpConfirmPassword = !_obscureSignUpConfirmPassword),
+            ),
+            validator: (v) {
+              if (v == null || v.isEmpty) return 'Please confirm your password';
+              if (v != _signUpPasswordController.text) return 'Passwords do not match';
+              return null;
+            },
+          ),
+          const SizedBox(height: 10),
+
+          // Collapsible Store Referral Code Section
+          InkWell(
+            onTap: () => setState(() => _isReferralExpanded = !_isReferralExpanded),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Have a store referral code?',
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.accent,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  Icon(
+                    _isReferralExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                    size: 18,
+                    color: AppColors.accent,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_isReferralExpanded) ...[
+            const SizedBox(height: 8),
+            AppTextField(
+              label: 'Referral Code',
+              hint: 'e.g. MARS50 for 50 bonus coins',
+              controller: _referralController,
+              textInputAction: TextInputAction.done,
+            ),
+          ],
+
+          const SizedBox(height: 18),
+
+          // Create Account Button
+          AppButton(
+            label: 'Create Account & Start Shopping',
+            onPressed: _handleSignUp,
+            isLoading: _isSignUpLoading,
+          ),
+          const SizedBox(height: 12),
+
+          // Compliance & Legal Policy Notice (Play Store & App Store Mandatory)
+          Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                const Text('By continuing, you agree to MARS ', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                InkWell(
+                  onTap: () => context.push('/legal'),
+                  child: const Text(
+                    'Terms of Service',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary, decoration: TextDecoration.underline),
+                  ),
+                ),
+                const Text(' & ', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                InkWell(
+                  onTap: () => context.push('/legal'),
+                  child: const Text(
+                    'Privacy Policy',
+                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: AppColors.primary, decoration: TextDecoration.underline),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 4),
+          const Center(
+            child: Text(
+              '🔒 Protected under Digital Personal Data Protection (DPDP) Act 2023',
+              style: TextStyle(fontSize: 9, color: Colors.grey),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }

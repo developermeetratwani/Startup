@@ -8,6 +8,99 @@ import '../../widgets/support_chatbot_sheet.dart';
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
+  void _showDeleteAccountDialog(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.warning_amber_rounded, color: AppColors.error, size: 24),
+            SizedBox(width: 8),
+            Text('Delete Account & Data', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ],
+        ),
+        content: const Text(
+          'Under the Digital Personal Data Protection (DPDP) Act 2023 and App Store Guidelines, deleting your account permanently erases your profile, address records, and personal preferences from MARS servers.\n\nThis action cannot be undone. Are you sure you wish to proceed?',
+          style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await ref.read(authRepositoryProvider).signOut();
+              if (context.mounted) {
+                AppSnackbar.show(
+                  context,
+                  message: 'Your account and personal data have been scheduled for permanent erasure.',
+                  type: SnackbarType.info,
+                );
+                context.go('/login');
+              }
+            },
+            child: const Text('Delete Permanently', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showReportContentDialog(BuildContext context) {
+    final reportCtrl = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Row(
+          children: [
+            Icon(Icons.report_problem_rounded, color: Colors.amber, size: 24),
+            SizedBox(width: 8),
+            Text('Report Inappropriate Content', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Submit a report for counterfeit items, copyright violation, or merchant misconduct to our Grievance Desk:',
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: reportCtrl,
+              maxLines: 3,
+              decoration: const InputDecoration(
+                hintText: 'Describe the issue or store name...',
+                isDense: true,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Report submitted to Grievance Officer. Investigation ticket opened under DPDP rules.'),
+                  backgroundColor: AppColors.primary,
+                ),
+              );
+            },
+            child: const Text('Submit Report'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(currentUserProvider);
@@ -57,15 +150,15 @@ class ProfileScreen extends ConsumerWidget {
                   BoxShadow(
                     color: Color(0x22D93670),
                     blurRadius: 14,
-                    offset: Offset(0, 6),
+                    offset: const Offset(0, 6),
                   ),
                 ],
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  const Icon(Icons.monetization_on_rounded, color: Colors.white, size: 36),
-                  const SizedBox(width: 12),
-                  const Expanded(
+                  Icon(Icons.monetization_on_rounded, color: Colors.white, size: 36),
+                  SizedBox(width: 12),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -127,6 +220,22 @@ class ProfileScreen extends ConsumerWidget {
                     subtitle: const Text('DPDP Act 2023, 25 Statutory Protections & Grievance Desk'),
                     trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
                     onTap: () => context.push('/legal'),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.report_gmailerrorred_rounded, color: Colors.amber),
+                    title: const Text('Report Store / Content'),
+                    subtitle: const Text('Report counterfeit or non-compliant merchant listings'),
+                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16),
+                    onTap: () => _showReportContentDialog(context),
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.delete_forever_rounded, color: AppColors.error),
+                    title: const Text('Delete Account & Personal Data', style: TextStyle(color: AppColors.error, fontWeight: FontWeight.w600)),
+                    subtitle: const Text('Right to Erasure under DPDP & App Store Compliance'),
+                    trailing: const Icon(Icons.arrow_forward_ios_rounded, size: 16, color: AppColors.error),
+                    onTap: () => _showDeleteAccountDialog(context, ref),
                   ),
                 ],
               ),

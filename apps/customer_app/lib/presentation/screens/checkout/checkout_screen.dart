@@ -21,6 +21,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
   String _paymentMethod = 'cod';
   bool _isPlacingOrder = false;
 
+  // Gold Membership Add-on (₹199/month)
+  bool _addGoldMembership = false;
+
+  // Scheduled Delivery Slot
+  String _deliveryMode = 'instant'; // 'instant' or 'scheduled'
+  String _selectedSlot = 'Today, 2:00 PM - 3:00 PM';
+
+  final List<String> _scheduledSlots = [
+    'Today, 2:00 PM - 3:00 PM',
+    'Today, 4:00 PM - 5:00 PM',
+    'Today, 6:00 PM - 7:00 PM',
+    'Today, 8:00 PM - 9:00 PM',
+    'Tomorrow, 10:00 AM - 11:00 AM',
+    'Tomorrow, 2:00 PM - 3:00 PM',
+  ];
+
   void _onMethodChanged(String method) {
     setState(() => _paymentMethod = method);
     final enumMethod = switch (method) {
@@ -53,6 +69,16 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
       lng2: location.longitude,
     );
 
+    // Calculate effective grand total factoring Gold membership
+    final effectiveDeliveryCharge = _addGoldMembership ? 0 : cartSummary.deliveryCharge;
+    final goldFee = _addGoldMembership ? 19900 : 0; // 199 rupees in paise
+    final effectiveGrandTotal = cartSummary.subtotal +
+        effectiveDeliveryCharge +
+        cartSummary.packagingCharge +
+        cartSummary.codCharge +
+        goldFee;
+    final grandTotalDisplay = '₹${(effectiveGrandTotal / 100).toStringAsFixed(0)}';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Confirm & Pay'),
@@ -62,20 +88,20 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Dynamic Whole Ahmedabad Delivery Estimation Banner
+            // Dynamic Delivery Estimation Banner
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: distanceKm > 8 ? Colors.indigo.shade50 : AppColors.primary.withOpacity(0.08),
+                color: distanceKm > 8 ? Colors.indigo.shade50 : AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                 border: Border.all(
-                  color: distanceKm > 8 ? Colors.indigo.shade300 : AppColors.primary.withOpacity(0.25),
+                  color: distanceKm > 8 ? Colors.indigo.shade300 : AppColors.primary.withValues(alpha: 0.25),
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
-                    distanceKm > 8 ? Icons.explore_rounded : Icons.bolt_rounded,
+                    _deliveryMode == 'scheduled' ? Icons.schedule_rounded : (distanceKm > 8 ? Icons.explore_rounded : Icons.bolt_rounded),
                     color: distanceKm > 8 ? Colors.indigo.shade800 : AppColors.primary,
                     size: 28,
                   ),
@@ -86,34 +112,45 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       children: [
                         Row(
                           children: [
-                            Text(
-                              'Estimated ~$etaMinutes Mins Delivery',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 13,
-                                color: distanceKm > 8 ? Colors.indigo.shade900 : AppColors.textPrimary,
+                            Flexible(
+                              child: Text(
+                                _deliveryMode == 'scheduled'
+                                    ? 'Scheduled for $_selectedSlot'
+                                    : 'Estimated ~$etaMinutes Mins Delivery',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  color: distanceKm > 8 ? Colors.indigo.shade900 : AppColors.textPrimary,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 6),
-                            if (distanceKm > 8)
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.indigo.shade100,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                                child: Text(
-                                  'WHOLE AHMEDABAD',
-                                  style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: Colors.indigo.shade900),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: _deliveryMode == 'scheduled' ? Colors.amber.shade100 : Colors.indigo.shade100,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                _deliveryMode == 'scheduled' ? 'SCHEDULED' : 'WHOLE AHMEDABAD',
+                                style: TextStyle(
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
+                                  color: _deliveryMode == 'scheduled' ? Colors.amber.shade900 : Colors.indigo.shade900,
                                 ),
                               ),
+                            ),
                           ],
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          distanceKm > 8
-                              ? 'Cross-city route from Kubernagar to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km). Time adjusts dynamically for cross-city traffic (not guaranteed 45 mins).'
-                              : 'Hyperlocal delivery to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km from store • traffic dependent).',
+                          _deliveryMode == 'scheduled'
+                              ? 'Rider will be dispatched 20 mins prior for on-time precision arrival at your door.'
+                              : (distanceKm > 8
+                                  ? 'Cross-city route to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km). Time adjusts dynamically for traffic.'
+                                  : 'Hyperlocal fashion delivery to ${location.areaName} (~${distanceKm.toStringAsFixed(1)} km from store).'),
                           style: TextStyle(
                             fontSize: 11,
                             color: distanceKm > 8 ? Colors.indigo.shade800 : AppColors.textSecondary,
@@ -126,7 +163,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
 
             // Delivery Address Card
             Text('Delivering to', style: AppTextStyles.titleMedium),
@@ -157,7 +194,196 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
               ),
             ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 18),
+
+            // ── DELIVERY MODE & SCHEDULING SELECTOR ──────────────────────────
+            Text('Delivery Preference', style: AppTextStyles.titleMedium),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () => setState(() => _deliveryMode = 'instant'),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: _deliveryMode == 'instant' ? AppColors.primary : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _deliveryMode == 'instant' ? AppColors.primary : AppColors.cardBorder,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(Icons.bolt_rounded, color: _deliveryMode == 'instant' ? Colors.amber : AppColors.primary, size: 20),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Instant Hyperlocal',
+                            style: TextStyle(
+                              color: _deliveryMode == 'instant' ? Colors.white : AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            '~15-25 Mins',
+                            style: TextStyle(
+                              color: _deliveryMode == 'instant' ? Colors.white70 : AppColors.textSecondary,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: InkWell(
+                    onTap: () => setState(() => _deliveryMode = 'scheduled'),
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: _deliveryMode == 'scheduled' ? AppColors.primary : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: _deliveryMode == 'scheduled' ? AppColors.primary : AppColors.cardBorder,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Column(
+                        children: [
+                          Icon(Icons.schedule_rounded, color: _deliveryMode == 'scheduled' ? Colors.amber : AppColors.primary, size: 20),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Schedule for Later',
+                            style: TextStyle(
+                              color: _deliveryMode == 'scheduled' ? Colors.white : AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                          Text(
+                            'Choose time slot',
+                            style: TextStyle(
+                              color: _deliveryMode == 'scheduled' ? Colors.white70 : AppColors.textSecondary,
+                              fontSize: 10,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            if (_deliveryMode == 'scheduled') ...[
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.cardBorder),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Select Your Preferred Time Slot:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: _scheduledSlots.map((slot) {
+                        final isSelected = _selectedSlot == slot;
+                        return ChoiceChip(
+                          label: Text(slot, style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            color: isSelected ? Colors.white : AppColors.textPrimary,
+                          )),
+                          selected: isSelected,
+                          selectedColor: AppColors.primary,
+                          backgroundColor: AppColors.surfaceVariant,
+                          onSelected: (val) {
+                            if (val) setState(() => _selectedSlot = slot);
+                          },
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 18),
+
+            // ── MARS GOLD MEMBERSHIP ADD-ON (₹199/month) ─────────────────────
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFFFFBEB), Color(0xFFFEF3C7)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: _addGoldMembership ? const Color(0xFFD97706) : const Color(0xFFFDE68A),
+                  width: _addGoldMembership ? 2 : 1,
+                ),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x0C000000), blurRadius: 8, offset: Offset(0, 2)),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF59E0B),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 24),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Row(
+                          children: [
+                            Text(
+                              'MARS Gold Membership',
+                              style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF92400E)),
+                            ),
+                            SizedBox(width: 6),
+                            Text('₹199/mo', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFFB45309))),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        const Text(
+                          '⚡ Free delivery on this order • Priority dispatch during peak traffic • VIP support',
+                          style: TextStyle(fontSize: 10, color: Color(0xFF78350F), height: 1.3),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Checkbox(
+                    value: _addGoldMembership,
+                    activeColor: const Color(0xFFD97706),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                    onChanged: (val) => setState(() => _addGoldMembership = val ?? false),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
 
             // Payment Options
             Text('Payment Method', style: AppTextStyles.titleMedium),
@@ -219,12 +445,24 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     subtitle: 'Eco-friendly fashion packaging',
                   ),
                   const SizedBox(height: 8),
-                  _PriceRow(title: 'Delivery Charges', value: cartSummary.deliveryDisplay),
+                  _PriceRow(
+                    title: 'Delivery Charges',
+                    value: _addGoldMembership ? 'FREE (Gold Benefit)' : cartSummary.deliveryDisplay,
+                    color: _addGoldMembership ? AppColors.success : null,
+                  ),
+                  if (_addGoldMembership) ...[
+                    const SizedBox(height: 8),
+                    _PriceRow(
+                      title: '👑 MARS Gold Membership (1 Month)',
+                      value: '₹199',
+                      color: const Color(0xFFD97706),
+                    ),
+                  ],
                   if (_paymentMethod == 'cod') ...[
                     const SizedBox(height: 8),
                     _PriceRow(
                       title: 'Cash on Delivery Handling Fee',
-                      value: 'â‚¹21',
+                      value: '₹21',
                       color: AppColors.primary,
                     ),
                   ],
@@ -233,7 +471,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Grand Total', style: AppTextStyles.titleMedium),
-                      Text(cartSummary.grandTotalDisplay, style: AppTextStyles.price),
+                      Text(grandTotalDisplay, style: AppTextStyles.price),
                     ],
                   ),
                 ],
@@ -249,7 +487,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
         decoration: BoxDecoration(
           color: AppColors.surface,
           boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(0, -4)),
+            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4)),
           ],
         ),
         child: SafeArea(
@@ -277,7 +515,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                 ),
               ),
               AppButton(
-                label: _getButtonLabel(cartSummary.grandTotalDisplay),
+                label: _getButtonLabel(grandTotalDisplay),
                 isLoading: _isPlacingOrder,
                 onPressed: () async {
                   setState(() => _isPlacingOrder = true);
@@ -289,23 +527,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   String? razorpayPaymentId;
                   String? razorpayOrderId;
 
-                  // ── RAZORPAY GATEWAY MODAL IF ONLINE PAYMENT SELECTED ───
                   if (_paymentMethod == 'online') {
                     const razorpay = RazorpayService();
                     final paymentResult = await razorpay.openCheckout(
-                      amountInPaise: cartSummary.grandTotal,
+                      amountInPaise: effectiveGrandTotal,
                       orderId: 'ord_${DateTime.now().millisecondsSinceEpoch}',
-                      customerName: user?.displayName ?? 'Meet Ratwani',
+                      customerName: user?.displayName ?? 'Valued Customer',
                       customerPhone: user?.phone ?? '9898012345',
-                      customerEmail: user?.email ?? 'developermeetratwani@gmail.com',
-                      storeName: 'XYZ Fashion Ahmedabad',
+                      customerEmail: user?.email ?? 'customer@marsfashion.in',
+                      storeName: 'MARS Fashion Boutique',
                       description: 'Hyperlocal Fashion Order (${cartSummary.itemCount} items)',
                     );
 
                     if (paymentResult == null) {
                       setState(() => _isPlacingOrder = false);
                       if (mounted) {
-                        AppSnackbar.show(context, message: 'Razorpay payment was cancelled', type: SnackbarType.warning);
+                        AppSnackbar.show(context, message: 'Payment cancelled', type: SnackbarType.warning);
                       }
                       return;
                     }
@@ -324,6 +561,22 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     razorpayOrderId: razorpayOrderId,
                   );
 
+                  // Record loyalty streak
+                  await LoyaltyStreakService.recordOrderForUser(effectiveUserId);
+
+                  // Send animated HTML email receipt via SMTP
+                  final customerEmail = user?.email ?? 'developermeetratwani@gmail.com';
+                  const smtp = SmtpAuthService();
+                  await smtp.sendOrderConfirmationEmail(
+                    recipientEmail: customerEmail,
+                    customerName: user?.displayName ?? 'Valued Customer',
+                    orderId: orderId ?? 'ord-kubernagar-8920',
+                    storeName: 'MARS Fashion Boutique',
+                    grandTotalPaise: effectiveGrandTotal,
+                    etaMinutes: _deliveryMode == 'scheduled' ? 0 : etaMinutes,
+                    appName: 'MARS',
+                  );
+
                   setState(() => _isPlacingOrder = false);
 
                   if (failure != null) {
@@ -337,9 +590,9 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   await ref.read(cartRepositoryProvider).clearCart(effectiveUserId);
 
                   if (mounted) {
-                    final msg = _paymentMethod == 'online'
-                        ? 'Payment verified via Razorpay! Assigned to driver partner.'
-                        : 'Order placed successfully! Assigned to driver partner.';
+                    final msg = _deliveryMode == 'scheduled'
+                        ? 'Order scheduled for $_selectedSlot! Animated invoice sent to $customerEmail.'
+                        : 'Order placed! Assigned to driver partner. Animated invoice sent to $customerEmail.';
                     AppSnackbar.show(context, message: msg, type: SnackbarType.success);
                     context.go('/orders/track/${orderId ?? 'ord-kubernagar-8920'}');
                   }
@@ -456,6 +709,3 @@ class _PriceRow extends StatelessWidget {
     );
   }
 }
-
-
-

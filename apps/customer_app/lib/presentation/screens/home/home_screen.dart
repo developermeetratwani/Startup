@@ -120,11 +120,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  Text(
-                    '${location.cityName} • Hyperlocal Delivery',
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                  Flexible(
+                    child: Text(
+                      '${location.cityName} • Hyperlocal',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
+                    ),
                   ),
                 ],
               ),
