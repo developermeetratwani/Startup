@@ -19,3 +19,4 @@ export 'services/invoice_generator_service.dart';
 export 'services/deals_service.dart';
 export 'services/loyalty_streak_service.dart';
 export 'utils/app_logger.dart';
+export 'utils/security_sanitizer.dart';

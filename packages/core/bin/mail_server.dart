@@ -114,10 +114,25 @@ void main() async {
   print('🚀 MARS Inter-App Order Bridge & SMTP Server running on http://0.0.0.0:$_kPort');
 
   await for (HttpRequest request in server) {
-    // Enable CORS for Flutter Web running on localhost:3000, 3001, 3002, 3003, 8000
+    // Security Hardening & CORS
     request.response.headers.set('Access-Control-Allow-Origin', '*');
     request.response.headers.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PATCH, DELETE');
-    request.response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Origin, Accept');
+    request.response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Origin, Accept, Authorization');
+    request.response.headers.set('X-Content-Type-Options', 'nosniff');
+    request.response.headers.set('X-Frame-Options', 'DENY');
+    request.response.headers.set('X-XSS-Protection', '1; mode=block');
+
+    // Anti-SQL Injection & Malicious Query Parameter Inspection
+    final rawQuery = request.uri.query;
+    final sqlInjectionPattern = RegExp(r'''(?i)((SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|UNION|EXEC|EXECUTE)|--|\/\*|\*\/|;|OR\s+['"\d\w]+=['"\d\w]+)''');
+    if (sqlInjectionPattern.hasMatch(rawQuery)) {
+      request.response
+        ..statusCode = HttpStatus.badRequest
+        ..headers.contentType = ContentType.json
+        ..write(jsonEncode({'error': 'Security violation: SQL injection pattern blocked'}));
+      await request.response.close();
+      continue;
+    }
 
     if (request.method == 'OPTIONS') {
       request.response.statusCode = HttpStatus.ok;

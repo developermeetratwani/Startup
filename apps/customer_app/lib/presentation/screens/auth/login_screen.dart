@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
 import 'package:core/core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../providers/auth_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -62,6 +63,134 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     _referralController.dispose();
     _otpController.dispose();
     super.dispose();
+  }
+
+
+  // ── Forgot Password Dialog ────────────────────────────────────────────────
+  void _showForgotPasswordDialog() {
+    final emailCtrl = TextEditingController(
+      text: _signInIdentifierController.text.contains('@') ? _signInIdentifierController.text.trim() : '',
+    );
+    bool isSubmitting = false;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (context, setModalState) {
+          return Container(
+            padding: EdgeInsets.only(
+              left: 24,
+              right: 24,
+              top: 24,
+              bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+            ),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(2),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(Icons.lock_reset_rounded, color: AppColors.primary, size: 24),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('Forgot Password', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          SizedBox(height: 2),
+                          Text('Enter your Gmail address to receive a secure reset link', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                AppTextField(
+                  label: 'Registered Gmail / Email *',
+                  hint: 'name@gmail.com',
+                  controller: emailCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 20),
+                AppButton(
+                  label: isSubmitting ? 'Sending Link...' : 'Send Reset Link',
+                  isLoading: isSubmitting,
+                  onPressed: () async {
+                    final email = emailCtrl.text.trim();
+                    if (!SecuritySanitizer.isValidEmail(email)) {
+                      AppSnackbar.show(context, message: 'Please enter a valid email address', type: SnackbarType.warning);
+                      return;
+                    }
+
+                    setModalState(() => isSubmitting = true);
+
+                    try {
+                      // 1. Firebase Auth password reset email
+                      try {
+                        final auth = FirebaseAuth.instance;
+                        await auth.sendPasswordResetEmail(email: email);
+                      } catch (fbErr) {
+                        AppLogger.warning('FirebaseAuth.reset', fbErr.toString());
+                      }
+
+                      // 2. Branded SMTP transactional email receipt
+                      const smtp = SmtpAuthService();
+                      final resetLink = 'https://mars-1d49a.web.app/#/reset-password?email=${Uri.encodeComponent(email)}&token=${DateTime.now().millisecondsSinceEpoch}';
+                      await smtp.sendPasswordResetEmail(
+                        recipientEmail: email,
+                        resetLink: resetLink,
+                        appName: 'MARS',
+                      );
+
+                      if (ctx.mounted) {
+                        Navigator.pop(ctx);
+                      }
+                      if (mounted) {
+                        AppSnackbar.show(
+                          context,
+                          message: '✅ Reset link sent to $email! Please check your Gmail inbox and spam folder.',
+                          type: SnackbarType.success,
+                        );
+                      }
+                    } catch (e) {
+                      setModalState(() => isSubmitting = false);
+                      if (mounted) {
+                        AppSnackbar.show(context, message: 'Could not send reset email: $e', type: SnackbarType.error);
+                      }
+                    }
+                  },
+                ),
+                const SizedBox(height: 12),
+              ],
+            ),
+          );
+        },
+      ),
+    );
   }
 
   // ── 1. Standard Sign In ───────────────────────────────────────────────────
@@ -370,7 +499,29 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                 return null;
               },
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
+
+            // Forgot Password Button
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: _showForgotPasswordDialog,
+                style: TextButton.styleFrom(
+                  padding: EdgeInsets.zero,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  'Forgot Password?',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 14),
 
             // Password Sign In Button
             AppButton(

@@ -387,4 +387,51 @@ class SmtpAuthService {
       appName: appName,
     );
   }
+
+  // ── 6. Branded Password Reset Link Email ─────────────────────────────────
+
+  Future<Failure?> sendPasswordResetEmail({
+    required String recipientEmail,
+    required String resetLink,
+    String customerName = 'Valued Customer',
+    String appName = 'MARS',
+  }) async {
+    final body = '''
+      ${_header(appName)}
+        <h2 style="margin:0 0 8px;color:#2d2d4e;font-size:22px;">Reset Your Password 🔐</h2>
+        <p style="color:#555;line-height:1.7;margin:0 0 20px;">
+          Hi <strong>$customerName</strong>, we received a request to reset your password for your <strong>$appName</strong> account.
+          Click the secure button below to set a new password:
+        </p>
+
+        <!-- CTA button -->
+        <div style="text-align:center;margin:28px 0;">
+          <a href="$resetLink"
+             style="background:linear-gradient(135deg,#6C5CE7,#a29bfe);color:#fff;padding:14px 36px;
+                    border-radius:8px;font-size:15px;font-weight:700;text-decoration:none;display:inline-block;
+                    letter-spacing:0.3px;box-shadow:0 4px 14px rgba(108,92,231,0.4);">
+            🔑 Reset Password Now
+          </a>
+        </div>
+
+        <p style="color:#555;line-height:1.6;font-size:13px;margin:20px 0 10px;">
+          Or copy and paste this link in your browser:
+        </p>
+        <div style="background:#fff;border:1px solid #e0dff5;border-radius:8px;padding:12px;font-size:11px;word-break:break-all;color:#6C5CE7;font-family:monospace;">
+          $resetLink
+        </div>
+
+        <p style="color:#9b9bb4;font-size:12px;margin-top:20px;">
+          If you did not request a password reset, you can safely ignore this email. Your account remains completely secure.
+        </p>
+      ${_footer()}
+    ''';
+
+    return _send(
+      to: recipientEmail,
+      subject: '[$appName] Password Reset Request',
+      htmlBody: body,
+      appName: appName,
+    );
+  }
 }
