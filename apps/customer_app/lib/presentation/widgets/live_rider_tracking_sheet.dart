@@ -239,8 +239,8 @@ class _LiveRiderTrackingSheetState extends ConsumerState<LiveRiderTrackingSheet>
                   children: [
                     // Free OpenStreetMap Raster Tiles
                     TileLayer(
-                      urlTemplate: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                      fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      fallbackUrl: 'https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
                       userAgentPackageName: 'in.marsfashion.app',
                     ),
 

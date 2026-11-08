@@ -308,8 +308,8 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen>
                             children: [
                               // High-DPI CartoDB Voyager Map Tiles (Clean Swiggy/Uber Look)
                               TileLayer(
-                                urlTemplate: 'https://a.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png',
-                                fallbackUrl: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                fallbackUrl: 'https://a.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png',
                                 userAgentPackageName: 'in.marsfashion.app',
                               ),
 
