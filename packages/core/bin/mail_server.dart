@@ -124,7 +124,7 @@ void main() async {
 
     // Anti-SQL Injection & Malicious Query Parameter Inspection
     final rawQuery = request.uri.query;
-    final sqlInjectionPattern = RegExp(r'''(?i)((SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|UNION|EXEC|EXECUTE)|--|\/\*|\*\/|;|OR\s+['"\d\w]+=['"\d\w]+)''');
+    final sqlInjectionPattern = RegExp(r'''(\b(SELECT|INSERT|UPDATE|DELETE|DROP|ALTER|CREATE|TRUNCATE|UNION|EXEC|EXECUTE)\b|--|\/\*|\*\/|;|\bOR\b\s+['"\d\w]+=['"\d\w]+)''', caseSensitive: false);
     if (sqlInjectionPattern.hasMatch(rawQuery)) {
       request.response
         ..statusCode = HttpStatus.badRequest
