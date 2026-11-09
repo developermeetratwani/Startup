@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
-import '../theme/app_spacing.dart';
 
 class AppCard extends StatefulWidget {
   final Widget child;
@@ -9,6 +8,7 @@ class AppCard extends StatefulWidget {
   final double? elevation;
   final Color? color;
   final BorderRadius? borderRadius;
+  final Border? border;
 
   const AppCard({
     super.key,
@@ -18,6 +18,7 @@ class AppCard extends StatefulWidget {
     this.elevation,
     this.color,
     this.borderRadius,
+    this.border,
   });
 
   @override
@@ -29,18 +30,24 @@ class _AppCardState extends State<AppCard> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveRadius = widget.borderRadius ?? BorderRadius.circular(AppSpacing.radiusLg);
+    final effectiveRadius = widget.borderRadius ?? BorderRadius.circular(20);
 
     final cardContent = Container(
       decoration: BoxDecoration(
         color: widget.color ?? AppColors.surface,
         borderRadius: effectiveRadius,
-        border: Border.all(color: AppColors.cardBorder, width: 1),
+        border: widget.border ?? Border.all(color: AppColors.cardBorder, width: 1),
         boxShadow: const [
           BoxShadow(
-            color: Color(0x0A171717),
-            blurRadius: 16,
+            color: Color(0x060F1016),
+            blurRadius: 18,
             offset: Offset(0, 4),
+            spreadRadius: 0,
+          ),
+          BoxShadow(
+            color: Color(0x040F1016),
+            blurRadius: 6,
+            offset: Offset(0, 2),
             spreadRadius: 0,
           ),
         ],
@@ -55,7 +62,7 @@ class _AppCardState extends State<AppCard> {
           splashColor: AppColors.primary.withValues(alpha: 0.05),
           highlightColor: AppColors.primary.withValues(alpha: 0.03),
           child: Padding(
-            padding: widget.padding ?? const EdgeInsets.all(AppSpacing.cardPadding),
+            padding: widget.padding ?? const EdgeInsets.all(16),
             child: widget.child,
           ),
         ),

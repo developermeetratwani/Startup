@@ -82,12 +82,66 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Product Image
-                      ProductImage(
-                        imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : null,
-                        height: 280,
-                        width: double.infinity,
-                        borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
+                      // Product Image Showcase
+                      Container(
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(24),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x14000000),
+                              blurRadius: 20,
+                              offset: Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Stack(
+                          children: [
+                            ProductImage(
+                              imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : null,
+                              height: 320,
+                              width: double.infinity,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            Positioned(
+                              top: 14,
+                              left: 14,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF0F1016).withValues(alpha: 0.85),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.15)),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.bolt_rounded, color: Color(0xFFFF9800), size: 14),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      '⚡ 15-20 MINS HYPERLOCAL',
+                                      style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.3),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: 14,
+                              right: 14,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.95),
+                                  shape: BoxShape.circle,
+                                  boxShadow: const [
+                                    BoxShadow(color: Color(0x1A000000), blurRadius: 8),
+                                  ],
+                                ),
+                                child: const Icon(Icons.favorite_border_rounded, size: 20, color: AppColors.primary),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 16),
 
@@ -105,7 +159,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: inStock ? AppColors.success.withOpacity(0.15) : AppColors.error.withOpacity(0.15),
+                              color: inStock ? AppColors.success.withValues(alpha: 0.15) : AppColors.error.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -121,24 +175,59 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // Price
+                      // Price & Luxury Discount
                       Row(
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
                         children: [
-                          Text(product.priceDisplay, style: AppTextStyles.price.copyWith(fontSize: 24)),
+                          Text(product.priceDisplay, style: AppTextStyles.priceLarge.copyWith(fontSize: 28, fontWeight: FontWeight.w900)),
                           if (product.discountedPrice > 0 && product.discountedPrice < product.basePrice) ...[
                             const SizedBox(width: 10),
                             Text(
                               '₹${(product.basePrice / 100).toStringAsFixed(0)}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                decoration: TextDecoration.lineThrough,
-                                color: AppColors.textSecondary,
+                              style: AppTextStyles.priceStrikethrough.copyWith(fontSize: 16),
+                            ),
+                            const SizedBox(width: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFDCFCE7),
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                '${(((product.basePrice - product.discountedPrice) / product.basePrice) * 100).round()}% OFF',
+                                style: const TextStyle(color: Color(0xFF15803D), fontSize: 11, fontWeight: FontWeight.w800),
                               ),
                             ),
                           ],
                         ],
                       ),
-                      const Divider(height: 24),
+                      const SizedBox(height: 12),
+
+                      // MARS Gold Savings Pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFFEF3C7), Color(0xFFFDE68A)],
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0xFFF59E0B).withValues(alpha: 0.3)),
+                        ),
+                        child: const Row(
+                          children: [
+                            Icon(Icons.workspace_premium_rounded, color: Color(0xFFB45309), size: 18),
+                            SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                'MARS Gold benefit: ₹0 Delivery Charge on this order',
+                                style: TextStyle(color: Color(0xFF92400E), fontSize: 11.5, fontWeight: FontWeight.w700),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const Divider(height: 28),
 
                       // Size Selection
                       if (sizes.isNotEmpty) ...[
@@ -265,7 +354,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                   color: AppColors.surface,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -4),
                     ),

@@ -12,6 +12,8 @@ import '../../providers/product_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/support_chatbot_sheet.dart';
 import '../../widgets/floating_cart_bar.dart';
+import '../../widgets/luxury_bottom_nav_bar.dart';
+import '../../widgets/luxury_stories_bar.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -146,6 +148,60 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
         actions: [
+          // VIP MARS Gold Crown Pill
+          GestureDetector(
+            onTap: () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Row(
+                    children: [
+                      Icon(Icons.workspace_premium_rounded, color: Color(0xFFFFD700), size: 18),
+                      SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'MARS Gold VIP: Free Delivery waived & 15-Min priority dispatch active!',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                        ),
+                      ),
+                    ],
+                  ),
+                  backgroundColor: const Color(0xFF0F1016),
+                  behavior: SnackBarBehavior.floating,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                  duration: const Duration(seconds: 3),
+                ),
+              );
+            },
+            child: Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
+                ),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: const [
+                  BoxShadow(color: Color(0x33F59E0B), blurRadius: 6, offset: Offset(0, 2)),
+                ],
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 13),
+                  SizedBox(width: 3),
+                  Text(
+                    'GOLD',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
           // Order Receipt shortcut
           IconButton(
             icon: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 22),
@@ -285,12 +341,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(18),
                         border: Border.all(color: AppColors.cardBorder, width: 1.2),
                         boxShadow: const [
                           BoxShadow(
                             color: Color(0x08000000),
-                            blurRadius: 14,
+                            blurRadius: 16,
                             offset: Offset(0, 4),
                           ),
                         ],
@@ -301,7 +357,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Search "kurta", "oversized tee", "denims"...',
+                              'Search "Sabyasachi", "Oversized Tees", "Sneakers"...',
                               style: TextStyle(
                                 color: AppColors.textHint,
                                 fontSize: 14,
@@ -325,6 +381,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
 
                 const SizedBox(height: 8),
+
+                // High-Fashion Live Drops Stories Bar (Nike / Luxe style)
+                LuxuryStoriesBar(
+                  onStorySelected: (tag) {
+                    setState(() => _activeQuickFilter = tag);
+                  },
+                ),
+
+                const SizedBox(height: 10),
 
                 // Dynamic Promotional Banner Carousel (Admin sync)
                 StreamBuilder<List<DealBanner>>(
@@ -810,34 +875,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ignoring: !_isNavBarVisible,
             child: Column(
               mainAxisSize: MainAxisSize.min,
-              children: [
-                const FloatingCartBar(),
-                Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    border: Border(top: BorderSide(color: Color(0xFFEEEEF0), width: 1)),
-                  ),
-                  child: BottomNavigationBar(
-                    backgroundColor: Colors.white,
-                    elevation: 0,
-                    currentIndex: 0,
-                    selectedItemColor: AppColors.accent,
-                    unselectedItemColor: AppColors.textSecondary,
-                    selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12),
-                    unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-                    onTap: (index) {
-                      if (index == 1) context.push('/search');
-                      if (index == 2) context.push('/cart');
-                      if (index == 3) context.push('/profile');
-                    },
-                    items: const [
-                      BottomNavigationBarItem(icon: Icon(Icons.home_filled), label: 'Home'),
-                      BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Search'),
-                      BottomNavigationBarItem(icon: Icon(Icons.shopping_bag_outlined), label: 'Cart'),
-                      BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: 'Profile'),
-                    ],
-                  ),
-                ),
+              children: const [
+                FloatingCartBar(),
+                LuxuryBottomNavBar(currentIndex: 0),
               ],
             ),
           ),
