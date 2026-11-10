@@ -37,7 +37,7 @@ class DriverEarningsScreen extends ConsumerWidget {
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 const SizedBox(height: 6),
                 DropdownButtonFormField<String>(
-                  value: selectedHub,
+                  initialValue: selectedHub,
                   isExpanded: true,
                   decoration:
                       const InputDecoration(border: OutlineInputBorder()),
@@ -120,6 +120,7 @@ class DriverEarningsScreen extends ConsumerWidget {
                   amount: amountRupees * 100,
                 );
 
+                if (!context.mounted) return;
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
@@ -242,6 +243,7 @@ class DriverEarningsScreen extends ConsumerWidget {
                   referenceNumber: refCtrl.text.trim(),
                 );
 
+                if (!context.mounted) return;
                 Navigator.pop(ctx);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

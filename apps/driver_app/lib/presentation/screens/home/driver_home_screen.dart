@@ -40,7 +40,7 @@ class DriverHomeScreen extends ConsumerWidget {
               scale: 0.9,
               child: Switch(
                 value: isOnline,
-                activeColor: AppColors.success,
+                activeThumbColor: AppColors.success,
                 onChanged: (val) async {
                   if (val) {
                     final profile = ref.read(driverProfileProvider);

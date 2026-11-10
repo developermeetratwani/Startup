@@ -152,7 +152,7 @@ class _ProductInventoryCard extends ConsumerWidget {
               // Publish Switch
               Switch(
                 value: product.isPublished,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: (val) {
                   ref.read(vendorProductRepoProvider).togglePublishStatus(product.id, val);
                 },
@@ -173,7 +173,7 @@ class _ProductInventoryCard extends ConsumerWidget {
                   color: AppColors.surfaceVariant,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
                   border: Border.all(
-                    color: variant.stockCount > 0 ? AppColors.divider : AppColors.error.withOpacity(0.5),
+                    color: variant.stockCount > 0 ? AppColors.divider : AppColors.error.withValues(alpha: 0.5),
                   ),
                 ),
                 child: Row(

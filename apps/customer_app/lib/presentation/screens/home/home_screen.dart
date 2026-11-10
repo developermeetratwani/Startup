@@ -956,6 +956,31 @@ class _StoreCard extends StatelessWidget {
 
   const _StoreCard({required this.store});
 
+  Widget _buildMiniPill(String name, String price) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: const Color(0xFFE5E7EB)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            name,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Color(0xFF1F2937)),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            price,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.accent),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -1179,6 +1204,47 @@ class _StoreCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 10),
+                    // Boutique Trending Showcase
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF9FAFB),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: const Color(0xFFF3F4F6)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.auto_awesome, size: 12, color: Color(0xFFD4AF37)),
+                          const SizedBox(width: 5),
+                          const Text(
+                            'POPULAR',
+                            style: TextStyle(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              color: Color(0xFF6B7280),
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              child: Row(
+                                children: [
+                                  _buildMiniPill('Oversized Tee', '₹599'),
+                                  const SizedBox(width: 5),
+                                  _buildMiniPill('Slim Cargo', '₹999'),
+                                  const SizedBox(width: 5),
+                                  _buildMiniPill('Linen Shirt', '₹1,249'),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                     // Zomato/Swiggy style footer strip
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -1282,6 +1348,12 @@ class _HomeProductCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final image = product.imageUrls.isNotEmpty ? product.imageUrls.first : null;
+    final cartAsync = ref.watch(cartStreamProvider);
+    final cartItems = cartAsync.valueOrNull ?? [];
+    final cartItem = cartItems.cast<CartItemEntity?>().firstWhere(
+      (item) => item?.productId == product.id,
+      orElse: () => null,
+    );
     final hasDiscount = product.discountedPrice > 0 && product.discountedPrice < product.basePrice;
     final discountPercent = hasDiscount
         ? (((product.basePrice - product.discountedPrice) / product.basePrice) * 100).round()
@@ -1415,31 +1487,99 @@ class _HomeProductCard extends ConsumerWidget {
                               ),
                           ],
                         ),
-                        // Interactive ADD Button
-                        InkWell(
-                          onTap: () => _quickAddToCart(context, ref),
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                        // Interactive ADD / Stepper Button
+                        if (cartItem != null && cartItem.quantity > 0)
+                          Container(
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: AppColors.accent,
                               borderRadius: BorderRadius.circular(16),
-                              border: Border.all(color: AppColors.accent, width: 1.4),
-                              boxShadow: const [
-                                BoxShadow(color: Color(0x12D93670), blurRadius: 4, offset: Offset(0, 2)),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.accent.withValues(alpha: 0.3),
+                                  blurRadius: 6,
+                                  offset: const Offset(0, 2),
+                                ),
                               ],
                             ),
-                            child: const Text(
-                              'ADD +',
-                              style: TextStyle(
-                                color: AppColors.accent,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 11,
-                                letterSpacing: 0.3,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                InkWell(
+                                  onTap: () {
+                                    final cartRepo = ref.read(cartRepositoryProvider);
+                                    if (cartItem.quantity > 1) {
+                                      cartRepo.updateQuantity(
+                                        customerId: cartItem.customerId,
+                                        itemId: cartItem.id,
+                                        quantity: cartItem.quantity - 1,
+                                      );
+                                    } else {
+                                      cartRepo.removeFromCart(
+                                        customerId: cartItem.customerId,
+                                        itemId: cartItem.id,
+                                      );
+                                    }
+                                  },
+                                  borderRadius: const BorderRadius.horizontal(left: Radius.circular(16)),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                    child: Icon(Icons.remove, size: 14, color: Colors.white),
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                                  child: Text(
+                                    '',
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w800,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ),
+                                InkWell(
+                                  onTap: () {
+                                    final cartRepo = ref.read(cartRepositoryProvider);
+                                    cartRepo.updateQuantity(
+                                      customerId: cartItem.customerId,
+                                      itemId: cartItem.id,
+                                      quantity: cartItem.quantity + 1,
+                                    );
+                                  },
+                                  borderRadius: const BorderRadius.horizontal(right: Radius.circular(16)),
+                                  child: const Padding(
+                                    padding: EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                    child: Icon(Icons.add, size: 14, color: Colors.white),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        else
+                          InkWell(
+                            onTap: () => _quickAddToCart(context, ref),
+                            borderRadius: BorderRadius.circular(16),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: AppColors.accent, width: 1.4),
+                                boxShadow: const [
+                                  BoxShadow(color: Color(0x12D93670), blurRadius: 4, offset: Offset(0, 2)),
+                                ],
+                              ),
+                              child: const Text(
+                                'ADD +',
+                                style: TextStyle(
+                                  color: AppColors.accent,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 11,
+                                  letterSpacing: 0.3,
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ],
                     ),
                   ],

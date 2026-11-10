@@ -106,6 +106,13 @@ class AppTextStyles {
     color: AppColors.textPrimary,
   );
 
+  static TextStyle get priceSmall => GoogleFonts.plusJakartaSans(
+    fontSize: 14,
+    fontWeight: FontWeight.w700,
+    letterSpacing: -0.2,
+    color: AppColors.textPrimary,
+  );
+
   static TextStyle get priceLarge => GoogleFonts.plusJakartaSans(
     fontSize: 24,
     fontWeight: FontWeight.w800,

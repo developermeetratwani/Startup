@@ -281,7 +281,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 0.08),
                             blurRadius: 16,
-                            offset: const Offset(0, 4),
+                            offset: Offset(0, 4),
                           ),
                         ],
                       ),
@@ -923,8 +923,8 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
                               color: isCancelled
-                                  ? AppColors.error.withOpacity(0.15)
-                                  : AppColors.success.withOpacity(0.15),
+                                  ? AppColors.error.withValues(alpha: 0.15)
+                                  : AppColors.success.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(
@@ -999,7 +999,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: AppColors.error.withOpacity(0.1),
+                      color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
                     ),
                     child: Column(
@@ -1173,13 +1173,14 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
   void _showTaxInvoiceSheet(BuildContext context, OrderEntity order) {
     final invoiceData = InvoiceGeneratorService.fromOrder(order);
 
+    bool isSending = false;
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       builder: (ctx) => StatefulBuilder(
         builder: (context, setModalState) {
-          bool isSending = false;
 
           return Container(
             height: MediaQuery.of(context).size.height * 0.85,

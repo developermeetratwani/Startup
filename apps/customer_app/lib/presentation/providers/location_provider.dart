@@ -121,8 +121,10 @@ class LocationNotifier extends StateNotifier<LocationState> {
       Position? position;
       try {
         position = await Geolocator.getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.best,
-          timeLimit: const Duration(seconds: 10),
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.best,
+            timeLimit: Duration(seconds: 10),
+          ),
         );
       } catch (_) {
         if (!kIsWeb) {

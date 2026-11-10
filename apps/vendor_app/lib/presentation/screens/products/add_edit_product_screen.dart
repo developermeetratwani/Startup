@@ -332,7 +332,7 @@ class _AddEditProductScreenState extends ConsumerState<AddEditProductScreen> {
 
               // Category dropdown
               DropdownButtonFormField<String>(
-                value: _selectedCategory,
+                initialValue: _selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Fashion Category',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusSm)),

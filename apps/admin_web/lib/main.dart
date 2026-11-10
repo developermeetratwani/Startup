@@ -1217,7 +1217,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         )),
                         DataCell(Switch(
                           value: d.isActive,
-                          activeColor: AppColors.success,
+                          activeThumbColor: AppColors.success,
                           onChanged: (_) {
                             setState(() {
                               DealsService.toggleDeal(d.id);

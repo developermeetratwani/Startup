@@ -132,7 +132,7 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: store.isOpen ? AppColors.success.withOpacity(0.15) : AppColors.error.withOpacity(0.15),
+                              color: store.isOpen ? AppColors.success.withValues(alpha: 0.15) : AppColors.error.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),
                             ),
                             child: Text(

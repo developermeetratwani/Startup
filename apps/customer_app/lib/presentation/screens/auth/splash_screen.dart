@@ -104,7 +104,7 @@ class _SplashScreenState extends State<SplashScreen>
               Text(
                 'Fashion from your neighbourhood',
                 style: TextStyle(
-                  color: AppColors.linen.withOpacity(0.7),
+                  color: AppColors.linen.withValues(alpha: 0.7),
                   fontSize: 14,
                   letterSpacing: 0.2,
                 ),

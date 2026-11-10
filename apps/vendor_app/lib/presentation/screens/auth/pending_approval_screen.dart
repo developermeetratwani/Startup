@@ -18,7 +18,7 @@ class PendingApprovalScreen extends StatelessWidget {
                 width: 80,
                 height: 80,
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withOpacity(0.15),
+                  color: AppColors.warning.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.hourglass_top_rounded, color: AppColors.warning, size: 44),

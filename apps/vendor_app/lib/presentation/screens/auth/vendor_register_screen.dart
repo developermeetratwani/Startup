@@ -113,7 +113,7 @@ class _VendorRegisterScreenState extends State<VendorRegisterScreen> {
 
               // Market Cluster selection
               DropdownButtonFormField<String>(
-                value: _selectedMarket,
+                initialValue: _selectedMarket,
                 decoration: InputDecoration(
                   labelText: 'Target Market Cluster',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(AppSpacing.radiusSm)),

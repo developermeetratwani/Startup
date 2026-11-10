@@ -265,9 +265,9 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.06),
+                          color: Colors.blue.withValues(alpha: 0.06),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                          border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
                         ),
                         child: const Row(
                           children: [

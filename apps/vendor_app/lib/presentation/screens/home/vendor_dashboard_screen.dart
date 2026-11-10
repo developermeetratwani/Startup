@@ -48,7 +48,7 @@ class VendorDashboardScreen extends ConsumerWidget {
                     ),
                     Switch(
                       value: store.isOpen,
-                      activeColor: AppColors.success,
+                      activeThumbColor: AppColors.success,
                       onChanged: (val) {
                         ref.read(vendorStoreStatusOverrideProvider.notifier).state = val;
                         ref.read(vendorStoreRepoProvider).updateStoreStatus(
@@ -68,9 +68,9 @@ class VendorDashboardScreen extends ConsumerWidget {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          ref.refresh(currentStoreProvider);
-          ref.refresh(vendorOrdersProvider);
-          ref.refresh(vendorEarningsProvider);
+          ref.invalidate(currentStoreProvider);
+          ref.invalidate(vendorOrdersProvider);
+          ref.invalidate(vendorEarningsProvider);
         },
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),

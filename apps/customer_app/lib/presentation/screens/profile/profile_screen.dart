@@ -114,67 +114,246 @@ class ProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         child: Column(
           children: [
-            // User Avatar & Name
+            // High-End Luxury Profile Header
             Center(
               child: Column(
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundColor: AppColors.primary,
-                    child: Text(
-                      user?.displayName.isNotEmpty == true ? user!.displayName[0].toUpperCase() : 'U',
-                      style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
+                  Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: [Color(0xFFD4AF37), Color(0xFFF59E0B), Color(0xFFD97706)],
+                      ),
+                      boxShadow: [
+                        BoxShadow(color: Color(0x33D4AF37), blurRadius: 16, offset: Offset(0, 4)),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 42,
+                      backgroundColor: const Color(0xFF0F1016),
+                      child: Text(
+                        user?.displayName.isNotEmpty == true ? user!.displayName[0].toUpperCase() : 'M',
+                        style: const TextStyle(
+                          color: Color(0xFFD4AF37),
+                          fontSize: 32,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
-                  Text(user?.displayName ?? 'Valued Customer', style: AppTextStyles.headlineMedium),
-                  const SizedBox(height: 4),
-                  Text(user?.email ?? user?.phone ?? '', style: AppTextStyles.bodySmall),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 24),
-
-            // Store Coins / Referral Rewards Banner
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [AppColors.accent, AppColors.accentTomato],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                boxShadow: const [
-                  BoxShadow(
-                    color: Color(0x22D93670),
-                    blurRadius: 14,
-                    offset: const Offset(0, 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        user?.displayName ?? 'Valued Customer',
+                        style: AppTextStyles.headlineMedium.copyWith(fontWeight: FontWeight.w800),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(Icons.verified_rounded, color: Color(0xFF2563EB), size: 18),
+                    ],
                   ),
-                ],
-              ),
-              child: const Row(
-                children: [
-                  Icon(Icons.monetization_on_rounded, color: Colors.white, size: 36),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  const SizedBox(height: 4),
+                  Text(
+                    user?.email ?? user?.phone ?? 'hyperlocal@marsfashion.in',
+                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFD4AF37), Color(0xFFF59E0B)],
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x28D4AF37), blurRadius: 8, offset: Offset(0, 2)),
+                      ],
+                    ),
+                    child: const Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
+                        Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 14),
+                        SizedBox(width: 4),
                         Text(
-                          'Store Referral Program',
-                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
-                        ),
-                        Text(
-                          'Support your local Kubernagar & Gandhinagar retailers to earn Store Coins',
-                          style: TextStyle(color: Colors.white70, fontSize: 11),
+                          'MARS GOLD VIP ELITE',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.6),
                         ),
                       ],
                     ),
                   ),
                 ],
               ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // Black Obsidian & Gold Loyalty Card (Amex Black Tier)
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0F1016), Color(0xFF1A1C24), Color(0xFF12131A)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(22),
+                border: Border.all(color: const Color(0x33D4AF37), width: 1.2),
+                boxShadow: const [
+                  BoxShadow(
+                    color: Color(0x33000000),
+                    blurRadius: 20,
+                    offset: Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(Icons.stars_rounded, color: Color(0xFFD4AF37), size: 18),
+                          SizedBox(width: 6),
+                          Text(
+                            'MARS PRIVILEGE CLUB',
+                            style: TextStyle(
+                              color: Color(0xFFD4AF37),
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: const Color(0x26D4AF37),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: const Color(0x40D4AF37)),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.local_fire_department_rounded, color: Colors.orange, size: 12),
+                            SizedBox(width: 3),
+                            Text(
+                              '3-WEEK STREAK',
+                              style: TextStyle(color: Colors.amber, fontSize: 9.5, fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Secret VIP Tier Unlocked ✨',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Frequent shopper bonus: 15% automatic discount on all weekly apparel orders + priority 15-minute dispatch.',
+                    style: TextStyle(color: Colors.white70, fontSize: 12, height: 1.4),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(color: Color(0x1FFFFFFF), height: 1),
+                  const SizedBox(height: 12),
+                  const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Total Lifetime Savings:',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      Text(
+                        '₹1,450 Saved',
+                        style: TextStyle(color: Color(0xFFD4AF37), fontWeight: FontWeight.w800, fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // Quick Stats Row
+            Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
+                      ],
+                    ),
+                    child: const Column(
+                      children: [
+                        Text('12', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.primary)),
+                        SizedBox(height: 2),
+                        Text('Orders Placed', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
+                      ],
+                    ),
+                    child: const Column(
+                      children: [
+                        Text('4.9 ★', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: Color(0xFF16A34A))),
+                        SizedBox(height: 2),
+                        Text('Member Rating', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: AppColors.cardBorder),
+                      boxShadow: const [
+                        BoxShadow(color: Color(0x08000000), blurRadius: 8, offset: Offset(0, 2)),
+                      ],
+                    ),
+                    child: const Column(
+                      children: [
+                        Text('15m', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800, color: AppColors.accent)),
+                        SizedBox(height: 2),
+                        Text('Avg Speed', style: TextStyle(fontSize: 10, color: AppColors.textSecondary, fontWeight: FontWeight.w600)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
 
             const SizedBox(height: 24),

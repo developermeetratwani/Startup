@@ -185,7 +185,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
                   title: const Text('Doorstep GPS Location', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: const Text('Used exclusively while app is active to calculate dynamic delivery ETA & direct delivery rider to your door in Ahmedabad.', style: TextStyle(fontSize: 12)),
                   value: _consentState.doorstepLocationAllowed,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) {
                     setState(() {
                       _consentState = _consentState.copyWith(doorstepLocationAllowed: val);
@@ -197,7 +197,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
                   title: const Text('Order Tracking & OTP Notifications', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: const Text('Receive push alerts for order preparation, driver dispatch, OTP handovers, and delivery status updates.', style: TextStyle(fontSize: 12)),
                   value: _consentState.pushAlertsAllowed,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) {
                     setState(() {
                       _consentState = _consentState.copyWith(pushAlertsAllowed: val);
@@ -209,7 +209,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
                   title: const Text('Camera for 48-Hour Size Exchange Proof', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: const Text('Optional: allows capturing photo proof of apparel fit issues for free instant size exchange pickup.', style: TextStyle(fontSize: 12)),
                   value: _consentState.cameraProofAllowed,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) {
                     setState(() {
                       _consentState = _consentState.copyWith(cameraProofAllowed: val);
@@ -221,7 +221,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
                   title: const Text('Anonymized Diagnostics & Crash Telemetry', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: const Text('Anonymous performance telemetry to diagnose app crashes. Zero personally identifiable data collected.', style: TextStyle(fontSize: 12)),
                   value: _consentState.telemetryAllowed,
-                  activeColor: AppColors.primary,
+                  activeThumbColor: AppColors.primary,
                   onChanged: (val) {
                     setState(() {
                       _consentState = _consentState.copyWith(telemetryAllowed: val);
@@ -495,7 +495,7 @@ class _LegalAndConsentScreenState extends State<LegalAndConsentScreen> with Sing
                 const Expanded(
                   child: Text(
                     'If your grievance is not resolved within 30 days, you retain the statutory right to escalate your appeal directly to the Data Protection Board of India (DPBI).',
-                    style: const TextStyle(fontSize: 11, color: AppColors.textSecondary),
+                    style: TextStyle(fontSize: 11, color: AppColors.textSecondary),
                   ),
                 ),
               ],
