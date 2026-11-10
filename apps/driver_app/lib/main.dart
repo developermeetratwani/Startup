@@ -40,6 +40,7 @@ class DriverApp extends ConsumerWidget {
       title: 'MARS Driver — Delivery Partner',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      scrollBehavior: const ButterySmoothScrollBehavior(),
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
         badgeText: 'MARS Driver',

@@ -439,12 +439,13 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 130,
+          Expanded(
+            flex: 2,
             child: Text(label, style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500)),
           ),
           const SizedBox(width: 8),
           Expanded(
+            flex: 3,
             child: Text(value, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: Colors.black87)),
           ),
         ],

@@ -34,7 +34,10 @@ class ProductImage extends StatelessWidget {
         width: width,
         height: height,
         fit: fit,
-        fadeInDuration: const Duration(milliseconds: 250),
+        fadeInDuration: const Duration(milliseconds: 200),
+        memCacheWidth: (width != null && width! < 1000) ? (width! * 2.5).toInt() : 700,
+        memCacheHeight: (height != null && height! < 1000) ? (height! * 2.5).toInt() : 700,
+        filterQuality: FilterQuality.medium,
         placeholder: (_, __) => LoadingShimmer(
           width: width ?? double.infinity,
           height: height ?? double.infinity,

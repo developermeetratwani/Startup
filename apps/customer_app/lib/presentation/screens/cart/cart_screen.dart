@@ -296,9 +296,9 @@ class _CartItemTile extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.productName, style: AppTextStyles.labelLarge, maxLines: 1),
+                  Text(item.productName, style: AppTextStyles.labelLarge, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 2),
-                  Text('Size: ${item.size} • Color: ${item.color}', style: AppTextStyles.bodySmall),
+                  Text('Size: ${item.size} • Color: ${item.color}', style: AppTextStyles.bodySmall, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 4),
                   Text(item.lineTotalDisplay, style: AppTextStyles.priceSmall),
                 ],
@@ -354,12 +354,17 @@ class _BillRow extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: isBold
-              ? AppTextStyles.titleMedium
-              : AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+        Expanded(
+          child: Text(
+            title,
+            style: isBold
+                ? AppTextStyles.titleMedium
+                : AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
+        const SizedBox(width: 8),
         Text(
           value,
           style: isBold

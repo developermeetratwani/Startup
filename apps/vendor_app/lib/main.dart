@@ -40,6 +40,7 @@ class VendorApp extends ConsumerWidget {
       title: 'MARS Vendor — Retailer Portal',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      scrollBehavior: const ButterySmoothScrollBehavior(),
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
         badgeText: 'MARS Vendor',

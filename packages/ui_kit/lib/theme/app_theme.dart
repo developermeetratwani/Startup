@@ -115,3 +115,20 @@ class AppTheme {
     );
   }
 }
+
+/// Global buttery-smooth scroll behavior for 60Hz/120Hz displays across iOS & Android
+class ButterySmoothScrollBehavior extends MaterialScrollBehavior {
+  const ButterySmoothScrollBehavior();
+
+  @override
+  ScrollPhysics getScrollPhysics(BuildContext context) {
+    return const BouncingScrollPhysics(
+      parent: AlwaysScrollableScrollPhysics(),
+    );
+  }
+
+  @override
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
+    return child;
+  }
+}

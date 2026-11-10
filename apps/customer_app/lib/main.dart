@@ -44,6 +44,7 @@ class CustomerApp extends ConsumerWidget {
       title: AppConstants.appName,
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      scrollBehavior: const ButterySmoothScrollBehavior(),
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
         badgeText: 'MARS',

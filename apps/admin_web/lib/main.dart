@@ -33,6 +33,7 @@ class AdminDashboardApp extends StatelessWidget {
       title: 'MARS Admin — Central Admin Portal',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
+      scrollBehavior: const ButterySmoothScrollBehavior(),
       home: const AdminHomeScreen(),
     );
   }

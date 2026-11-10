@@ -1081,23 +1081,28 @@ class _StoreCard extends StatelessWidget {
                       child: const Icon(Icons.favorite_border_rounded, size: 18, color: AppColors.primary),
                     ),
                   ),
-                  // Bottom Left Scrim Offer
-                  const Positioned(
+                  // Bottom Left Scrim Offer (Bounded to avoid ETA pill collision)
+                  Positioned(
                     bottom: 10,
                     left: 12,
+                    right: 95,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.local_offer_rounded, color: Color(0xFFFFD700), size: 14),
-                        SizedBox(width: 5),
-                        Text(
-                          'FLAT ₹150 OFF ABOVE ₹599',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w800,
-                            fontSize: 12,
-                            letterSpacing: 0.3,
-                            shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+                        const Icon(Icons.local_offer_rounded, color: Color(0xFFFFD700), size: 14),
+                        const SizedBox(width: 5),
+                        Flexible(
+                          child: Text(
+                            'FLAT ₹150 OFF ABOVE ₹599',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.w800,
+                              fontSize: 11.5,
+                              letterSpacing: 0.3,
+                              shadows: [Shadow(color: Colors.black, blurRadius: 4)],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
                       ],
@@ -1469,24 +1474,31 @@ class _HomeProductCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         // Price
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '₹${((product.discountedPrice > 0 ? product.discountedPrice : product.basePrice) / 100).toStringAsFixed(0)}',
-                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.primary),
-                            ),
-                            if (hasDiscount)
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                '₹${(product.basePrice / 100).toStringAsFixed(0)}',
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: AppColors.textHint,
-                                  decoration: TextDecoration.lineThrough,
-                                ),
+                                '₹${((product.discountedPrice > 0 ? product.discountedPrice : product.basePrice) / 100).toStringAsFixed(0)}',
+                                style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: AppColors.primary),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
-                          ],
+                              if (hasDiscount)
+                                Text(
+                                  '₹${(product.basePrice / 100).toStringAsFixed(0)}',
+                                  style: const TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.textHint,
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
                         ),
+                        const SizedBox(width: 4),
                         // Interactive ADD / Stepper Button
                         if (cartItem != null && cartItem.quantity > 0)
                           Container(
