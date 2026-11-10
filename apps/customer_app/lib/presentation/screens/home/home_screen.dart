@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ui_kit.dart';
@@ -23,7 +22,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
-  bool _isNavBarVisible = true;
   String _activeQuickFilter = 'all';
   int _activeDealPage = 0;
 
@@ -254,18 +252,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ],
       ),
-      body: NotificationListener<UserScrollNotification>(
-        onNotification: (notification) {
-          if (notification.metrics.pixels <= 10) {
-            if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
-          } else if (notification.direction == ScrollDirection.reverse) {
-            if (_isNavBarVisible) setState(() => _isNavBarVisible = false);
-          } else if (notification.direction == ScrollDirection.forward) {
-            if (!_isNavBarVisible) setState(() => _isNavBarVisible = true);
-          }
-          return true;
-        },
-        child: RefreshIndicator(
+      body: RefreshIndicator(
           color: AppColors.accent,
           onRefresh: () async => ref.refresh(nearbyStoresProvider),
           child: SingleChildScrollView(
@@ -863,44 +850,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: AnimatedSlide(
-        offset: _isNavBarVisible ? Offset.zero : const Offset(0, 1.5),
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeInOutCubic,
-        child: AnimatedOpacity(
-          opacity: _isNavBarVisible ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: IgnorePointer(
-            ignoring: !_isNavBarVisible,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: const [
-                FloatingCartBar(),
-                LuxuryBottomNavBar(currentIndex: 0),
-              ],
-            ),
-          ),
+      bottomNavigationBar: SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: const [
+            FloatingCartBar(),
+            LuxuryBottomNavBar(currentIndex: 0),
+          ],
         ),
       ),
-      floatingActionButton: AnimatedSlide(
-        offset: _isNavBarVisible ? Offset.zero : const Offset(0, 2.5),
-        duration: const Duration(milliseconds: 280),
-        curve: Curves.easeInOutCubic,
-        child: AnimatedOpacity(
-          opacity: _isNavBarVisible ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          child: IgnorePointer(
-            ignoring: !_isNavBarVisible,
-            child: FloatingActionButton.extended(
-              heroTag: 'fab_helpbot',
-              backgroundColor: AppColors.primary,
-              icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
-              label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-              onPressed: () => SupportChatbotSheet.show(context),
-            ),
-          ),
-        ),
+      floatingActionButton: FloatingActionButton.extended(
+        heroTag: 'fab_helpbot',
+        backgroundColor: AppColors.primary,
+        icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
+        label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+        onPressed: () => SupportChatbotSheet.show(context),
       ),
     );
   }
