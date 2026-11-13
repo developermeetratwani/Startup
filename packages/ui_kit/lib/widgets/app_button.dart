@@ -61,14 +61,16 @@ class _AppButtonState extends State<AppButton> {
                 Icon(widget.leadingIcon, size: 18, color: textColor),
                 const SizedBox(width: AppSpacing.sm),
               ],
-              Text(
+              Flexible(
+                  child: Text(
                 widget.label,
+                textAlign: TextAlign.center,
                 style: AppTextStyles.labelLarge.copyWith(
                   color: textColor,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.2,
                 ),
-              ),
+              )),
             ],
           );
 
@@ -144,14 +146,21 @@ class _AppButtonState extends State<AppButton> {
         );
     }
 
-    final sizedButton = widget.fullWidth ? SizedBox(width: widget.width ?? double.infinity, child: button) : button;
+    final sizedButton = widget.fullWidth
+        ? SizedBox(width: widget.width ?? double.infinity, child: button)
+        : button;
 
     return Listener(
       onPointerDown: (_) => setState(() => _isPressed = true),
       onPointerUp: (_) => setState(() => _isPressed = false),
       onPointerCancel: (_) => setState(() => _isPressed = false),
       child: AnimatedScale(
-        scale: _isPressed ? 0.965 : 1.0,
+        scale: _isPressed &&
+                widget.onPressed != null &&
+                !widget.isLoading &&
+                !MediaQuery.disableAnimationsOf(context)
+            ? 0.975
+            : 1.0,
         duration: const Duration(milliseconds: 110),
         curve: Curves.easeOutCubic,
         child: sizedButton,

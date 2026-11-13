@@ -18,21 +18,41 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="Your city. Your next move. The MARS delivery workspace.">
 
   <!-- iOS meta tags & icons -->
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="driver_app">
+  <meta name="apple-mobile-web-app-title" content="MARS">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg"/>
 
-  <title>driver_app</title>
+  <title>MARS — Delivery Partner</title>
   <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0F1016">
+  <style>
+    html, body { margin: 0; background: #0F1016; }
+    #mars-boot { position: fixed; inset: 0; display: grid; place-content: center;
+      background: #0F1016; color: #F4EFE9; font-family: Arial, sans-serif; text-align: center; }
+    #mars-boot strong { font-size: 32px; font-weight: 700; letter-spacing: 12px; padding-left: 12px; }
+    #mars-boot span { margin-top: 18px; font-size: 10px; letter-spacing: 3px; color: #A8A4A0; }
+    #mars-boot i { width: 110px; height: 2px; margin: 28px auto 0; background: #D93670;
+      transform-origin: left; animation: mars-arrive 1.5s ease-in-out infinite alternate; }
+    @keyframes mars-arrive { from { transform: scaleX(.2); opacity: .4; } to { transform: scaleX(1); opacity: 1; } }
+    @media (prefers-reduced-motion: reduce) { #mars-boot i { animation: none; } }
+  </style>
 </head>
 <body>
+  <div id="mars-boot" role="status" aria-label="Loading MARS">
+    <strong>MARS</strong><span>LOCAL FASHION. NEW POSSIBILITIES.</span><i aria-hidden="true"></i>
+  </div>
+  <script>
+    window.addEventListener('flutter-first-frame', function () {
+      document.getElementById('mars-boot')?.remove();
+    }, { once: true });
+  </script>
   <script src="flutter_bootstrap.js" async></script>
 </body>
 </html>

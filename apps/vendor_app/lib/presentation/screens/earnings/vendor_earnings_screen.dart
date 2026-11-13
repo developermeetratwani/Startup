@@ -166,44 +166,10 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Net Payout Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryLight],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'TOTAL NET PAYOUT',
-                        style: TextStyle(color: AppColors.textHint, fontSize: 12, letterSpacing: 1),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        earnings.netEarningsDisplay,
-                        style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _StatMini(label: 'Total Orders', value: '${earnings.completedOrders} completed'),
-                          _StatMini(label: 'Settlement cycle', value: 'Weekly (T+2)'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
+                MarsHero(eyebrow: 'Your net payout', title: earnings.netEarningsDisplay,
+                  description: '${earnings.completedOrders} completed orders · Weekly settlement cycle (T+2)',
+                  accent: AppColors.purple, icon: Icons.account_balance_wallet_outlined),
                 const SizedBox(height: AppSpacing.lg),
-
                 // Transparent Financial Breakdown
                 Text('Transparent Financial Breakdown', style: AppTextStyles.titleMedium),
                 const SizedBox(height: 12),
@@ -456,24 +422,6 @@ class _VendorEarningsScreenState extends ConsumerState<VendorEarningsScreen> {
   }
 }
 
-class _StatMini extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _StatMini({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: const TextStyle(color: AppColors.textHint, fontSize: 10)),
-        const SizedBox(height: 2),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
-      ],
-    );
-  }
-}
 
 class _BreakdownRow extends StatelessWidget {
   final String title;

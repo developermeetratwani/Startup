@@ -39,25 +39,10 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 56),
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(Icons.two_wheeler_rounded, color: Colors.white, size: 36),
-              ),
-              const SizedBox(height: 24),
-              Text('Delivery Partner App', style: AppTextStyles.displayMedium),
-              const SizedBox(height: 6),
-              Text(
-                'Deliver clothing parcels across Kubernagar & Gandhinagar and earn per drop',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 36),
-
+              const SizedBox(height: 20),
+              const MarsHero(eyebrow: 'MARS / Driver', title: 'The city is\nyours to move.',
+                description: 'Local routes. New possibilities. Welcome to your MARS delivery workspace.', accent: AppColors.liveEmerald, icon: Icons.route_rounded),
+              const MarsSectionHeading(number: '01', title: 'Welcome back', subtitle: 'Sign in to your workspace'),
               AppTextField(
                 label: 'Mobile Number (+91)',
                 hint: '9898012345',

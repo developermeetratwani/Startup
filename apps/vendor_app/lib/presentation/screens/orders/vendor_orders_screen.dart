@@ -82,16 +82,8 @@ class _OrderListView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     if (orders.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.receipt_long_outlined, size: 48, color: AppColors.textHint),
-            const SizedBox(height: 12),
-            Text(emptyMsg, style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary)),
-          ],
-        ),
-      );
+      return MarsEmptyState(icon: Icons.receipt_long_outlined,
+        title: emptyMsg, description: 'You are all caught up. Orders will appear here as they move through your store.');
     }
 
     return ListView.separated(
@@ -99,7 +91,7 @@ class _OrderListView extends ConsumerWidget {
       itemCount: orders.length,
       separatorBuilder: (_, __) => const SizedBox(height: 16),
       itemBuilder: (context, i) {
-        return _OrderCard(order: orders[i]);
+        return MarsReveal(delay: (i % 5) * 60, child: _OrderCard(order: orders[i]));
       },
     );
   }

@@ -65,191 +65,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        titleSpacing: AppSpacing.pagePadding,
-        title: GestureDetector(
+        toolbarHeight: 80,
+        titleSpacing: 20,
+        title: InkWell(
+          borderRadius: BorderRadius.circular(12),
           onTap: () => _showLocationSelector(context, ref),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.accent, AppColors.accentTomato],
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(Icons.location_on_rounded, color: Colors.white, size: 14),
-                  ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      location.areaName.isNotEmpty ? location.areaName : 'Ahmedabad',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.titleMedium.copyWith(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 16,
-                        letterSpacing: -0.3,
-                      ),
-                    ),
-                  ),
-                  const Icon(Icons.keyboard_arrow_down_rounded, size: 20, color: AppColors.textPrimary),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE8F5E9),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.bolt_rounded, size: 11, color: Color(0xFF267E3E)),
-                        const SizedBox(width: 2),
-                        Text(
-                          etaBadgeText,
-                          style: const TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            color: Color(0xFF267E3E),
-                            letterSpacing: 0.2,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 6),
-                  Flexible(
-                    child: Text(
-                      '${location.cityName} • Hyperlocal',
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('MARS', style: AppTextStyles.titleLarge.copyWith(letterSpacing: 5, fontSize: 22)),
+            const SizedBox(height: 5),
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.location_on_outlined, size: 13, color: AppColors.accent),
+              const SizedBox(width: 4),
+              Flexible(child: Text(location.areaName.isNotEmpty ? location.areaName : 'Ahmedabad',
+                maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.bodySmall)),
+              const Icon(Icons.keyboard_arrow_down_rounded, size: 16),
+            ]),
+          ]),
         ),
         actions: [
-          // VIP MARS Gold Crown Pill
-          GestureDetector(
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Row(
-                    children: [
-                      Icon(Icons.workspace_premium_rounded, color: Color(0xFFFFD700), size: 18),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'MARS Gold VIP: Free Delivery waived & 15-Min priority dispatch active!',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                  backgroundColor: const Color(0xFF0F1016),
-                  behavior: SnackBarBehavior.floating,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                  duration: const Duration(seconds: 3),
-                ),
-              );
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
-                ),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: const [
-                  BoxShadow(color: Color(0x33F59E0B), blurRadius: 6, offset: Offset(0, 2)),
-                ],
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 13),
-                  SizedBox(width: 3),
-                  Text(
-                    'GOLD',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 10,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // Order Receipt shortcut
-          IconButton(
-            icon: const Icon(Icons.receipt_long_rounded, color: AppColors.primary, size: 22),
-            tooltip: 'My Orders',
-            onPressed: () => context.push('/orders'),
-          ),
-          // Cart Bag with vibrant badge
-          IconButton(
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const Icon(Icons.shopping_bag_outlined, color: AppColors.primary, size: 24),
-                if (cartSummary.itemCount > 0)
-                  Positioned(
-                    right: -5,
-                    top: -5,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(colors: [AppColors.accent, AppColors.accentTomato]),
-                        shape: BoxShape.circle,
-                        boxShadow: const [BoxShadow(color: Color(0x33D93670), blurRadius: 4)],
-                      ),
-                      child: Text(
-                        '${cartSummary.itemCount}',
-                        style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.w900),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            onPressed: () => context.push('/cart'),
-          ),
-          // User Avatar
-          GestureDetector(
-            onTap: () => context.push('/profile'),
-            child: Container(
-              margin: const EdgeInsets.only(right: 14, left: 2),
-              padding: const EdgeInsets.all(2),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: AppColors.cardBorder, width: 1.5),
-              ),
-              child: const CircleAvatar(
-                radius: 14,
-                backgroundColor: AppColors.primary,
-                child: Icon(Icons.person_rounded, size: 16, color: Colors.white),
-              ),
-            ),
-          ),
+          IconButton(tooltip: 'Style and order support', onPressed: () => SupportChatbotSheet.show(context),
+            icon: const Icon(Icons.chat_bubble_outline_rounded, size: 21)),
+          IconButton(tooltip: 'My orders', onPressed: () => context.push('/orders'),
+            icon: const Icon(Icons.receipt_long_outlined, size: 22)),
+          IconButton(tooltip: 'Shopping bag', onPressed: () => context.push('/cart'),
+            icon: Badge(isLabelVisible: cartSummary.itemCount > 0,
+              label: Text('${cartSummary.itemCount}'),
+              child: const Icon(Icons.shopping_bag_outlined, size: 23))),
+          const SizedBox(width: 10),
         ],
       ),
       body: RefreshIndicator(
@@ -261,64 +103,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Active Order Live Tracking Banner (Zomato style)
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(AppSpacing.pagePadding, 12, AppSpacing.pagePadding, 8),
-                  child: InkWell(
-                    onTap: () => context.push('/orders/track/ord-kubernagar-8920'),
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
-                      decoration: BoxDecoration(
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF171717), Color(0xFF282828)],
-                        ),
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: const [
-                          BoxShadow(color: Color(0x1F000000), blurRadius: 10, offset: Offset(0, 3)),
-                        ],
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: const BoxDecoration(
-                              color: AppColors.accent,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.delivery_dining_rounded, color: Colors.white, size: 18),
-                          ),
-                          const SizedBox(width: 12),
-                          const Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text('Active Order • En Route', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13, color: Colors.white)),
-                                    SizedBox(width: 6),
-                                    CircleAvatar(radius: 3.5, backgroundColor: Color(0xFF22C55E)),
-                                  ],
-                                ),
-                                SizedBox(height: 2),
-                                Text('Rider Suresh (~14 Mins) • Tap to view GPS map', style: TextStyle(fontSize: 11, color: Colors.white70)),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                            decoration: BoxDecoration(
-                              color: AppColors.accent,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: const Text('TRACK', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 12),
+                  child: MarsEditorial(onExplore: () => context.push('/search')),
                 ),
-
+                Padding(padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 6),
+                  child: Row(children: [
+                    const Icon(Icons.bolt_rounded, size: 15, color: AppColors.accent),
+                    const SizedBox(width: 5),
+                    Text(etaBadgeText, style: AppTextStyles.labelSmall),
+                    const Spacer(),
+                    Text('LOCAL FINDS. BIG FEELINGS.', style: AppTextStyles.labelUppercase.copyWith(fontSize: 8)),
+                  ])),
                 // Floating Search Bar (Zomato / Swiggy Pill)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding, vertical: 8),
@@ -344,7 +140,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: Text(
-                              'Search "Sabyasachi", "Oversized Tees", "Sneakers"...',
+                              'Find your style, brand or boutique',
                               style: TextStyle(
                                 color: AppColors.textHint,
                                 fontSize: 14,
@@ -756,7 +552,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: AppSpacing.pagePadding),
                         itemCount: products.length,
                         separatorBuilder: (_, __) => const SizedBox(width: 14),
-                        itemBuilder: (context, index) => _HomeProductCard(product: products[index]),
+                        itemBuilder: (context, index) => MarsReveal(delay: (index % 5) * 60, child: _HomeProductCard(product: products[index])),
                       ),
                     );
                   },
@@ -777,7 +573,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     children: [
                       const Flexible(
                         child: Text(
-                          'Featured Boutiques & Stores',
+                          'The local favourites',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w900,
@@ -816,7 +612,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       itemCount: filteredStores.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 16),
                       itemBuilder: (context, index) {
-                        return _StoreCard(store: filteredStores[index]);
+                        return MarsReveal(delay: (index % 4) * 60, child: _StoreCard(store: filteredStores[index]));
                       },
                     );
                   },
@@ -860,13 +656,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        heroTag: 'fab_helpbot',
-        backgroundColor: AppColors.primary,
-        icon: const Icon(Icons.smart_toy_rounded, color: Colors.white, size: 20),
-        label: const Text('HelpBot AI', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
-        onPressed: () => SupportChatbotSheet.show(context),
-      ),
+
     );
   }
 

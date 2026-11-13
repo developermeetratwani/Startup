@@ -27,16 +27,24 @@ class AppCard extends StatefulWidget {
 
 class _AppCardState extends State<AppCard> {
   bool _isPressed = false;
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final effectiveRadius = widget.borderRadius ?? BorderRadius.circular(20);
 
-    final cardContent = Container(
+    final cardContent = AnimatedContainer(
+      duration: Duration(
+          milliseconds: MediaQuery.disableAnimationsOf(context) ? 0 : 180),
       decoration: BoxDecoration(
         color: widget.color ?? AppColors.surface,
         borderRadius: effectiveRadius,
-        border: widget.border ?? Border.all(color: AppColors.cardBorder, width: 1),
+        border: widget.border ??
+            Border.all(
+                color: _isHovered
+                    ? AppColors.accent.withValues(alpha: .35)
+                    : AppColors.cardBorder,
+                width: 1),
         boxShadow: const [
           BoxShadow(
             color: Color(0x060F1016),
@@ -58,6 +66,7 @@ class _AppCardState extends State<AppCard> {
         clipBehavior: Clip.antiAlias,
         child: InkWell(
           onTap: widget.onTap,
+          onHover: (value) => setState(() => _isHovered = value),
           borderRadius: effectiveRadius,
           splashColor: AppColors.primary.withValues(alpha: 0.05),
           highlightColor: AppColors.primary.withValues(alpha: 0.03),
@@ -76,7 +85,9 @@ class _AppCardState extends State<AppCard> {
       onPointerUp: (_) => setState(() => _isPressed = false),
       onPointerCancel: (_) => setState(() => _isPressed = false),
       child: AnimatedScale(
-        scale: _isPressed ? 0.985 : 1.0,
+        scale: _isPressed && !MediaQuery.disableAnimationsOf(context)
+            ? 0.985
+            : 1.0,
         duration: const Duration(milliseconds: 120),
         curve: Curves.easeOutCubic,
         child: cardContent,

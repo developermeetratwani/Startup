@@ -62,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen>
       backgroundColor: AppColors.primary,
       body: Center(
         child: FadeTransition(
-          opacity: _fadeAnimation,
+          opacity: MediaQuery.disableAnimationsOf(context) ? const AlwaysStoppedAnimation(1) : _fadeAnimation,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -95,9 +95,9 @@ class _SplashScreenState extends State<SplashScreen>
                 'MARS',
                 style: TextStyle(
                   color: AppColors.linen,
-                  fontSize: 28,
+                  fontSize: 46,
                   fontWeight: FontWeight.w700,
-                  letterSpacing: 1.2,
+                  letterSpacing: 10,
                 ),
               ),
               const SizedBox(height: 8),

@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 import 'app_spacing.dart';
+import '../widgets/mars_motion.dart';
 
 class AppTheme {
   AppTheme._();
@@ -26,6 +27,62 @@ class AppTheme {
         outline: AppColors.cardBorder,
       ),
       scaffoldBackgroundColor: AppColors.background,
+      pageTransitionsTheme: const PageTransitionsTheme(builders: {
+        TargetPlatform.android: MarsPageTransitions(),
+        TargetPlatform.iOS: MarsPageTransitions(),
+        TargetPlatform.windows: MarsPageTransitions(),
+        TargetPlatform.macOS: MarsPageTransitions(),
+        TargetPlatform.linux: MarsPageTransitions(),
+      }),
+      cardTheme: CardThemeData(
+        color: AppColors.surface,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+            side: const BorderSide(color: AppColors.cardBorder)),
+      ),
+      dialogTheme: DialogThemeData(
+          backgroundColor: AppColors.surface,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(28))),
+      bottomSheetTheme: const BottomSheetThemeData(
+          backgroundColor: AppColors.surface,
+          showDragHandle: true,
+          modalBackgroundColor: AppColors.surface,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(28)))),
+      snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.onyx,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+      chipTheme: ChipThemeData(
+          backgroundColor: AppColors.surface,
+          selectedColor: AppColors.raspberryLight,
+          side: const BorderSide(color: AppColors.cardBorder),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
+      dataTableTheme: DataTableThemeData(
+          headingRowColor: WidgetStateProperty.all(AppColors.surfaceWarm),
+          headingTextStyle: GoogleFonts.plusJakartaSans(
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+              letterSpacing: .3,
+              color: AppColors.textSecondary),
+          dataTextStyle: GoogleFonts.plusJakartaSans(
+              fontSize: 12, color: AppColors.textPrimary),
+          dividerThickness: .7,
+          headingRowHeight: 52,
+          dataRowMinHeight: 58,
+          dataRowMaxHeight: 78),
+      tabBarTheme: TabBarThemeData(
+          labelColor: AppColors.accent,
+          unselectedLabelColor: AppColors.textSecondary,
+          indicatorColor: AppColors.accent,
+          dividerColor: AppColors.divider,
+          labelStyle: GoogleFonts.plusJakartaSans(
+              fontWeight: FontWeight.w700, fontSize: 13)),
       textTheme: GoogleFonts.plusJakartaSansTextTheme(),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.background,
@@ -128,7 +185,8 @@ class ButterySmoothScrollBehavior extends MaterialScrollBehavior {
   }
 
   @override
-  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
+  Widget buildOverscrollIndicator(
+      BuildContext context, Widget child, ScrollableDetails details) {
     return child;
   }
 }

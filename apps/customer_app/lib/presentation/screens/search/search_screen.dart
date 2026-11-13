@@ -55,22 +55,26 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
         ),
       ),
       body: _controller.text.trim().isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.search, size: 64, color: AppColors.textHint),
-                  const SizedBox(height: 12),
-                  Text('Search across local stores', style: AppTextStyles.titleMedium),
-                  const SizedBox(height: 6),
-                  Text('Find shirts, kurta, dresses, denim and more', style: AppTextStyles.bodySmall),
-                ],
-              ),
-            )
+          ? SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: [
+                const MarsHero(eyebrow: 'MARS / Discover', title: 'What is your\nkind of style?',
+                  description: 'Something timeless. Something unexpected. Find your next favourite in the neighbourhood.',
+                  icon: Icons.search_rounded),
+                const MarsSectionHeading(number: '01', title: 'Start with a feeling', subtitle: 'A few ideas to get you inspired'),
+                Wrap(spacing: 10, runSpacing: 10, children: [
+                  for (final term in ['Kurta', 'Dresses', 'Denim', 'Shirts', 'Saree', 'T-shirt'])
+                    ActionChip(label: Text(term), avatar: const Icon(Icons.north_east, size: 15),
+                      onPressed: () {
+                        _controller.text = term;
+                        ref.read(productSearchQueryProvider.notifier).state = term;
+                        setState(() {});
+                      }),
+                ]),
+              ]))
           : searchResultsAsync.when(
               data: (products) {
                 if (products.isEmpty) {
-                  return const Center(child: Text('No matching products found'));
+                  return const MarsEmptyState(icon: Icons.search_off_rounded, title: 'A little harder to find.', description: 'Try another style, brand or a shorter search. Your next favourite is out there.');
                 }
 
                 return ListView.separated(

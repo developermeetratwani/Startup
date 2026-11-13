@@ -36,62 +36,22 @@ class _VendorNavShellState extends ConsumerState<VendorNavShell> {
         0;
 
     return Scaffold(
-      body: IndexedStack(
+      body: MarsTabStack(
         index: _currentIndex,
         children: _screens,
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: AppColors.accent,
-        unselectedItemColor: AppColors.textSecondary,
-        items: [
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.dashboard_rounded),
-            label: 'Dashboard',
-          ),
-          BottomNavigationBarItem(
-            icon: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                const Icon(Icons.receipt_long_rounded),
-                if (pendingCount > 0)
-                  Positioned(
-                    right: -4,
-                    top: -4,
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      decoration: const BoxDecoration(
-                        color: AppColors.accent,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Text(
-                        '$pendingCount',
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            label: 'Orders',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.inventory_2_rounded),
-            label: 'Products',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.monetization_on_rounded),
-            label: 'Earnings',
-          ),
-          const BottomNavigationBarItem(
-            icon: Icon(Icons.storefront_rounded),
-            label: 'Store',
-          ),
+      bottomNavigationBar: MarsNavigation(
+        selectedIndex: _currentIndex,
+        onSelected: (index) => setState(() => _currentIndex = index),
+        accent: AppColors.accent,
+        destinations: [
+          const MarsDestination('Home', Icons.grid_view_rounded),
+          MarsDestination('Orders', Icons.receipt_long_rounded,
+              badge: pendingCount),
+          const MarsDestination('Catalog', Icons.checkroom_rounded),
+          const MarsDestination(
+              'Earnings', Icons.account_balance_wallet_outlined),
+          const MarsDestination('Store', Icons.storefront_outlined)
         ],
       ),
     );

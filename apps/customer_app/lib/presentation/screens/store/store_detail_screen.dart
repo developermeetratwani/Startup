@@ -63,7 +63,7 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
               slivers: [
               // Store Header App Bar
               SliverAppBar(
-                expandedHeight: 220,
+                expandedHeight: 290,
                 pinned: true,
                 flexibleSpace: FlexibleSpaceBar(
                   title: Text(
@@ -78,7 +78,7 @@ class _StoreDetailScreenState extends ConsumerState<StoreDetailScreen> {
                   background: Stack(
                     fit: StackFit.expand,
                     children: [
-                      ProductImage(imageUrl: store.bannerImageUrl, height: 220),
+                      ProductImage(imageUrl: store.bannerImageUrl, height: 290, borderRadius: BorderRadius.zero),
                       Container(
                         decoration: const BoxDecoration(
                           gradient: LinearGradient(
