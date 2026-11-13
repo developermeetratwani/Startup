@@ -1,134 +1,123 @@
-import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_text_styles.dart';
+import 'mars_motion.dart';
 
+/// Desktop presentation frame with an accurate, keyboard-aware app viewport.
+/// Phones use the entire screen without any simulated device chrome.
 class PhoneSimulatorWrapper extends StatelessWidget {
   final Widget child;
   final String? badgeText;
-
-  const PhoneSimulatorWrapper({
-    super.key,
-    required this.child,
-    this.badgeText,
-  });
+  const PhoneSimulatorWrapper({super.key, required this.child, this.badgeText});
 
   @override
   Widget build(BuildContext context) {
-    if (!kIsWeb) return child;
-
-    final size = MediaQuery.of(context).size;
-    // On physical mobile screens or narrow screens, display full screen edge-to-edge
-    if (size.width < 550) return child;
-
-    final availableHeight = size.height - 40;
-    final scale = math.min(1.0, availableHeight / 860.0);
-
-    return Scaffold(
-      backgroundColor: const Color(0xFF0B0F19),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Transform.scale(
-            scale: math.max(0.65, scale),
-            alignment: Alignment.center,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (badgeText != null)
+    final media = MediaQuery.of(context);
+    if (!kIsWeb || media.size.width < 700) return child;
+    final partner = (badgeText ?? '').contains('Vendor');
+    final rider = (badgeText ?? '').contains('Driver');
+    final wide = media.size.width >= 1050;
+    final accent = rider
+        ? AppColors.liveEmerald
+        : partner
+            ? AppColors.purple
+            : AppColors.accent;
+    return Material(
+      color: AppColors.onyx,
+      child: SafeArea(
+          child: Padding(
+        padding: EdgeInsets.all(wide ? 32 : 18),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          if (wide)
+            Expanded(
+                child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 38),
+              child: SingleChildScrollView(child: MarsReveal(
+                  child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Row(children: [
+                    Text('MARS',
+                        style: AppTextStyles.displayLarge.copyWith(
+                            color: AppColors.linen,
+                            fontSize: 26,
+                            letterSpacing: 8)),
+                    const SizedBox(width: 16),
+                    Container(width: 34, height: 1, color: accent),
+                  ]),
+                  const SizedBox(height: 64),
+                  Text(
+                      rider
+                          ? 'MOVE THE CITY.'
+                          : partner
+                              ? 'THE LOCAL EDIT.'
+                              : 'YOUR CITY. YOUR STYLE.',
+                      style: AppTextStyles.labelUppercase
+                          .copyWith(color: accent, letterSpacing: 3)),
+                  const SizedBox(height: 20),
+                  Text(
+                      rider
+                          ? 'Every mile.\nMore possibility.'
+                          : partner
+                              ? 'Small boutique.\nBig energy.'
+                              : 'Great style.\nCloser than\nyou think.',
+                      style: AppTextStyles.displayLarge.copyWith(
+                          color: AppColors.linen,
+                          fontSize: 54,
+                          height: 1.06,
+                          letterSpacing: -2.6)),
+                  const SizedBox(height: 26),
+                  ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 330),
+                      child: Text(
+                          rider
+                              ? 'Your next delivery, your next opportunity. Keep your city moving with MARS.'
+                              : partner
+                                  ? 'The workspace for your next chapter. Orders, collections and growth, beautifully in sync.'
+                                  : 'Discover independent boutiques and fresh fashion from the neighbourhoods you love.',
+                          style: AppTextStyles.bodyLarge.copyWith(
+                              color: AppColors.textHint, height: 1.8))),
+                  const SizedBox(height: 48),
                   Container(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF1E293B),
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(color: const Color(0xFF334155)),
-                    ),
-                    child: Text(
-                      badgeText!,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                  ),
-                Container(
-                  width: 410,
-                  height: 840,
-                  decoration: BoxDecoration(
-                    color: Colors.black,
-                    borderRadius: BorderRadius.circular(48),
-                    border: Border.all(color: const Color(0xFF334155), width: 10),
+                      height: 1,
+                      width: 280,
+                      color: AppColors.textHint.withValues(alpha: .2)),
+                  const SizedBox(height: 22),
+                  Text('AHMEDABAD  /  GANDHINAGAR',
+                      style: AppTextStyles.labelSmall.copyWith(
+                          color: AppColors.textHint, letterSpacing: 2)),
+                ],
+              ))),
+            )),
+          SizedBox(
+              width: 440,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                        color: AppColors.textHint.withValues(alpha: .25)),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.6),
-                        blurRadius: 36,
-                        offset: const Offset(0, 18),
-                      ),
-                    ],
-                  ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(38),
-                    child: Stack(
-                      children: [
-                        Positioned.fill(child: child),
-
-                        // Top Dynamic Island
-                        Positioned(
-                          top: 10,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Container(
-                              width: 110,
-                              height: 26,
-                              decoration: BoxDecoration(
-                                color: Colors.black,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    width: 10,
-                                    height: 10,
-                                    margin: const EdgeInsets.only(right: 12),
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFF1E293B),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-
-                        // Bottom Home Bar
-                        Positioned(
-                          bottom: 8,
-                          left: 0,
-                          right: 0,
-                          child: Center(
-                            child: Container(
-                              width: 130,
-                              height: 4,
-                              decoration: BoxDecoration(
-                                color: Colors.black.withValues(alpha: 0.4),
-                                borderRadius: BorderRadius.circular(2),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+                          color: accent.withValues(alpha: .12),
+                          blurRadius: 90,
+                          spreadRadius: 8)
+                    ]),
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(30),
+                    child: LayoutBuilder(
+                        builder: (context, constraints) => MediaQuery(
+                            data: media.copyWith(
+                                size: Size(constraints.maxWidth,
+                                    constraints.maxHeight),
+                                padding: EdgeInsets.zero,
+                                viewPadding: EdgeInsets.zero),
+                            child: child))),
+              )),
+          if (wide) const SizedBox(width: 40),
+        ]),
+      )),
     );
   }
 }

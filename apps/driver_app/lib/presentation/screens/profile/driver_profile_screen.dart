@@ -17,52 +17,10 @@ class DriverProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         child: Column(
           children: [
-            // Driver Avatar Card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surfaceVariant,
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(color: AppColors.primary, width: 2),
-                      image: const DecorationImage(
-                        image: NetworkImage('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200'),
-                        fit: BoxFit.cover,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          children: [
-                            Text(profile.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                            const SizedBox(width: 6),
-                            const Icon(Icons.verified_rounded, color: AppColors.primary, size: 18),
-                          ],
-                        ),
-                        const SizedBox(height: 4),
-                        Text('${profile.vehicleType} • ${profile.cluster}', style: const TextStyle(fontSize: 12, color: AppColors.textSecondary)),
-                        const SizedBox(height: 4),
-                        Text(profile.phone, style: const TextStyle(fontSize: 12, color: AppColors.accent, fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
+            MarsHero(eyebrow: profile.isVerified ? 'MARS / Verified partner' : 'MARS / Partner profile',
+              title: profile.name, description: '${profile.vehicleType} · ${profile.cluster}\n${profile.phone}',
+              accent: AppColors.liveEmerald, icon: Icons.person_outline_rounded),
             const SizedBox(height: AppSpacing.xl),
-
             // 1. Vehicle Information
             ListTile(
               leading: const Icon(Icons.two_wheeler_rounded, color: AppColors.primary),

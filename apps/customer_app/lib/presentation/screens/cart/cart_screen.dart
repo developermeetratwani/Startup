@@ -19,7 +19,7 @@ class CartScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Shopping Cart'),
+        title: const Text('Your shopping bag'),
         actions: [
           if (cartSummary.items.isNotEmpty)
             IconButton(
@@ -44,27 +44,10 @@ class CartScreen extends ConsumerWidget {
         ],
       ),
       body: cartSummary.items.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.shopping_bag_outlined, size: 80, color: AppColors.textHint),
-                  const SizedBox(height: 16),
-                  Text('Your cart is empty', style: AppTextStyles.headlineMedium),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Explore local clothing stores and add items to your cart',
-                    style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                  ),
-                  const SizedBox(height: 24),
-                  AppButton(
-                    label: 'Browse Stores',
-                    fullWidth: false,
-                    onPressed: () => context.go('/home'),
-                  ),
-                ],
-              ),
-            )
+          ? MarsEmptyState(icon: Icons.shopping_bag_outlined,
+              title: 'Room for something lovely.',
+              description: 'Your bag is waiting for its first local find. Discover the boutiques around you.',
+              actionLabel: 'Explore the neighbourhood', onAction: () => context.go('/home'))
           : SingleChildScrollView(
               padding: const EdgeInsets.all(AppSpacing.pagePadding),
               child: Column(

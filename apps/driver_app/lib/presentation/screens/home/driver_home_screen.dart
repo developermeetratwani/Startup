@@ -82,77 +82,27 @@ class DriverHomeScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Duty Header Banner
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: isOnline ? AppColors.success.withValues(alpha: 0.1) : AppColors.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                border: Border.all(color: isOnline ? AppColors.success : AppColors.error),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    isOnline ? Icons.two_wheeler_rounded : Icons.bed_rounded,
-                    color: isOnline ? AppColors.success : AppColors.error,
-                    size: 32,
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          isOnline ? 'Ready for Deliveries' : 'You are Currently Offline',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                        ),
-                        Text(
-                          isOnline
-                              ? 'Operating in Kubernagar & Gandhinagar'
-                              : 'Go online to receive nearby store delivery requests',
-                          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+            MarsHero(
+              eyebrow: isOnline ? 'MARS / On the move' : 'MARS / Delivery partner',
+              title: isOnline ? 'Your city.\nYour next move.' : 'A fresh start.\nEvery shift.',
+              description: isOnline
+                ? 'You are available for nearby deliveries. Your next assignment will appear below.'
+                : 'Take a breath. When you are ready, switch on your availability to receive deliveries.',
+              accent: AppColors.liveEmerald,
+              icon: Icons.route_rounded,
             ),
-
-            const SizedBox(height: AppSpacing.lg),
+            const MarsSectionHeading(number: '01', title: 'Your daily rhythm', subtitle: 'Every delivery makes a difference'),
 
             // Today's Earnings Snapshot
             earningsAsync.when(
-              data: (e) => Row(
-                children: [
-                  Expanded(
-                    child: _MiniCard(
-                      title: "Today's Pay",
-                      value: e.todayEarningsDisplay,
-                      icon: Icons.currency_rupee_rounded,
-                      color: AppColors.success,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MiniCard(
-                      title: 'Trips Completed',
-                      value: '${e.todayDeliveries}',
-                      icon: Icons.check_circle_rounded,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _MiniCard(
-                      title: 'Rating',
-                      value: '${e.rating} ★',
-                      icon: Icons.star_rounded,
-                      color: AppColors.warning,
-                    ),
-                  ),
-                ],
-              ),
+              data: (e) => MarsMetricGrid(children: [
+                _MiniCard(title: "Today's pay", value: e.todayEarningsDisplay,
+                  icon: Icons.currency_rupee_rounded, color: AppColors.ratingGreen),
+                _MiniCard(title: 'Trips completed', value: '${e.todayDeliveries}',
+                  icon: Icons.check_circle_outline_rounded, color: AppColors.primary),
+                _MiniCard(title: 'Partner rating', value: '${e.rating} ★',
+                  icon: Icons.star_outline_rounded, color: AppColors.goldDark),
+              ]),
               loading: () => const SizedBox.shrink(),
               error: (_, __) => const SizedBox.shrink(),
             ),
@@ -176,23 +126,9 @@ class DriverHomeScreen extends ConsumerWidget {
   }
 
   Widget _buildOfflineState() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-      ),
-      child: const Center(
-        child: Column(
-          children: [
-            Icon(Icons.power_settings_new_rounded, size: 48, color: AppColors.textHint),
-            SizedBox(height: 12),
-            Text('Turn online switch ON', style: TextStyle(fontWeight: FontWeight.bold)),
-            Text('Delivery requests will appear when you are available', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-          ],
-        ),
-      ),
-    );
+    return const MarsEmptyState(icon: Icons.nightlight_round,
+      title: 'A moment to recharge.',
+      description: 'Switch on your availability above when you are ready for your next delivery.');
   }
 
   Widget _buildWaitingRadar() {
@@ -231,34 +167,7 @@ class _MiniCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 6),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 10, color: AppColors.textSecondary),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 2),
-          Text(
-            value,
-            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
-      ),
-    );
+    return MarsMetric(label: title, value: value, icon: icon, accent: color);
   }
 }
 

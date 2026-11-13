@@ -96,12 +96,8 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                         ),
                         child: Stack(
                           children: [
-                            ProductImage(
-                              imageUrl: product.imageUrls.isNotEmpty ? product.imageUrls.first : null,
-                              height: 320,
-                              width: double.infinity,
-                              borderRadius: BorderRadius.circular(24),
-                            ),
+                            MarsProductGallery(key: ValueKey(product.id),
+                              images: product.imageUrls, label: product.name),
                             Positioned(
                               top: 14,
                               left: 14,
@@ -146,7 +142,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       const SizedBox(height: 16),
 
                       // Name & Rating
-                      Text(product.name, style: AppTextStyles.headlineMedium),
+                      Text(product.name, style: AppTextStyles.displayMedium),
                       const SizedBox(height: 6),
                       Row(
                         children: [

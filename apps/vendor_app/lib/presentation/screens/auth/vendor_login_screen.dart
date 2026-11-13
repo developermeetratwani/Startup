@@ -39,25 +39,10 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 48),
-              Container(
-                width: 64,
-                height: 64,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 36),
-              ),
-              const SizedBox(height: 24),
-              Text('Retailer Portal', style: AppTextStyles.displayMedium),
-              const SizedBox(height: 6),
-              Text(
-                'Manage your store, orders & inventory across Kubernagar & Gandhinagar',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-              ),
-              const SizedBox(height: 36),
-
+              const SizedBox(height: 20),
+              const MarsHero(eyebrow: 'MARS / Vendor', title: 'Good things.\nStart local.',
+                description: 'Your boutique deserves a bigger stage. Welcome to your MARS merchant studio.', accent: AppColors.purple, icon: Icons.storefront_outlined),
+              const MarsSectionHeading(number: '01', title: 'Welcome back', subtitle: 'Sign in to your workspace'),
               AppTextField(
                 label: 'Retailer Email / Phone',
                 hint: 'e.g. shreeji@fashion.com',

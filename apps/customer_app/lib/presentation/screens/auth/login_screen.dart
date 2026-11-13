@@ -349,7 +349,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -357,48 +357,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-              // App Brand Header
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(11),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(14),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x18171717),
-                          blurRadius: 10,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.checkroom_rounded, color: Colors.white, size: 24),
-                  ),
-                  const SizedBox(width: 14),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'MARS FASHION',
-                          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, letterSpacing: -0.2, color: AppColors.textPrimary),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Hyperlocal Fashion Delivery • Ahmedabad & Gandhinagar',
-                          style: TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w500),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
+              const MarsHero(eyebrow: 'MARS / Your local fashion destination',
+                title: 'Find your people.\nFind your style.',
+                description: 'The boutiques you love. The discoveries you did not see coming. All closer to home.',
+                icon: Icons.checkroom_outlined),
               const SizedBox(height: 24),
-
               // Segmented Tab Bar for Sign In vs Sign Up
               Container(
                 height: 48,

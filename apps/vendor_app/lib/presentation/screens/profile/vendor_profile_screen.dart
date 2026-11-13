@@ -25,49 +25,10 @@ class VendorProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Store Header Card
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: AppColors.surfaceVariant,
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 60,
-                        height: 60,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(Icons.storefront_rounded, color: Colors.white, size: 32),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(store.name, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
-                            const SizedBox(height: 4),
-                            Text(store.location.address.isNotEmpty ? store.location.address : store.location.city, style: AppTextStyles.bodySmall),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                const Icon(Icons.star_rounded, color: AppColors.warning, size: 16),
-                                const SizedBox(width: 4),
-                                Text('${store.rating.toStringAsFixed(1)} (${store.totalRatings} reviews)', style: AppTextStyles.labelSmall),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
+                MarsHero(eyebrow: 'MARS / Your boutique', title: store.name,
+                  description: '${store.location.address.isNotEmpty ? store.location.address : store.location.city} · ${store.rating.toStringAsFixed(1)} stars · ${store.totalRatings} reviews',
+                  accent: AppColors.purple, icon: Icons.storefront_outlined),
                 const SizedBox(height: AppSpacing.xl),
-
                 // Settings Section
                 Text('Store Configuration', style: AppTextStyles.titleMedium),
                 const SizedBox(height: 12),

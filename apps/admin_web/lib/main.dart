@@ -64,12 +64,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   final _tabs = [
-    'Overview & Metrics',
+    'Overview',
     'Vendor Approvals',
-    'Clothing Stores & Settlements',
+    'Stores & settlements',
     'Order Monitoring',
-    'Driver Fleet & KYC',
-    'Promotions & Deals Ad Manager',
+    'Riders & verification',
+    'Campaign studio',
     'Size Exchanges',
     'Multi-Region Settings',
     'Commissions & Coins',
@@ -98,8 +98,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('MARS FASHION', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    Text('Admin Console', style: TextStyle(color: AppColors.textHint, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text('MARS / OPS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text('Marketplace workspace', style: TextStyle(color: AppColors.textHint, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
@@ -130,8 +130,8 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                   child: ListTile(
                     dense: true,
                     selected: isSelected,
-                    selectedTileColor: AppColors.primaryLight,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    selectedTileColor: AppColors.accent.withValues(alpha: .18),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     leading: Icon(icons[index], color: isSelected ? AppColors.accent : AppColors.textHint, size: 18),
                     title: Text(
                       _tabs[index],
@@ -199,7 +199,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
               color: AppColors.background,
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 16),
-                child: _buildBodyContent(isMobile: true),
+                child: MarsReveal(key: ValueKey(_selectedTab), child: _buildBodyContent(isMobile: true)),
               ),
             )
           : Row(
@@ -212,7 +212,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       children: [
                         // Top App Bar
                         Container(
-                          height: 64,
+                          height: 80,
                           padding: const EdgeInsets.symmetric(horizontal: 24),
                           decoration: const BoxDecoration(
                             color: AppColors.surface,
@@ -238,7 +238,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                       children: [
                                         Icon(Icons.cloud_done_rounded, color: AppColors.success, size: 16),
                                         SizedBox(width: 6),
-                                        Text('Firestore & Cloudinary Live Sync', style: TextStyle(color: AppColors.success, fontSize: 11, fontWeight: FontWeight.bold)),
+                                        Text('Marketplace sync', style: TextStyle(color: AppColors.success, fontSize: 11, fontWeight: FontWeight.bold)),
                                       ],
                                     ),
                                   ),
@@ -252,7 +252,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                         Expanded(
                           child: SingleChildScrollView(
                             padding: const EdgeInsets.all(24),
-                            child: _buildBodyContent(isMobile: false),
+                            child: MarsReveal(key: ValueKey(_selectedTab), child: _buildBodyContent(isMobile: false)),
                           ),
                         ),
                       ],
@@ -265,6 +265,17 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
   }
 
   Widget _buildBodyContent({required bool isMobile}) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      if (_selectedTab != 0) ...[
+        MarsSectionHeading(number: '0${_selectedTab + 1}', title: _tabs[_selectedTab],
+          subtitle: 'MARS / Marketplace operations'),
+        const SizedBox(height: 8),
+      ],
+      _buildTabContent(isMobile: isMobile),
+    ]);
+  }
+
+  Widget _buildTabContent({required bool isMobile}) {
     switch (_selectedTab) {
       case 0:
         return _buildOverviewTab(isMobile);
@@ -294,7 +305,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
       builder: (context, constraints) {
         final width = constraints.maxWidth;
         final int crossAxisCount = width < 450 ? 1 : (width < 800 ? 2 : 4);
-        final double childAspectRatio = width < 450 ? 2.8 : (width < 800 ? 1.6 : 1.7);
+        final double tileHeight = 210 * MediaQuery.textScalerOf(context).scale(1);
 
         return GridView.builder(
           shrinkWrap: true,
@@ -303,7 +314,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             crossAxisCount: crossAxisCount,
             crossAxisSpacing: 12,
             mainAxisSpacing: 12,
-            childAspectRatio: childAspectRatio,
+            mainAxisExtent: tileHeight,
           ),
           itemCount: cards.length,
           itemBuilder: (ctx, i) => _KPICard(data: cards[i]),
@@ -325,7 +336,15 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        MarsHero(eyebrow: 'MARS / The control room',
+          title: 'A whole city. In sync.',
+          description: 'The people, boutiques and deliveries behind every great local discovery. Your marketplace, at a glance.',
+          accent: AppColors.purple, icon: Icons.hub_outlined,
+          actionLabel: 'Open order monitor', onAction: () => setState(() => _selectedTab = 3)),
+        const MarsSectionHeading(number: '01', title: 'Marketplace pulse', subtitle: 'Business overview'),
         _buildKPIGrid(cards, isMobile: isMobile),
+        const SizedBox(height: 24),
+        _buildOrderDistribution(orders),
         const SizedBox(height: 20),
 
         // Quick Navigation Actions
@@ -447,6 +466,40 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         ),
       ],
     );
+  }
+
+  Widget _buildOrderDistribution(List<OrderEntity> orders) {
+    final groups = <String, int>{
+      'New': orders.where((o) => o.status == OrderStatus.pending).length,
+      'Preparing': orders.where((o) => o.status == OrderStatus.confirmed || o.status == OrderStatus.preparing).length,
+      'On the move': orders.where((o) => o.status == OrderStatus.readyForPickup || o.status == OrderStatus.pickedUp).length,
+      'Delivered': orders.where((o) => o.status == OrderStatus.delivered).length,
+      'Other': orders.where((o) => ![OrderStatus.pending, OrderStatus.confirmed, OrderStatus.preparing,
+        OrderStatus.readyForPickup, OrderStatus.pickedUp, OrderStatus.delivered].contains(o.status)).length,
+    };
+    const colors = [AppColors.accent, AppColors.purple, AppColors.tomato, AppColors.ratingGreen, AppColors.textHint];
+    return AppCard(padding: const EdgeInsets.all(24), child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('The order journey', style: AppTextStyles.titleLarge),
+        const SizedBox(height: 6),
+        Text('${orders.length} orders in the current feed', style: AppTextStyles.bodySmall),
+        const SizedBox(height: 24),
+        ClipRRect(borderRadius: BorderRadius.circular(8), child: SizedBox(height: 14,
+          child: orders.isEmpty ? const ColoredBox(color: AppColors.surfaceVariant) : Row(children: [
+            for (var i = 0; i < groups.length; i++)
+              if (groups.values.elementAt(i) > 0)
+                Expanded(flex: groups.values.elementAt(i), child: ColoredBox(color: colors[i], child: const SizedBox.expand())),
+          ]))),
+        const SizedBox(height: 20),
+        Wrap(spacing: 24, runSpacing: 14, children: [
+          for (var i = 0; i < groups.length; i++)
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              Container(width: 8, height: 8, decoration: BoxDecoration(color: colors[i], shape: BoxShape.circle)),
+              const SizedBox(width: 8),
+              Text('${groups.keys.elementAt(i)}  ${groups.values.elementAt(i)}', style: AppTextStyles.labelSmall),
+            ]),
+        ]),
+      ]));
   }
 
   Widget _buildApprovalsTab(bool isMobile) {
@@ -1154,6 +1207,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const MarsHero(eyebrow: 'MARS / Campaign studio', title: 'Make your next big impression.',
+          description: 'Create the campaigns that help local collections get discovered.', icon: Icons.campaign_outlined),
+        const SizedBox(height: 24),
         _buildKPIGrid(cards, isMobile: isMobile),
         const SizedBox(height: 16),
         Card(
@@ -1535,38 +1591,7 @@ class _KPICard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: const BorderSide(color: AppColors.cardBorder)),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              data.title,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 11, color: AppColors.textSecondary, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              data.value,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold, color: data.color),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              data.subtitle,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(fontSize: 10, color: AppColors.textHint),
-            ),
-          ],
-        ),
-      ),
-    );
+    return MarsMetric(label: data.title, value: data.value, detail: data.subtitle,
+      icon: Icons.insights_rounded, accent: data.color);
   }
 }

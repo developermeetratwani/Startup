@@ -268,7 +268,7 @@ class DriverEarningsScreen extends ConsumerWidget {
     final codSummary = ref.watch(driverCodSummaryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Rider Earnings & Cash Settlement')),
+      appBar: AppBar(title: const Text('Your earnings')),
       body: earningsAsync.when(
         data: (earnings) {
           return SingleChildScrollView(
@@ -276,53 +276,10 @@ class DriverEarningsScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Earnings Card
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [AppColors.primary, AppColors.primaryLight],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusLg),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text('TODAYS EARNINGS',
-                          style: TextStyle(
-                              color: AppColors.textHint,
-                              fontSize: 11,
-                              letterSpacing: 1)),
-                      const SizedBox(height: 6),
-                      Text(earnings.todayEarningsDisplay,
-                          style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 14),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _StatItem(
-                              title: 'This Week',
-                              value: earnings.weeklyEarningsDisplay),
-                          _StatItem(
-                              title: 'Deliveries Done',
-                              value: '${earnings.totalDeliveries} drops'),
-                          _StatItem(
-                              title: 'Partner Rating',
-                              value: '${earnings.rating} ★'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-
+                MarsHero(eyebrow: 'Today / Your earnings', title: earnings.todayEarningsDisplay,
+                  description: '${earnings.weeklyEarningsDisplay} this week · ${earnings.totalDeliveries} deliveries · ${earnings.rating} partner rating',
+                  accent: AppColors.liveEmerald, icon: Icons.account_balance_wallet_outlined),
                 const SizedBox(height: AppSpacing.lg),
-
                 // COD Cash Collection & Remittance Section
                 Text('COD Cash In Hand & Hub Settlement',
                     style: AppTextStyles.titleMedium),
@@ -770,29 +727,6 @@ class _RemittanceTile extends StatelessWidget {
   }
 }
 
-class _StatItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const _StatItem({required this.title, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title,
-            style: const TextStyle(color: AppColors.textHint, fontSize: 10)),
-        const SizedBox(height: 2),
-        Text(value,
-            style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 13)),
-      ],
-    );
-  }
-}
 
 class _TripTile extends StatelessWidget {
   final String store;

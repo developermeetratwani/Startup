@@ -78,6 +78,16 @@ class VendorDashboardScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              MarsHero(
+                eyebrow: 'MARS / Merchant studio',
+                title: 'Your boutique.\nIn full bloom.',
+                description: 'A new day to make a local impression. Your orders, collection and earnings, together.',
+                accent: AppColors.purple,
+                icon: Icons.storefront_outlined,
+                actionLabel: 'Add to collection',
+                onAction: () => context.push('/products/add'),
+              ),
+              const MarsSectionHeading(number: '01', title: 'The business edit', subtitle: 'Your store at a glance'),
               if (storeAsync.valueOrNull?.isOpen == false)
                 Container(
                   margin: const EdgeInsets.only(bottom: AppSpacing.md),
@@ -102,37 +112,14 @@ class VendorDashboardScreen extends ConsumerWidget {
                 ),
 
               earningsAsync.when(
-                data: (earnings) => Row(
-                  children: [
-                    Expanded(
-                      child: _MetricCard(
-                        title: 'Total Sales',
-                        value: earnings.totalSalesDisplay,
-                        icon: Icons.payments_rounded,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _MetricCard(
-                        title: 'Platform Comm.',
-                        subtitle: '10% fee',
-                        value: earnings.commissionDisplay,
-                        icon: Icons.percent_rounded,
-                        color: AppColors.warning,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: _MetricCard(
-                        title: 'Net Payout',
-                        value: earnings.netEarningsDisplay,
-                        icon: Icons.account_balance_wallet_rounded,
-                        color: AppColors.success,
-                      ),
-                    ),
-                  ],
-                ),
+                data: (earnings) => MarsMetricGrid(children: [
+                  _MetricCard(title: 'Total sales', value: earnings.totalSalesDisplay,
+                    icon: Icons.payments_outlined, color: AppColors.primary),
+                  _MetricCard(title: 'Platform fee', subtitle: '10% fee', value: earnings.commissionDisplay,
+                    icon: Icons.percent_rounded, color: AppColors.goldDark),
+                  _MetricCard(title: 'Net payout', value: earnings.netEarningsDisplay,
+                    icon: Icons.account_balance_wallet_outlined, color: AppColors.ratingGreen),
+                ]),
                 loading: () => const ShimmerProductCard(),
                 error: (_, __) => const SizedBox.shrink(),
               ),
@@ -300,25 +287,8 @@ class _MetricCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
-        border: Border.all(color: AppColors.divider),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 20),
-          const SizedBox(height: 8),
-          Text(title, style: AppTextStyles.bodySmall.copyWith(color: AppColors.textSecondary)),
-          if (subtitle != null) Text(subtitle!, style: const TextStyle(fontSize: 9, color: AppColors.textHint)),
-          const SizedBox(height: 4),
-          Text(value, style: AppTextStyles.titleMedium.copyWith(fontWeight: FontWeight.bold)),
-        ],
-      ),
-    );
+    return MarsMetric(label: title, value: value, detail: subtitle,
+      icon: icon, accent: color);
   }
 }
 

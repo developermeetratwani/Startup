@@ -14,7 +14,7 @@ class VendorProductsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Product Inventory'),
+        title: const Text('Your collection'),
         actions: [
           IconButton(
             icon: const Icon(Icons.add_circle_outline_rounded, color: AppColors.accent, size: 28),
@@ -25,24 +25,10 @@ class VendorProductsScreen extends ConsumerWidget {
       body: productsAsync.when(
         data: (products) {
           if (products.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.checkroom_rounded, size: 56, color: AppColors.textHint),
-                  const SizedBox(height: 12),
-                  const Text('No products listed yet', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  const SizedBox(height: 6),
-                  const Text('Start adding clothes to receive customer orders', style: TextStyle(color: AppColors.textSecondary, fontSize: 12)),
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    onPressed: () => context.push('/products/add'),
-                    icon: const Icon(Icons.add),
-                    label: const Text('Add First Product'),
-                  ),
-                ],
-              ),
-            );
+            return MarsEmptyState(icon: Icons.checkroom_outlined,
+              title: 'Your next collection starts here.',
+              description: 'Add your first piece and help nearby shoppers discover your boutique.',
+              actionLabel: 'Add your first product', onAction: () => context.push('/products/add'));
           }
 
           return ListView.separated(
@@ -51,7 +37,7 @@ class VendorProductsScreen extends ConsumerWidget {
             separatorBuilder: (_, __) => const SizedBox(height: 14),
             itemBuilder: (context, i) {
               final product = products[i];
-              return _ProductInventoryCard(product: product);
+              return MarsReveal(delay: (i % 5) * 60, child: _ProductInventoryCard(product: product));
             },
           );
         },
