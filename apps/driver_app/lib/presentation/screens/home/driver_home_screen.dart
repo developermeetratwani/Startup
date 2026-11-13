@@ -83,7 +83,7 @@ class DriverHomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             MarsHero(
-              eyebrow: isOnline ? 'MARS / On the move' : 'MARS / Delivery partner',
+              eyebrow: isOnline ? 'SwiftDrop / On the move' : 'SwiftDrop / Delivery partner',
               title: isOnline ? 'Your city.\nYour next move.' : 'A fresh start.\nEvery shift.',
               description: isOnline
                 ? 'You are available for nearby deliveries. Your next assignment will appear below.'

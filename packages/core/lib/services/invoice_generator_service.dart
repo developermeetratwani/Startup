@@ -31,7 +31,7 @@ class TaxInvoiceData {
     required this.invoiceNumber,
     required this.orderId,
     required this.invoiceDate,
-    this.marketplaceName = 'MARS Hyperlocal Fashion Marketplace Pvt. Ltd.',
+    this.marketplaceName = 'SwiftDrop Hyperlocal Fashion Marketplace Pvt. Ltd.',
     this.marketplaceGstin = '24AAACX1234F1Z5',
     this.marketplaceAddress = 'B-42, Krishna Park Colony, Kubernagar Main Bazar, Ahmedabad - 382340',
     required this.vendorName,
@@ -147,7 +147,7 @@ class InvoiceGeneratorService {
         <!-- Header -->
         <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #6C5CE7; padding-bottom: 20px;">
           <div>
-            <h1 style="margin: 0; font-size: 22px; color: #6C5CE7; font-weight: 800; letter-spacing: -0.5px;">MARS</h1>
+            <h1 style="margin: 0; font-size: 22px; color: #6C5CE7; font-weight: 800; letter-spacing: -0.5px;">SwiftDrop</h1>
             <p style="margin: 4px 0 0 0; font-size: 12px; color: #4A5568; font-weight: 600;">Hyperlocal Fashion Marketplace</p>
             <p style="margin: 2px 0 0 0; font-size: 11px; color: #718096;">CIN: U72900GJ2026PTC123456 • GSTIN: ${data.marketplaceGstin}</p>
             <p style="margin: 2px 0 0 0; font-size: 11px; color: #718096;">${data.marketplaceAddress}</p>
@@ -250,9 +250,9 @@ class InvoiceGeneratorService {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
           'to': recipientEmail,
-          'subject': 'Your Tax Invoice & Bill for Order #${invoice.orderId} — MARS',
+          'subject': 'Your Tax Invoice & Bill for Order #${invoice.orderId} — SwiftDrop',
           'html': html,
-          'appName': 'MARS Fashion Marketplace',
+          'appName': 'SwiftDrop Fashion Marketplace',
         }),
       );
 

@@ -40,8 +40,8 @@ class _VendorLoginScreenState extends State<VendorLoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const MarsHero(eyebrow: 'MARS / Vendor', title: 'Good things.\nStart local.',
-                description: 'Your boutique deserves a bigger stage. Welcome to your MARS merchant studio.', accent: AppColors.purple, icon: Icons.storefront_outlined),
+              const MarsHero(eyebrow: 'SwiftDrop / Vendor', title: 'Good things.\nStart local.',
+                description: 'Your boutique deserves a bigger stage. Welcome to your SwiftDrop merchant studio.', accent: AppColors.purple, icon: Icons.storefront_outlined),
               const MarsSectionHeading(number: '01', title: 'Welcome back', subtitle: 'Sign in to your workspace'),
               AppTextField(
                 label: 'Retailer Email / Phone',

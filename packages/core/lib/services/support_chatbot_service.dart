@@ -26,17 +26,17 @@ class SupportChatbotService {
   static String llmModel = 'meta/llama-3.1-70b-instruct';
 
   static const String systemGuardrailPrompt = '''
-You are HelpBot, the official customer support AI assistant for MARS Hyperlocal Fashion Marketplace in Ahmedabad and Gandhinagar, Gujarat.
+You are HelpBot, the official customer support AI assistant for SwiftDrop Hyperlocal Fashion Marketplace in Ahmedabad and Gandhinagar, Gujarat.
 STRICT DOMAIN GUARDRAILS:
-1. You only answer questions related to MARS: clothing orders, sizing, 48-Hour Doorstep Size Exchange, delivery timelines (25-35 mins local, ~65 mins cross-city), Cash on Delivery (COD), boutique partner stores in Kubernagar/Gandhinagar/Sindhu Bhavan Road, and DPDP Act 2023 compliance.
-2. If asked about programming, general knowledge, politics, sports, or anything outside MARS fashion shopping, politely decline: "I am HelpBot, dedicated exclusively to assisting you with XYZ Fashion Marketplace orders, sizing, 48-Hour exchanges, and delivery. How may I assist with your shopping today?"
+1. You only answer questions related to SwiftDrop: clothing orders, sizing, 48-Hour Doorstep Size Exchange, delivery timelines (25-35 mins local, ~65 mins cross-city), Cash on Delivery (COD), boutique partner stores in Kubernagar/Gandhinagar/Sindhu Bhavan Road, and DPDP Act 2023 compliance.
+2. If asked about programming, general knowledge, politics, sports, or anything outside SwiftDrop fashion shopping, politely decline: "I am HelpBot, dedicated exclusively to assisting you with XYZ Fashion Marketplace orders, sizing, 48-Hour exchanges, and delivery. How may I assist with your shopping today?"
 3. Tone: Warm, helpful, concise, professional.
 ''';
 
   static final List<SupportChatMessage> _chatHistory = [
     SupportChatMessage(
       id: 'welcome',
-      text: 'Hello! I am HelpBot, your MARS Fashion Assistant. How can I help with your apparel orders, sizing, 48-Hour exchange, or delivery tracking today?',
+      text: 'Hello! I am HelpBot, your SwiftDrop Fashion Assistant. How can I help with your apparel orders, sizing, 48-Hour exchange, or delivery tracking today?',
       isUser: false,
       timestamp: DateTime.now(),
       actionSuggestions: [
@@ -143,7 +143,7 @@ STRICT DOMAIN GUARDRAILS:
     final offTopicKeywords = ['python', 'javascript', 'write code', 'movie', 'cricket match', 'president', 'weather', 'recipe', 'song'];
     if (offTopicKeywords.any((k) => q.contains(k))) {
       return (
-        'I am HelpBot, trained exclusively to assist you with MARS Fashion Marketplace orders, sizing, doorstep exchanges, and delivery logistics in Ahmedabad & Gandhinagar. How can I assist with your garment order today?',
+        'I am HelpBot, trained exclusively to assist you with SwiftDrop Fashion Marketplace orders, sizing, doorstep exchanges, and delivery logistics in Ahmedabad & Gandhinagar. How can I assist with your garment order today?',
         ['Track My Order', '48-Hour Size Exchange', 'Payment Options', 'Contact Grievance Desk']
       );
     }

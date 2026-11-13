@@ -37,13 +37,13 @@ class VendorApp extends ConsumerWidget {
     final router = ref.watch(vendorRouterProvider);
 
     return MaterialApp.router(
-      title: 'MARS Vendor — Retailer Portal',
+      title: 'SwiftDrop Vendor — Retailer Portal',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       scrollBehavior: const ButterySmoothScrollBehavior(),
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'MARS Vendor',
+        badgeText: 'SwiftDrop Vendor',
         child: child ?? const SizedBox.shrink(),
       ),
     );

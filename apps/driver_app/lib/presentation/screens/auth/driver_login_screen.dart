@@ -40,8 +40,8 @@ class _DriverLoginScreenState extends State<DriverLoginScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 20),
-              const MarsHero(eyebrow: 'MARS / Driver', title: 'The city is\nyours to move.',
-                description: 'Local routes. New possibilities. Welcome to your MARS delivery workspace.', accent: AppColors.liveEmerald, icon: Icons.route_rounded),
+              const MarsHero(eyebrow: 'SwiftDrop / Driver', title: 'The city is\nyours to move.',
+                description: 'Local routes. New possibilities. Welcome to your SwiftDrop delivery workspace.', accent: AppColors.liveEmerald, icon: Icons.route_rounded),
               const MarsSectionHeading(number: '01', title: 'Welcome back', subtitle: 'Sign in to your workspace'),
               AppTextField(
                 label: 'Mobile Number (+91)',

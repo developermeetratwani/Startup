@@ -38,7 +38,7 @@ class GrievanceOfficerContact {
     this.designation = 'Chief Grievance Redressal & Nodal Compliance Officer',
     this.email = 'grievance@marsfashion.in',
     this.phone = '+91 98980 12345',
-    this.address = 'MARS HQ, Kubernagar Main Market, Ahmedabad - 382340, Gujarat, India',
+    this.address = 'SwiftDrop HQ, Kubernagar Main Market, Ahmedabad - 382340, Gujarat, India',
     this.acknowledgmentSla = 'Within 48 hours',
     this.resolutionSla = 'Within 30 calendar days',
   });
@@ -99,7 +99,7 @@ class UserConsentState {
   );
 }
 
-/// Comprehensive Statutory Legal & Privacy Consent Service for MARS
+/// Comprehensive Statutory Legal & Privacy Consent Service for SwiftDrop
 /// Strictly compliant with India's Digital Personal Data Protection (DPDP) Act 2023,
 /// Consumer Protection (E-Commerce) Rules 2020, and Information Technology Act 2000.
 class LegalConsentService {
@@ -188,7 +188,7 @@ class LegalConsentService {
       title: 'RBI Tokenized Payments (PCI-DSS Aggregator)',
       governingLaw: 'Reserve Bank of India Payment Aggregator Framework',
       category: 'Financial Data',
-      purposeExplanation: 'Zero card number or CVV storage on MARS servers. All online transactions routed via RBI-authorized Razorpay gateway.',
+      purposeExplanation: 'Zero card number or CVV storage on SwiftDrop servers. All online transactions routed via RBI-authorized Razorpay gateway.',
       isMandatoryForCoreService: true,
     ),
     StatutoryConsentRequirement(

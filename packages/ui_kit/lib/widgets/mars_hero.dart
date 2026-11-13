@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'mars_motion.dart';
+import 'swiftdrop_logo.dart';
 
 /// Brand artwork is decorative; all operational information comes from callers.
 class MarsHero extends StatefulWidget {
@@ -72,12 +73,7 @@ class _MarsHeroState extends State<MarsHero>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
-                          Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                  color: widget.accent,
-                                  shape: BoxShape.circle)),
+                          const SwiftDropMark(size: 28),
                           const SizedBox(width: 8),
                           Expanded(
                               child: Text(widget.eyebrow.toUpperCase(),

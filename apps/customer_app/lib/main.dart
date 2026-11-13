@@ -47,7 +47,7 @@ class CustomerApp extends ConsumerWidget {
       scrollBehavior: const ButterySmoothScrollBehavior(),
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'MARS',
+        badgeText: 'SwiftDrop',
         child: child ?? const SizedBox.shrink(),
       ),
     );

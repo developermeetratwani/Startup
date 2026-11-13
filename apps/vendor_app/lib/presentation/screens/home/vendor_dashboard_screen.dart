@@ -79,7 +79,7 @@ class VendorDashboardScreen extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               MarsHero(
-                eyebrow: 'MARS / Merchant studio',
+                eyebrow: 'SwiftDrop / Merchant studio',
                 title: 'Your boutique.\nIn full bloom.',
                 description: 'A new day to make a local impression. Your orders, collection and earnings, together.',
                 accent: AppColors.purple,

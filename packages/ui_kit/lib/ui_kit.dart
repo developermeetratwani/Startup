@@ -11,6 +11,7 @@ export 'widgets/loading_shimmer.dart';
 export 'widgets/app_snackbar.dart';
 export 'widgets/product_image.dart';
 export 'widgets/phone_simulator_wrapper.dart';
+export 'widgets/swiftdrop_logo.dart';
 export 'widgets/mars_motion.dart';
 export 'widgets/mars_hero.dart';
 export 'widgets/mars_navigation.dart';

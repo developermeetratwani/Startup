@@ -23,7 +23,7 @@ class PaymentErrorResult {
   });
 }
 
-/// Razorpay Payment Gateway Service for MARS
+/// Razorpay Payment Gateway Service for SwiftDrop
 /// Supports Web and Mobile test/live checkout flows
 class RazorpayService {
   static const String defaultTestKey = 'rzp_test_meetratwani1234';
@@ -39,7 +39,7 @@ class RazorpayService {
     required String customerName,
     required String customerPhone,
     required String customerEmail,
-    String storeName = 'MARS Hyperlocal',
+    String storeName = 'SwiftDrop Hyperlocal',
     String description = 'Apparel & Fashion Order',
     Map<String, dynamic>? notes,
   }) async {
@@ -59,7 +59,7 @@ class RazorpayService {
       'theme': {
         'color': '#6C5CE7',
       },
-      'notes': notes ?? {'platform': 'MARS', 'compliance': 'DPDP 2023'},
+      'notes': notes ?? {'platform': 'SwiftDrop', 'compliance': 'DPDP 2023'},
     };
 
     debugPrint('[RazorpayService] Initiating checkout with options: $options');

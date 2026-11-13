@@ -17,7 +17,7 @@ class DriverProfileScreen extends ConsumerWidget {
         padding: const EdgeInsets.all(AppSpacing.pagePadding),
         child: Column(
           children: [
-            MarsHero(eyebrow: profile.isVerified ? 'MARS / Verified partner' : 'MARS / Partner profile',
+            MarsHero(eyebrow: profile.isVerified ? 'SwiftDrop / Verified partner' : 'SwiftDrop / Partner profile',
               title: profile.name, description: '${profile.vehicleType} · ${profile.cluster}\n${profile.phone}',
               accent: AppColors.liveEmerald, icon: Icons.person_outline_rounded),
             const SizedBox(height: AppSpacing.xl),

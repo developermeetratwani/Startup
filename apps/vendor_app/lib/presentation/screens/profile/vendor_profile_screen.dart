@@ -25,7 +25,7 @@ class VendorProfileScreen extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                MarsHero(eyebrow: 'MARS / Your boutique', title: store.name,
+                MarsHero(eyebrow: 'SwiftDrop / Your boutique', title: store.name,
                   description: '${store.location.address.isNotEmpty ? store.location.address : store.location.city} · ${store.rating.toStringAsFixed(1)} stars · ${store.totalRatings} reviews',
                   accent: AppColors.purple, icon: Icons.storefront_outlined),
                 const SizedBox(height: AppSpacing.xl),
