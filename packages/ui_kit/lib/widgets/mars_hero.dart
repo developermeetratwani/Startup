@@ -37,7 +37,7 @@ class _MarsHeroState extends State<MarsHero>
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (MediaQuery.disableAnimationsOf(context) ||
-        !TickerMode.valuesOf(context).enabled) {
+        !TickerMode.of(context)) {
       _controller.stop();
     } else {
       _controller.repeat(reverse: true);

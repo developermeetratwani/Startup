@@ -138,7 +138,7 @@ class _ProductInventoryCard extends ConsumerWidget {
               // Publish Switch
               Switch(
                 value: product.isPublished,
-                activeThumbColor: AppColors.primary,
+                activeColor: AppColors.primary,
                 onChanged: (val) {
                   ref.read(vendorProductRepoProvider).togglePublishStatus(product.id, val);
                 },

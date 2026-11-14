@@ -48,7 +48,7 @@ class VendorDashboardScreen extends ConsumerWidget {
                     ),
                     Switch(
                       value: store.isOpen,
-                      activeThumbColor: AppColors.success,
+                      activeColor: AppColors.success,
                       onChanged: (val) {
                         ref.read(vendorStoreStatusOverrideProvider.notifier).state = val;
                         ref.read(vendorStoreRepoProvider).updateStoreStatus(

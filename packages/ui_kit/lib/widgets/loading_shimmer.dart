@@ -18,7 +18,7 @@ class LoadingShimmer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       enabled: !MediaQuery.disableAnimationsOf(context) &&
-          TickerMode.valuesOf(context).enabled,
+          TickerMode.of(context),
       baseColor: AppColors.shimmerBase,
       highlightColor: AppColors.shimmerHighlight,
       child: Container(
@@ -40,7 +40,7 @@ class ShimmerProductCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       enabled: !MediaQuery.disableAnimationsOf(context) &&
-          TickerMode.valuesOf(context).enabled,
+          TickerMode.of(context),
       baseColor: AppColors.shimmerBase,
       highlightColor: AppColors.shimmerHighlight,
       child: Column(
