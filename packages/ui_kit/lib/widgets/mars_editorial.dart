@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_text_styles.dart';
 import 'mars_motion.dart';
+import 'swiftdrop_logo.dart';
 
 class MarsEditorial extends StatelessWidget {
   final VoidCallback onExplore;
@@ -40,6 +41,8 @@ class MarsEditorial extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
+                    const SwiftDropMark(size: 30),
+                    const SizedBox(width: 10),
                     Flexible(
                         child: Container(
                             padding: const EdgeInsets.symmetric(

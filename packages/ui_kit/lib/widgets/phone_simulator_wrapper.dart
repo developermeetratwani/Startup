@@ -39,7 +39,7 @@ class PhoneSimulatorWrapper extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Row(children: [
-                    Text('MARS',
+                    Text('SwiftDrop',
                         style: AppTextStyles.displayLarge.copyWith(
                             color: AppColors.linen,
                             fontSize: 26,
@@ -73,7 +73,7 @@ class PhoneSimulatorWrapper extends StatelessWidget {
                       constraints: const BoxConstraints(maxWidth: 330),
                       child: Text(
                           rider
-                              ? 'Your next delivery, your next opportunity. Keep your city moving with MARS.'
+                              ? 'Your next delivery, your next opportunity. Keep your city moving with SwiftDrop.'
                               : partner
                                   ? 'The workspace for your next chapter. Orders, collections and growth, beautifully in sync.'
                                   : 'Discover independent boutiques and fresh fashion from the neighbourhoods you love.',

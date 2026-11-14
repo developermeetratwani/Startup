@@ -111,7 +111,7 @@ void _persistOrders() {
 void main() async {
   _initOrders();
   final server = await HttpServer.bind(InternetAddress.anyIPv4, _kPort);
-  print('🚀 MARS Inter-App Order Bridge & SMTP Server running on http://0.0.0.0:$_kPort');
+  print('🚀 SwiftDrop Inter-App Order Bridge & SMTP Server running on http://0.0.0.0:$_kPort');
 
   await for (HttpRequest request in server) {
     // Security Hardening & CORS
@@ -314,9 +314,9 @@ void main() async {
         final data = jsonDecode(content) as Map<String, dynamic>;
 
         final to = data['to'] as String? ?? '';
-        final subject = data['subject'] as String? ?? 'MARS Notification';
+        final subject = data['subject'] as String? ?? 'SwiftDrop Notification';
         final html = data['html'] as String? ?? '';
-        final appName = data['appName'] as String? ?? 'MARS';
+        final appName = data['appName'] as String? ?? 'SwiftDrop';
 
         if (to.isEmpty) {
           request.response

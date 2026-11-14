@@ -57,7 +57,7 @@ class _SearchScreenState extends ConsumerState<SearchScreen> {
       body: _controller.text.trim().isEmpty
           ? SingleChildScrollView(padding: const EdgeInsets.all(20), child: Column(
               crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const MarsHero(eyebrow: 'MARS / Discover', title: 'What is your\nkind of style?',
+                const MarsHero(eyebrow: 'SwiftDrop / Discover', title: 'What is your\nkind of style?',
                   description: 'Something timeless. Something unexpected. Find your next favourite in the neighbourhood.',
                   icon: Icons.search_rounded),
                 const MarsSectionHeading(number: '01', title: 'Start with a feeling', subtitle: 'A few ideas to get you inspired'),

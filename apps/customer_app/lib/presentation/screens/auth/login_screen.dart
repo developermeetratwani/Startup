@@ -164,7 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
                       await smtp.sendPasswordResetEmail(
                         recipientEmail: email,
                         resetLink: resetLink,
-                        appName: 'MARS',
+                        appName: 'SwiftDrop',
                       );
 
                       if (ctx.mounted) {
@@ -253,7 +253,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       await smtp.sendOtpEmail(
         recipientEmail: identifier,
         otpCode: otp,
-        appName: 'MARS',
+        appName: 'SwiftDrop',
       );
 
       setState(() {
@@ -297,7 +297,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
     );
 
     if (mounted) {
-      AppSnackbar.show(context, message: '✅ OTP Verified! Welcome to MARS.', type: SnackbarType.success);
+      AppSnackbar.show(context, message: '✅ OTP Verified! Welcome to SwiftDrop.', type: SnackbarType.success);
       context.go('/home');
     }
   }
@@ -333,7 +333,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
       if (mounted) {
         AppSnackbar.show(
           context,
-          message: '🎉 Welcome to MARS, $name! Account created successfully.',
+          message: '🎉 Welcome to SwiftDrop, $name! Account created successfully.',
           type: SnackbarType.success,
         );
         context.go('/home');
@@ -357,7 +357,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 12),
-              const MarsHero(eyebrow: 'MARS / Your local fashion destination',
+              const MarsHero(eyebrow: 'SwiftDrop / Your local fashion destination',
                 title: 'Find your people.\nFind your style.',
                 description: 'The boutiques you love. The discoveries you did not see coming. All closer to home.',
                 icon: Icons.checkroom_outlined),
@@ -585,7 +585,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
           ),
           const SizedBox(height: 4),
           const Text(
-            'Join MARS to shop verified fashion boutiques in Ahmedabad & Gandhinagar.',
+            'Join SwiftDrop to shop verified fashion boutiques in Ahmedabad & Gandhinagar.',
             style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
           ),
           const SizedBox(height: 16),
@@ -731,7 +731,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
             const SizedBox(height: 8),
             AppTextField(
               label: 'Referral Code',
-              hint: 'e.g. MARS50 for 50 bonus coins',
+              hint: 'e.g. SwiftDrop50 for 50 bonus coins',
               controller: _referralController,
               textInputAction: TextInputAction.done,
             ),
@@ -753,7 +753,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen>
               alignment: WrapAlignment.center,
               crossAxisAlignment: WrapCrossAlignment.center,
               children: [
-                const Text('By continuing, you agree to MARS ', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
+                const Text('By continuing, you agree to SwiftDrop ', style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
                 InkWell(
                   onTap: () => context.push('/legal'),
                   child: const Text(

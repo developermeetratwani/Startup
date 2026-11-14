@@ -37,7 +37,7 @@ void main() {
                       MarsEditorial(onExplore: () {}),
                       const SizedBox(height: 12),
                       const MarsHero(
-                          eyebrow: 'MARS / Merchant studio',
+                          eyebrow: 'SwiftDrop / Merchant studio',
                           title: 'Your boutique.\nIn full bloom.',
                           description:
                               'Your orders, collection and earnings, together.'),
@@ -91,7 +91,7 @@ void main() {
     await mount(
         tester,
         const MarsHero(
-            eyebrow: 'MARS',
+            eyebrow: 'SwiftDrop',
             title: 'Ready when you are.',
             description: 'Your city, closer.'),
         reduced: true);
@@ -105,7 +105,7 @@ void main() {
     await mount(
         tester,
         MarsHero(
-            eyebrow: 'MARS',
+            eyebrow: 'SwiftDrop',
             title: 'Your next move.',
             description: 'Explore the city.',
             actionLabel: 'Explore',
@@ -131,7 +131,7 @@ void main() {
             builder: (_, value, __) =>
                 MarsTabStack(index: value, children: const [
                   MarsHero(
-                      eyebrow: 'MARS',
+                      eyebrow: 'SwiftDrop',
                       title: 'First tab',
                       description: 'Animated content'),
                   Text('Second tab'),

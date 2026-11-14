@@ -34,7 +34,7 @@ class AppColors {
   static const Color raspberryLight = Color(0xFFFCE8F0);
   static const Color tomatoLight = Color(0xFFFEECEB);
 
-  // ─── Luxury Metallic Accents (MARS Gold / VIP) ─────────────────────────────
+  // ─── Luxury Metallic Accents (SwiftDrop Gold / VIP) ─────────────────────────────
   static const Color gold = Color(0xFFD4AF37); // Classic Champagne Gold
   static const Color goldLight = Color(0xFFFEF3C7);
   static const Color goldDark = Color(0xFFB45309);

@@ -353,7 +353,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
 
             const SizedBox(height: 18),
 
-            // ── MARS GOLD MEMBERSHIP ADD-ON (₹199/month) ─────────────────────
+            // ── SwiftDrop GOLD MEMBERSHIP ADD-ON (₹199/month) ─────────────────────
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
@@ -389,7 +389,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                         const Row(
                           children: [
                             Text(
-                              'MARS Gold Membership',
+                              'SwiftDrop Gold Membership',
                               style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14, color: Color(0xFF92400E)),
                             ),
                             SizedBox(width: 6),
@@ -484,7 +484,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                   if (_addGoldMembership) ...[
                     const SizedBox(height: 8),
                     _PriceRow(
-                      title: '👑 MARS Gold Membership (1 Month)',
+                      title: '👑 SwiftDrop Gold Membership (1 Month)',
                       value: '₹199',
                       color: const Color(0xFFD97706),
                     ),
@@ -566,7 +566,7 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                       customerName: user?.displayName ?? 'Valued Customer',
                       customerPhone: user?.phone ?? '9898012345',
                       customerEmail: user?.email ?? 'customer@marsfashion.in',
-                      storeName: 'MARS Fashion Boutique',
+                      storeName: 'SwiftDrop Fashion Boutique',
                       description: 'Hyperlocal Fashion Order (${cartSummary.itemCount} items)',
                     );
 
@@ -602,10 +602,10 @@ class _CheckoutScreenState extends ConsumerState<CheckoutScreen> {
                     recipientEmail: customerEmail,
                     customerName: user?.displayName ?? 'Valued Customer',
                     orderId: orderId ?? 'ord-kubernagar-8920',
-                    storeName: 'MARS Fashion Boutique',
+                    storeName: 'SwiftDrop Fashion Boutique',
                     grandTotalPaise: effectiveGrandTotal,
                     etaMinutes: _deliveryMode == 'scheduled' ? 0 : etaMinutes,
-                    appName: 'MARS',
+                    appName: 'SwiftDrop',
                   );
 
                   setState(() => _isPlacingOrder = false);

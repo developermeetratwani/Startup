@@ -1210,7 +1210,7 @@ class _OrderTrackingScreenState extends ConsumerState<OrderTrackingScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text('TAX INVOICE & BILL', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF6C5CE7))),
-                        Text('MARS Hyperlocal Fashion Pvt. Ltd.', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
+                        Text('SwiftDrop Hyperlocal Fashion Pvt. Ltd.', style: TextStyle(fontSize: 11, color: AppColors.textSecondary)),
                       ],
                     ),
                     IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(ctx)),

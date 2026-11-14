@@ -1,4 +1,4 @@
-# MARS editorial frontend
+# SwiftDrop editorial frontend
 
 The four applications share a warmer ivory canvas, ink surfaces, raspberry accents, locally bundled Plus Jakarta Sans, and consistent navigation, cards, inputs, dialogs, tables and sheets. Merchant panels use lilac highlights; delivery panels use emerald.
 

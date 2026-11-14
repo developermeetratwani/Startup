@@ -165,7 +165,7 @@ class DriverEarningsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Remit collected customer COD cash to MARS finance desk via UPI:',
+                  'Remit collected customer COD cash to SwiftDrop finance desk via UPI:',
                   style:
                       TextStyle(fontSize: 12, color: AppColors.textSecondary),
                 ),
@@ -197,7 +197,7 @@ class DriverEarningsScreen extends ConsumerWidget {
                         TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 const SizedBox(height: 4),
                 const Text(
-                    'xyzstartup@icici (MARS Logistics Settlement)',
+                    'xyzstartup@icici (SwiftDrop Logistics Settlement)',
                     style: TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.bold,

@@ -34,7 +34,7 @@ class LuxuryStoriesBar extends StatelessWidget {
       gradientColors: [Color(0xFFE11D48), Color(0xFFF97316), Color(0xFFFBBF24)],
     ),
     StoryItem(
-      title: 'MARS Gold',
+      title: 'SwiftDrop Gold',
       subtitle: 'VIP Perks',
       imageUrl: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=400&auto=format&fit=crop',
       tag: 'gold',

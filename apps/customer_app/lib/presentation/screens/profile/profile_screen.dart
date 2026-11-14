@@ -21,7 +21,7 @@ class ProfileScreen extends ConsumerWidget {
           ],
         ),
         content: const Text(
-          'Under the Digital Personal Data Protection (DPDP) Act 2023 and App Store Guidelines, deleting your account permanently erases your profile, address records, and personal preferences from MARS servers.\n\nThis action cannot be undone. Are you sure you wish to proceed?',
+          'Under the Digital Personal Data Protection (DPDP) Act 2023 and App Store Guidelines, deleting your account permanently erases your profile, address records, and personal preferences from SwiftDrop servers.\n\nThis action cannot be undone. Are you sure you wish to proceed?',
           style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
         ),
         actions: [
@@ -178,7 +178,7 @@ class ProfileScreen extends ConsumerWidget {
                         Icon(Icons.workspace_premium_rounded, color: Colors.white, size: 14),
                         SizedBox(width: 4),
                         Text(
-                          'MARS GOLD VIP ELITE',
+                          'SwiftDrop GOLD VIP ELITE',
                           style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 0.6),
                         ),
                       ],
@@ -220,7 +220,7 @@ class ProfileScreen extends ConsumerWidget {
                           Icon(Icons.stars_rounded, color: Color(0xFFD4AF37), size: 18),
                           SizedBox(width: 6),
                           Text(
-                            'MARS PRIVILEGE CLUB',
+                            'SwiftDrop PRIVILEGE CLUB',
                             style: TextStyle(
                               color: Color(0xFFD4AF37),
                               fontSize: 11,

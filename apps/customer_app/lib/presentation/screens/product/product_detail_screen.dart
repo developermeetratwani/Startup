@@ -200,7 +200,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                       ),
                       const SizedBox(height: 12),
 
-                      // MARS Gold Savings Pill
+                      // SwiftDrop Gold Savings Pill
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                         decoration: BoxDecoration(
@@ -216,7 +216,7 @@ class _ProductDetailScreenState extends ConsumerState<ProductDetailScreen> {
                             SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                'MARS Gold benefit: ₹0 Delivery Charge on this order',
+                                'SwiftDrop Gold benefit: ₹0 Delivery Charge on this order',
                                 style: TextStyle(color: Color(0xFF92400E), fontSize: 11.5, fontWeight: FontWeight.w700),
                               ),
                             ),

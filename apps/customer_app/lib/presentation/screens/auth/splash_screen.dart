@@ -66,39 +66,8 @@ class _SplashScreenState extends State<SplashScreen>
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [AppColors.accent, AppColors.accentTomato],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(22),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Color(0x33D93670),
-                      blurRadius: 20,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(
-                  Icons.shopping_bag_rounded,
-                  color: Colors.white,
-                  size: 44,
-                ),
-              ),
-              const SizedBox(height: 24),
-              const Text(
-                'MARS',
-                style: TextStyle(
-                  color: AppColors.linen,
-                  fontSize: 46,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 10,
-                ),
+              const SwiftDropLogo(
+                height: 96,
               ),
               const SizedBox(height: 8),
               Text(

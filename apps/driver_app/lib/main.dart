@@ -37,13 +37,13 @@ class DriverApp extends ConsumerWidget {
     final router = ref.watch(driverRouterProvider);
 
     return MaterialApp.router(
-      title: 'MARS Driver — Delivery Partner',
+      title: 'SwiftDrop Driver — Delivery Partner',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       scrollBehavior: const ButterySmoothScrollBehavior(),
       routerConfig: router,
       builder: (context, child) => PhoneSimulatorWrapper(
-        badgeText: 'MARS Driver',
+        badgeText: 'SwiftDrop Driver',
         child: child ?? const SizedBox.shrink(),
       ),
     );

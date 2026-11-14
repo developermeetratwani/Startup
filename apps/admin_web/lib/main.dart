@@ -30,7 +30,7 @@ class AdminDashboardApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MARS Admin — Central Admin Portal',
+      title: 'SwiftDrop Admin — Central Admin Portal',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       scrollBehavior: const ButterySmoothScrollBehavior(),
@@ -85,20 +85,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.accent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Icon(Icons.shield_rounded, color: Colors.white, size: 22),
-              ),
+              const SwiftDropMark(size: 42),
               const SizedBox(width: 12),
               const Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('MARS / OPS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text('SwiftDrop / OPS', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15), maxLines: 1, overflow: TextOverflow.ellipsis),
                     Text('Marketplace workspace', style: TextStyle(color: AppColors.textHint, fontSize: 11), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
@@ -268,7 +261,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       if (_selectedTab != 0) ...[
         MarsSectionHeading(number: '0${_selectedTab + 1}', title: _tabs[_selectedTab],
-          subtitle: 'MARS / Marketplace operations'),
+          subtitle: 'SwiftDrop / Marketplace operations'),
         const SizedBox(height: 8),
       ],
       _buildTabContent(isMobile: isMobile),
@@ -336,7 +329,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        MarsHero(eyebrow: 'MARS / The control room',
+        MarsHero(eyebrow: 'SwiftDrop / The control room',
           title: 'A whole city. In sync.',
           description: 'The people, boutiques and deliveries behind every great local discovery. Your marketplace, at a glance.',
           accent: AppColors.purple, icon: Icons.hub_outlined,
@@ -643,7 +636,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     final kpiCards = [
       _KPICardData(title: 'Dispatches Handed Out', value: '$totalDeliveries Orders', subtitle: 'Across 4 registered stores', color: AppColors.primary),
       _KPICardData(title: 'Gross Boutique Sales', value: '₹${(totalGross / 100).toStringAsFixed(0)}', subtitle: 'Customer purchases', color: AppColors.accent),
-      _KPICardData(title: 'MARS 10% Revenue Cut', value: '₹${(totalMarsCut / 100).toStringAsFixed(0)}', subtitle: 'Our platform profit (10%)', color: AppColors.success),
+      _KPICardData(title: 'SwiftDrop 10% Revenue Cut', value: '₹${(totalMarsCut / 100).toStringAsFixed(0)}', subtitle: 'Our platform profit (10%)', color: AppColors.success),
       _KPICardData(title: 'Net Vendor Settlement Due', value: '₹${(totalDue / 100).toStringAsFixed(0)}', subtitle: 'Payable to store accounts', color: AppColors.tomato),
     ];
 
@@ -689,7 +682,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                       DataColumn(label: Text('Cluster Location')),
                       DataColumn(label: Text('Deliveries Handed Out')),
                       DataColumn(label: Text('Total Gross Sales')),
-                      DataColumn(label: Text('MARS 10% Cut')),
+                      DataColumn(label: Text('SwiftDrop 10% Cut')),
                       DataColumn(label: Text('Net Vendor (90%)')),
                       DataColumn(label: Text('Settlement Due')),
                       DataColumn(label: Text('Settlement Action')),
@@ -722,7 +715,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                 context: context,
                                 builder: (ctx) => AlertDialog(
                                   title: Text('Settle Payout with ${s['name']}'),
-                                  content: Text('Execute direct bank transfer of ₹${(due / 100).toStringAsFixed(0)} to ${s['name']} account? MARS 10% commission (₹${(marsCut / 100).toStringAsFixed(0)}) is retained in company treasury.'),
+                                  content: Text('Execute direct bank transfer of ₹${(due / 100).toStringAsFixed(0)} to ${s['name']} account? SwiftDrop 10% commission (₹${(marsCut / 100).toStringAsFixed(0)}) is retained in company treasury.'),
                                   actions: [
                                     TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancel')),
                                     ElevatedButton(
@@ -1207,7 +1200,7 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const MarsHero(eyebrow: 'MARS / Campaign studio', title: 'Make your next big impression.',
+        const MarsHero(eyebrow: 'SwiftDrop / Campaign studio', title: 'Make your next big impression.',
           description: 'Create the campaigns that help local collections get discovered.', icon: Icons.campaign_outlined),
         const SizedBox(height: 24),
         _buildKPIGrid(cards, isMobile: isMobile),

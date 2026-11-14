@@ -71,7 +71,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           borderRadius: BorderRadius.circular(12),
           onTap: () => _showLocationSelector(context, ref),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text('MARS', style: AppTextStyles.titleLarge.copyWith(letterSpacing: 5, fontSize: 22)),
+            const SwiftDropLogo(height: 32),
             const SizedBox(height: 5),
             Row(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.location_on_outlined, size: 13, color: AppColors.accent),
